@@ -68,15 +68,13 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
     <div class="idlabel" style="margin-top:22px">YOUR ZOYRA ID</div>
     <div class="userid" id="userId">Creating ID…</div>
     <button class="btn secondary full" onclick="copyId()">Copy ZOYRA ID</button>
-    
-    <!-- Encryption Status Indicator -->
     <div class="idlabel" style="margin-top:20px; color:var(--green)">🔒 ENCRYPTION STATUS: <span id="encStatus">Generating Keys...</span></div>
   </div>
   <div class="card">
     <h2>How to chat</h2>
     <p class="sub" style="margin:5px 0 14px">1. Share your ZOYRA ID with a friend<br>2. Get their ZOYRA ID<br>3. Go to Chats → Start conversation</p>
   </div>
-  <div class="notice">ZOYRA uses End-to-End Encryption. Your private keys never leave your device.</div>
+  <div class="notice">ZOYRA uses End-to-End Encryption. Messages are encrypted on your device before reaching the server.</div>
 </section>
 
 <section id="chats" class="screen">
@@ -159,27 +157,37 @@ applyTheme();
 // --- END-TO-END ENCRYPTION ENGINE ---
 const encStatus = document.getElementById('encStatus');
 
+function arrayBufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+  return window.btoa(binary);
+}
+
+function base64ToArrayBuffer(base64) {
+  const binary_string = window.atob(base64);
+  const bytes = new Uint8Array(binary_string.length);
+  for (let i = 0; i < binary_string.length; i++) bytes[i] = binary_string.charCodeAt(i);
+  return bytes.buffer;
+}
+
 async function generateAndSaveKeys() {
   if (localStorage.getItem('zoyra_private_key') && localStorage.getItem('zoyra_public_key')) {
-    encStatus.textContent = "Keys Loaded. Uploading Public Key...";
+    encStatus.textContent = "Keys Loaded. Syncing...";
     await uploadPublicKey();
     return;
   }
-  
   try {
     encStatus.textContent = "Generating secure keys...";
     const keyPair = await window.crypto.subtle.generateKey(
       { name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
       true, ["encrypt", "decrypt"]
     );
-
     const publicKeyJwk = await window.crypto.subtle.exportKey("jwk", keyPair.publicKey);
     const privateKeyJwk = await window.crypto.subtle.exportKey("jwk", keyPair.privateKey);
-
     localStorage.setItem('zoyra_public_key', JSON.stringify(publicKeyJwk));
     localStorage.setItem('zoyra_private_key', JSON.stringify(privateKeyJwk));
-    
-    encStatus.textContent = "Keys Generated. Uploading Public Key...";
+    encStatus.textContent = "Keys Generated. Syncing...";
     await uploadPublicKey();
   } catch (error) {
     console.error("Key generation failed:", error);
@@ -190,19 +198,16 @@ async function generateAndSaveKeys() {
 async function uploadPublicKey() {
   const myId = localStorage.getItem('zoyra_preview_id');
   if (!myId) return;
-  
   try {
     const publicKeyJwk = JSON.parse(localStorage.getItem('zoyra_public_key'));
-    // Save public key to Firestore so others can use it to encrypt messages for you
     await db.collection('users').doc(myId).set({
       publicKey: publicKeyJwk,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
-    
     encStatus.textContent = "Active & Secure 🔐";
   } catch (error) {
     console.error("Key upload failed:", error);
-    encStatus.textContent = "Network Error (Check Firestore Rules)";
+    encStatus.textContent = "Network Error";
   }
 }
 
@@ -218,6 +223,18 @@ async function getPublicKeyFromDB(targetId) {
     return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["encrypt"]);
   }
   return null;
+}
+
+async function encryptMessage(text, publicKey) {
+  const encoded = new TextEncoder().encode(text);
+  const encrypted = await window.crypto.subtle.encrypt({ name: "RSA-OAEP" }, publicKey, encoded);
+  return arrayBufferToBase64(encrypted);
+}
+
+async function decryptMessage(base64Cipher, privateKey) {
+  const cipherBuffer = base64ToArrayBuffer(base64Cipher);
+  const decrypted = await window.crypto.subtle.decrypt({ name: "RSA-OAEP" }, privateKey, cipherBuffer);
+  return new TextDecoder().decode(decrypted);
 }
 
 // --- ID & PROFILE ---
@@ -368,7 +385,7 @@ function closeChat(){
   renderChats();
 }
 
-function renderMessages(){
+async function renderMessages(){
   if(!activeChatId)return;
   if(unsubscribeMessages){unsubscribeMessages();}
   const box=document.getElementById('messageList');box.replaceChildren();
@@ -376,9 +393,15 @@ function renderMessages(){
   const chatId=getChatId(myId,activeChatId);
   const q = db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp','asc');
   
-  unsubscribeMessages = q.onSnapshot((snapshot)=>{
+  const myPrivateKey = await getPrivateKey();
+
+  unsubscribeMessages = q.onSnapshot(async (snapshot)=>{
     box.replaceChildren();
-    if(snapshot.empty){ const empty=document.createElement('div');empty.className='empty';empty.textContent='No messages yet. Say hi! 👋';box.appendChild(empty); lastMsgCount = 0; return; }
+    if(snapshot.empty){ 
+        const empty=document.createElement('div');empty.className='empty';empty.textContent='No messages yet. Say hi! 👋';box.appendChild(empty); 
+        lastMsgCount = 0; 
+        return; 
+    }
     
     if(!snapshot.empty && snapshot.size > lastMsgCount && lastMsgCount !== 0) {
       const lastDoc = snapshot.docs[snapshot.docs.length - 1];
@@ -386,11 +409,25 @@ function renderMessages(){
     }
     lastMsgCount = snapshot.size;
 
-    snapshot.forEach(doc=>{
-      const m=doc.data(); const msgId=doc.id; const isMine=m.senderId===myId;
-      const msg=document.createElement('div');msg.className='msg '+(isMine?'mine':'theirs');
+    for (const doc of snapshot.docs) {
+      const m = doc.data(); 
+      const msgId = doc.id; 
+      const isMine = m.senderId === myId;
+      const msg = document.createElement('div');
+      msg.className = 'msg ' + (isMine ? 'mine' : 'theirs');
       
-      const body=document.createElement('div');body.textContent=m.text||'[Encrypted Media]';
+      const body = document.createElement('div');
+      if (m.isEncrypted && m.text) {
+        try {
+          const decryptedText = await decryptMessage(m.text, myPrivateKey);
+          body.textContent = decryptedText;
+        } catch (err) {
+          body.textContent = '[Decryption Failed]';
+          console.error(err);
+        }
+      } else {
+        body.textContent = m.text || '[Encrypted Media]';
+      }
       msg.appendChild(body);
 
       const meta=document.createElement('div');meta.className='msg-meta';
@@ -405,7 +442,7 @@ function renderMessages(){
         meta.appendChild(delBtn);
       }
       msg.appendChild(meta);box.appendChild(msg);
-    });
+    }
     box.scrollTop=box.scrollHeight;
   },(err)=>{ console.error(err); const empty=document.createElement('div');empty.className='empty';empty.textContent='Could not load messages.';box.appendChild(empty); });
 }
@@ -416,19 +453,39 @@ window.deleteMessage = function(chatId, msgId) {
     .then(()=> showToast('Message deleted.')).catch((e)=> { console.error(e); showToast('Failed to delete.'); });
 };
 
-function sendMessage(){
+async function sendMessage(){
   if(!activeChatId)return;
   const input=document.getElementById('messageInput');
   const text=input.value.trim();
   if(!text){showToast('Write a message first.');return;}
   
   const myId=localStorage.getItem('zoyra_preview_id');
-  const myName=localStorage.getItem('zoyra_display_name')||'Anonymous';
   const chatId=getChatId(myId,activeChatId);
   
-  db.collection('chats').doc(chatId).collection('messages').add({
-    text:text, senderId:myId, senderName:myName, timestamp:firebase.firestore.FieldValue.serverTimestamp()
-  }).then(()=>{ input.value=''; }).catch((e)=>{ console.error(e); showToast('Failed to send.'); });
+  showToast('Encrypting & Sending... 🔒');
+  
+  try {
+    const friendPublicKey = await getPublicKeyFromDB(activeChatId);
+    if (!friendPublicKey) {
+      showToast('Could not find friend\'s key. Ask them to open the app.');
+      return;
+    }
+    
+    const encryptedText = await encryptMessage(text, friendPublicKey);
+    
+    await db.collection('chats').doc(chatId).collection('messages').add({
+      text: encryptedText,
+      isEncrypted: true,
+      senderId: myId,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    input.value='';
+    showToast('Message sent securely! 🔐');
+  } catch(e) {
+    console.error(e);
+    showToast('Failed to send.');
+  }
 }
 
 document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
