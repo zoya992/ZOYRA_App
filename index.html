@@ -4,13 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1020" id="themeColorMeta">
-<!-- PWA Meta Tags -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ZOYRA">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQwIiBmaWxsPSIjNjI3ZGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1NSUiIGZvbnQtc2l6ZT0iMTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlo8L3RleHQ+PC9zdmc+">
-
 <title>ZOYRA — Private conversations</title>
 <style>
 :root{--bg:#0b1020;--panel:#121b30;--panel2:#18243c;--line:#263552;--text:#f4f7ff;--muted:#9eacc5;--accent:#829cff;--accent2:#a8b8ff;--green:#57d6a0;--danger:#ff7e88}
@@ -115,7 +113,8 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
         <div style="position:relative"><div class="avatar" style="width:32px;height:32px;font-size:14px" id="chatAvatar">?</div><div class="online-dot" id="chatOnlineDot" style="display:none"></div></div>
         <div><strong id="chatTitle">Conversation</strong><div class="idlabel" id="chatSubtitle" style="font-size:10px"></div></div>
       </div>
-      <button class="btn ghost" style="flex:0 0 auto;padding:8px 12px;font-size:16px" onclick="startCall()" title="Video Call">📹</button>
+      <button class="btn ghost" style="flex:0 0 auto;padding:8px 12px;font-size:16px" onclick="startCall('audio')" title="Audio Call">📞</button>
+      <button class="btn ghost" style="flex:0 0 auto;padding:8px 12px;font-size:16px" onclick="startCall('video')" title="Video Call">📹</button>
     </div>
     <div id="messageList" style="min-height:200px;max-height:50vh;overflow:auto;margin:16px 0;padding:8px;background:#0e1729;border-radius:12px;border:1px solid var(--line)"></div>
     <div id="typingIndicator" class="typing-indicator"><span></span><span></span><span></span></div>
@@ -178,7 +177,6 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-// Service Worker Registration for PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
@@ -352,22 +350,23 @@ async function sendMessage(){
 document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
 // ==========================================
-// WEBRTC CALLING LOGIC (PRO UI)
+// WEBRTC CALLING LOGIC (AUDIO & VIDEO)
 // ==========================================
 let localStream, remoteStream, peerConnection; const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }; let callListener = null; let callTimerInterval;
 
-async function startCall() {
+async function startCall(type = 'video') {
   if (!activeChatId) return; const myId = localStorage.getItem('zoyra_preview_id'); const chatId = getChatId(myId, activeChatId);
   const contact = readContacts().find(c=>c.id===activeChatId); document.getElementById('callAvatar').textContent = (contact?.name || activeChatId).slice(0,1).toUpperCase();
   try {
-    showToast('Requesting Camera/Mic...'); localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    showToast(`Requesting ${type === 'audio' ? 'Microphone' : 'Camera & Mic'}...`); 
+    localStream = await navigator.mediaDevices.getUserMedia(type === 'audio' ? { audio: true } : { video: true, audio: true });
     document.getElementById('localVideo').srcObject = localStream; document.getElementById('callOverlay').style.display = 'flex';
     document.getElementById('callStatusText').textContent = 'Calling...'; startCallTimer();
     peerConnection = new RTCPeerConnection(servers); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
     peerConnection.onicecandidate = event => { if (event.candidate) { db.collection('calls').doc(chatId).collection('ice').add({ candidate: event.candidate.toJSON(), sender: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); } };
     peerConnection.ontrack = event => { document.getElementById('remoteVideo').srcObject = event.streams[0]; document.getElementById('callStatusText').textContent = 'Connected'; };
     const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer);
-    await db.collection('calls').doc(chatId).set({ offer: { type: offer.type, sdp: offer.sdp }, caller: myId, callee: activeChatId, status: 'offering', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection('calls').doc(chatId).set({ offer: { type: offer.type, sdp: offer.sdp }, caller: myId, callee: activeChatId, callType: type, status: 'offering', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
     callListener = db.collection('calls').doc(chatId).onSnapshot(async doc => { const data = doc.data(); if (data && data.status === 'answering' && data.answer && !peerConnection.currentRemoteDescription) { await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer)); } if (data && data.status === 'ended') { endCallUI(); } });
     db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { const data = change.doc.data(); if (data.sender !== myId) { peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e)); } } }); });
   } catch (err) { console.error(err); showToast('Camera/Mic access denied or error.'); endCallUI(); }
@@ -378,12 +377,12 @@ function listenForIncomingCalls() {
   db.collection('calls').where('callee', '==', myId).where('status', '==', 'offering').onSnapshot(async snapshot => {
     snapshot.docChanges().forEach(async change => {
       if (change.type === 'added') {
-        const callData = change.doc.data(); const chatId = change.doc.id; const callerId = callData.caller;
+        const callData = change.doc.data(); const chatId = change.doc.id; const callerId = callData.caller; const callType = callData.callType || 'video';
         const contact = readContacts().find(c=>c.id===callerId); document.getElementById('callAvatar').textContent = (contact?.name || callerId).slice(0,1).toUpperCase();
-        if(confirm(`Incoming Video Call from ${contact?.name || callerId}. Accept?`)) {
-          activeChatId = callerId; document.getElementById('chatRoom').style.display='block'; document.getElementById('chatTitle').textContent=contact?.name||'Video Call';
+        if(confirm(`Incoming ${callType === 'audio' ? 'Audio' : 'Video'} Call from ${contact?.name || callerId}. Accept?`)) {
+          activeChatId = callerId; document.getElementById('chatRoom').style.display='block'; document.getElementById('chatTitle').textContent=contact?.name||'Call';
           try {
-            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localStream = await navigator.mediaDevices.getUserMedia(callType === 'audio' ? { audio: true } : { video: true, audio: true });
             document.getElementById('localVideo').srcObject = localStream; document.getElementById('callOverlay').style.display = 'flex';
             document.getElementById('callStatusText').textContent = 'Connecting...'; startCallTimer();
             peerConnection = new RTCPeerConnection(servers); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
