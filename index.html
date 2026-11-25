@@ -43,6 +43,17 @@ body.light-theme .msg-time{color:#5a6b8c}
 .msg-del:hover{opacity:1;background:#ffffff15}
 footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#e8edff;color:#111a2c;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:10;max-width:90%;text-align:center}.toast.show{opacity:1}
+
+/* Call Overlay Styles */
+#callOverlay{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:1000;display:none;flex-direction:column}
+#remoteVideo{width:100%;height:100%;object-fit:cover;background:#111}
+#localVideo{position:absolute;bottom:100px;right:20px;width:100px;height:150px;object-fit:cover;border-radius:12px;border:2px solid #fff;background:#333;z-index:1001}
+.call-controls{position:absolute;bottom:40px;left:0;right:0;display:flex;justify-content:center;gap:20px;z-index:1001}
+.call-btn{width:60px;height:60px;border-radius:50%;border:0;font-size:24px;display:grid;place-items:center;color:#fff;cursor:pointer}
+.btn-end{background:#ff4444}
+.btn-mute{background:#555}
+.call-info{position:absolute;top:40px;left:0;right:0;text-align:center;color:#fff;z-index:1001;text-shadow:0 2px 4px rgba(0,0,0,0.8)}
+
 @media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
 </style>
 </head>
@@ -86,6 +97,7 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
     <div class="actions" style="align-items:center">
       <button class="btn ghost" style="flex:0 0 auto" onclick="closeChat()">← Back</button>
       <div style="flex:1;min-width:0"><strong id="chatTitle">Conversation</strong><div class="idlabel" id="chatSubtitle"></div></div>
+      <button class="btn ghost" style="flex:0 0 auto;padding:8px 12px;font-size:16px" onclick="startCall()" title="Video Call">📹</button>
     </div>
     <div id="messageList" style="min-height:200px;max-height:50vh;overflow:auto;margin:16px 0;padding:8px;background:#0e1729;border-radius:12px;border:1px solid var(--line)"></div>
     <label class="field" for="messageInput">Message</label>
@@ -106,8 +118,8 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 </section>
 
 <section id="calls" class="screen">
-  <div class="eyebrow">Stay connected</div><h1>Calls</h1><p class="sub">Coming soon.</p>
-  <div class="notice">Audio and video calling will be added in a future update.</div>
+  <div class="eyebrow">Stay connected</div><h1>Calls</h1><p class="sub">P2P Encrypted Calls.</p>
+  <div class="notice">Audio and video calling uses WebRTC. Media goes directly from device to device. Not stored on any server.</div>
 </section>
 
 <section id="settings" class="screen">
@@ -128,6 +140,20 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 <button data-screen="settings" onclick="go('settings',this)"><span>⚙</span>Settings</button>
 </nav>
 <div id="toast" class="toast" role="status"></div>
+
+<!-- Video Call Overlay -->
+<div id="callOverlay">
+  <video id="remoteVideo" autoplay playsinline></video>
+  <video id="localVideo" autoplay playsinline muted></video>
+  <div class="call-info">
+    <h2 id="callStatusText" style="margin:0;font-size:18px">Connecting...</h2>
+    <small id="callTimer" style="color:#ccc">00:00</small>
+  </div>
+  <div class="call-controls">
+    <button class="call-btn btn-mute" onclick="toggleMute()">🎤</button>
+    <button class="call-btn btn-end" onclick="endCall()">📞</button>
+  </div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -239,9 +265,7 @@ async function getPublicKeyFromDB(targetId, maxRetries = 5) {
         const jwk = doc.data().publicKey;
         return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["encrypt"]);
       }
-    } catch (e) {
-      console.error(`Retry ${i+1} failed:`, e);
-    }
+    } catch (e) { console.error(`Retry ${i+1} failed:`, e); }
     await new Promise(resolve => setTimeout(resolve, 1500));
   }
   return null;
@@ -423,7 +447,6 @@ async function renderMessages(){
         lastMsgCount = 0; 
         return; 
     }
-    
     if(!snapshot.empty && snapshot.size > lastMsgCount && lastMsgCount !== 0) {
       const lastDoc = snapshot.docs[snapshot.docs.length - 1];
       if(lastDoc.data().senderId !== myId) playNotificationSound();
@@ -436,7 +459,6 @@ async function renderMessages(){
       const isMine = m.senderId === myId;
       const msg = document.createElement('div');
       msg.className = 'msg ' + (isMine ? 'mine' : 'theirs');
-      
       const body = document.createElement('div');
       
       if (isMine && sentMessagesCache[msgId]) {
@@ -445,13 +467,8 @@ async function renderMessages(){
         try {
           const decryptedText = await decryptMessage(m.text, myPrivateKey);
           body.textContent = decryptedText;
-        } catch (err) {
-          body.textContent = '[Decryption Failed]';
-          console.error('Decryption error:', err);
-        }
-      } else {
-        body.textContent = '[Blocked: Unencrypted]';
-      }
+        } catch (err) { body.textContent = '[Decryption Failed]'; }
+      } else { body.textContent = '[Blocked: Unencrypted]'; }
       msg.appendChild(body);
 
       const meta=document.createElement('div');meta.className='msg-meta';
@@ -461,25 +478,21 @@ async function renderMessages(){
       meta.appendChild(stamp);
 
       if(isMine){
-        const delBtn=document.createElement('button');delBtn.className='msg-del';delBtn.innerHTML='🗑️';delBtn.title='Delete';
+        const delBtn=document.createElement('button');delBtn.className='msg-del';delBtn.innerHTML='🗑️';
         delBtn.addEventListener('click',()=>deleteMessage(chatId, msgId));
         meta.appendChild(delBtn);
       }
       msg.appendChild(meta);box.appendChild(msg);
     }
     box.scrollTop=box.scrollHeight;
-  },(err)=>{ console.error(err); const empty=document.createElement('div');empty.className='empty';empty.textContent='Could not load messages.';box.appendChild(empty); });
+  },(err)=>{ console.error(err); });
 }
 
 window.deleteMessage = function(chatId, msgId) {
   if(!confirm('Delete this message?')) return;
   db.collection('chats').doc(chatId).collection('messages').doc(msgId).delete()
-    .then(()=> { 
-      delete sentMessagesCache[msgId];
-      saveSentCache();
-      showToast('Message deleted.');
-    })
-    .catch((e)=> { console.error(e); showToast('Failed to delete.'); });
+    .then(()=> { delete sentMessagesCache[msgId]; saveSentCache(); showToast('Message deleted.'); })
+    .catch((e)=> showToast('Failed to delete.'));
 };
 
 async function sendMessage(){
@@ -490,43 +503,221 @@ async function sendMessage(){
   
   const myId=localStorage.getItem('zoyra_preview_id');
   const chatId=getChatId(myId,activeChatId);
-  
   showToast('Fetching key & Encrypting... 🔒');
   
   try {
     const friendPublicKey = await getPublicKeyFromDB(activeChatId, 5);
-    
-    // STRICT SECURITY: If key not found, DO NOT SEND.
-    if (!friendPublicKey) {
-      showToast('❌ Friend\'s key not found! Ask them to open the app.');
-      return; 
-    }
-
+    if (!friendPublicKey) { showToast('❌ Friend\'s key not found! Ask them to open the app.'); return; }
     const encryptedText = await encryptMessage(text, friendPublicKey);
     const docRef = await db.collection('chats').doc(chatId).collection('messages').add({
-      text: encryptedText,
-      isEncrypted: true,
-      senderId: myId,
+      text: encryptedText, isEncrypted: true, senderId: myId,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
-    
-    sentMessagesCache[docRef.id] = text;
-    saveSentCache();
-    showToast('Sent securely! 🔐');
-    input.value='';
-    
-  } catch(e) {
-    console.error(e);
-    showToast('Failed to send.');
-  }
+    sentMessagesCache[docRef.id] = text; saveSentCache();
+    showToast('Sent securely! 🔐'); input.value='';
+  } catch(e) { console.error(e); showToast('Failed to send.'); }
 }
 
 document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
+// ==========================================
+// WEBRTC CALLING LOGIC
+// ==========================================
+let localStream, remoteStream, peerConnection;
+const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+let callListener = null;
+
+async function startCall() {
+  if (!activeChatId) return;
+  const myId = localStorage.getItem('zoyra_preview_id');
+  const chatId = getChatId(myId, activeChatId);
+  
+  try {
+    showToast('Requesting Camera/Mic...');
+    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    document.getElementById('localVideo').srcObject = localStream;
+    document.getElementById('callOverlay').style.display = 'flex';
+    document.getElementById('callStatusText').textContent = 'Calling...';
+
+    peerConnection = new RTCPeerConnection(servers);
+    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+    
+    peerConnection.onicecandidate = event => {
+      if (event.candidate) {
+        db.collection('calls').doc(chatId).collection('ice').add({
+          candidate: event.candidate.toJSON(),
+          sender: myId,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    };
+
+    peerConnection.ontrack = event => {
+      document.getElementById('remoteVideo').srcObject = event.streams[0];
+      document.getElementById('callStatusText').textContent = 'Connected';
+    };
+
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+
+    await db.collection('calls').doc(chatId).set({
+      offer: { type: offer.type, sdp: offer.sdp },
+      caller: myId,
+      callee: activeChatId,
+      status: 'offering',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Listen for answer
+    callListener = db.collection('calls').doc(chatId).onSnapshot(async doc => {
+      const data = doc.data();
+      if (data && data.status === 'answering' && data.answer && !peerConnection.currentRemoteDescription) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+      }
+      if (data && data.status === 'ended') {
+        endCallUI();
+      }
+    });
+
+    // Listen for ICE candidates from peer
+    db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const data = change.doc.data();
+          if (data.sender !== myId) {
+            peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e));
+          }
+        }
+      });
+    });
+
+  } catch (err) {
+    console.error(err);
+    showToast('Camera/Mic access denied or error.');
+    endCallUI();
+  }
+}
+
+// Listen for incoming calls globally
+function listenForIncomingCalls() {
+  const myId = localStorage.getItem('zoyra_preview_id');
+  if (!myId) return;
+  
+  // We check all calls where we are the callee
+  db.collection('calls').where('callee', '==', myId).where('status', '==', 'offering')
+    .onSnapshot(async snapshot => {
+      snapshot.docChanges().forEach(async change => {
+        if (change.type === 'added') {
+          const callData = change.doc.data();
+          const chatId = change.doc.id;
+          const callerId = callData.caller;
+          
+          if(confirm(`Incoming Video Call from ${callerId}. Accept?`)) {
+            activeChatId = callerId; // Set active chat to caller
+            document.getElementById('chatRoom').style.display='block';
+            document.getElementById('chatTitle').textContent='Video Call';
+            
+            try {
+              localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+              document.getElementById('localVideo').srcObject = localStream;
+              document.getElementById('callOverlay').style.display = 'flex';
+              document.getElementById('callStatusText').textContent = 'Connecting...';
+
+              peerConnection = new RTCPeerConnection(servers);
+              localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+              
+              peerConnection.onicecandidate = event => {
+                if (event.candidate) {
+                  db.collection('calls').doc(chatId).collection('ice').add({
+                    candidate: event.candidate.toJSON(),
+                    sender: myId,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                  });
+                }
+              };
+
+              peerConnection.ontrack = event => {
+                document.getElementById('remoteVideo').srcObject = event.streams[0];
+                document.getElementById('callStatusText').textContent = 'Connected';
+              };
+
+              await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
+              const answer = await peerConnection.createAnswer();
+              await peerConnection.setLocalDescription(answer);
+
+              await db.collection('calls').doc(chatId).update({
+                answer: { type: answer.type, sdp: answer.sdp },
+                status: 'answering'
+              });
+
+              callListener = db.collection('calls').doc(chatId).onSnapshot(doc => {
+                if (doc.data().status === 'ended') endCallUI();
+              });
+
+              db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => {
+                snapshot.docChanges().forEach(change => {
+                  if (change.type === 'added') {
+                    const data = change.doc.data();
+                    if (data.sender !== myId) {
+                      peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e));
+                    }
+                  }
+                });
+              });
+
+            } catch(err) { console.error(err); endCallUI(); }
+          } else {
+            // Reject call
+            db.collection('calls').doc(chatId).update({ status: 'ended' });
+          }
+        }
+      });
+    });
+}
+
+function toggleMute() {
+  if (localStream) {
+    const audioTrack = localStream.getAudioTracks()[0];
+    if (audioTrack) {
+      audioTrack.enabled = !audioTrack.enabled;
+      showToast(audioTrack.enabled ? 'Unmuted' : 'Muted');
+    }
+  }
+}
+
+function endCall() {
+  const myId = localStorage.getItem('zoyra_preview_id');
+  const chatId = activeChatId ? getChatId(myId, activeChatId) : null;
+  
+  if (chatId) {
+    db.collection('calls').doc(chatId).update({ status: 'ended' }).catch(e=>{});
+    // Cleanup ICE subcollection
+    db.collection('calls').doc(chatId).collection('ice').get().then(snap => {
+      snap.forEach(doc => doc.ref.delete());
+    });
+  }
+  endCallUI();
+}
+
+function endCallUI() {
+  if (peerConnection) peerConnection.close();
+  if (localStream) localStream.getTracks().forEach(track => track.stop());
+  if (callListener) callListener();
+  
+  document.getElementById('callOverlay').style.display = 'none';
+  document.getElementById('remoteVideo').srcObject = null;
+  document.getElementById('localVideo').srcObject = null;
+  peerConnection = null;
+  localStream = null;
+  showToast('Call Ended');
+}
+
+// Initialize App
 initId();
 renderContacts();
 renderChats();
 generateAndSaveKeys(); 
+setTimeout(listenForIncomingCalls, 2000); // Start listening for calls after keys are ready
 </script>
 </body>
 </html>
