@@ -23,10 +23,13 @@ h1{font-size:27px;line-height:1.15;margin:8px 0 7px}h2{font-size:19px;margin:0 0
 .field{display:block;color:var(--muted);font-size:12px;margin:14px 0 6px}.fieldinput{width:100%;padding:13px;background:#0e1729;color:var(--text);border:1px solid var(--line);border-radius:12px;outline:none}
 .feature{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #ffffff12}.feature:last-child{border:0}.feature .ico{font-size:22px;width:34px}.feature small{display:block;color:var(--muted)}
 .notice{font-size:12px;color:#c3cee3;background:#202b42;border:1px solid #34445f;border-radius:13px;padding:12px;margin-top:16px}
-.msg{padding:10px 13px;border-radius:14px;max-width:82%;margin:8px 0;overflow-wrap:anywhere}
+.msg{padding:10px 13px;border-radius:14px;max-width:85%;margin:8px 0;overflow-wrap:anywhere;position:relative}
 .msg.mine{background:#26385d;color:#f4f7ff;margin-left:auto;border-bottom-right-radius:3px}
 .msg.theirs{background:#1a2b4b;color:#dce4ff;border-bottom-left-radius:3px}
-.msg small{display:block;color:#bdc9e2;font-size:10px;margin-top:5px}
+.msg-meta{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:4px}
+.msg-time{font-size:10px;color:#bdc9e2}
+.msg-del{background:none;border:none;color:#ff7e88;cursor:pointer;font-size:14px;padding:2px 5px;border-radius:6px;opacity:0.7;transition:0.2s}
+.msg-del:hover{opacity:1;background:#ffffff15}
 footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#e8edff;color:#111a2c;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:10;max-width:90%;text-align:center}.toast.show{opacity:1}
 @media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
@@ -107,7 +110,6 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 </nav>
 <div id="toast" class="toast" role="status"></div>
 
-<!-- Firebase SDKs (Compat version for easy use) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
@@ -174,6 +176,21 @@ function showToast(message){
   el.textContent=message;el.classList.add('show');
   clearTimeout(window.toastTimer);
   window.toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
+}
+
+function playNotificationSound(){
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.15);
+  } catch(e) {}
 }
 
 function readContacts(){
@@ -283,29 +300,56 @@ function renderMessages(){
   const q = db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp','asc');
   
   unsubscribeMessages = q.onSnapshot((snapshot)=>{
+    const isInitialLoad = box.children.length === 0 && !snapshot.empty;
     box.replaceChildren();
     if(snapshot.empty){
       const empty=document.createElement('div');empty.className='empty';empty.textContent='No messages yet. Say hi! 👋';box.appendChild(empty);return;
     }
     snapshot.forEach(doc=>{
       const m=doc.data();
+      const msgId=doc.id;
       const isMine=m.senderId===myId;
+      
+      // Play sound ONLY if it's a new message from the other person
+      if(!isMine && !isInitialLoad) {
+        playNotificationSound();
+      }
+
       const msg=document.createElement('div');msg.className='msg '+(isMine?'mine':'theirs');
       const body=document.createElement('div');body.textContent=m.text;
-      const stamp=document.createElement('small');
+      
+      const meta=document.createElement('div');meta.className='msg-meta';
+      
+      const stamp=document.createElement('span');stamp.className='msg-time';
       if(m.timestamp && m.timestamp.toDate){
         stamp.textContent=new Date(m.timestamp.toDate()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
       } else {
         stamp.textContent='sending...';
       }
-      msg.append(body,stamp);box.appendChild(msg);
+      meta.appendChild(stamp);
+
+      if(isMine){
+        const delBtn=document.createElement('button');delBtn.className='msg-del';delBtn.innerHTML='🗑️';delBtn.title='Delete message';
+        delBtn.addEventListener('click',()=>deleteMessage(chatId, msgId));
+        meta.appendChild(delBtn);
+      }
+      
+      msg.append(body,meta);box.appendChild(msg);
     });
     box.scrollTop=box.scrollHeight;
+    isInitialLoad = false; // Reset after first load
   },(err)=>{
     console.error(err);
     const empty=document.createElement('div');empty.className='empty';empty.textContent='Could not load messages. Check Firestore rules.';box.appendChild(empty);
   });
 }
+
+window.deleteMessage = function(chatId, msgId) {
+  if(!confirm('Delete this message?')) return;
+  db.collection('chats').doc(chatId).collection('messages').doc(msgId).delete()
+    .then(()=> showToast('Message deleted.'))
+    .catch((e)=> { console.error(e); showToast('Failed to delete.'); });
+};
 
 function sendMessage(){
   if(!activeChatId)return;
