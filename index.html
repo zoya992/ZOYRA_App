@@ -18,7 +18,7 @@ h1{font-size:27px;line-height:1.15;margin:8px 0 7px}h2{font-size:19px;margin:0 0
 .idlabel{font-size:12px;color:var(--muted)}.userid{font-size:22px;letter-spacing:.06em;font-weight:800;margin:7px 0 13px;overflow-wrap:anywhere}
 .btn{border:0;border-radius:13px;padding:13px 16px;font-weight:700;color:#10182c;background:linear-gradient(135deg,#b5c2ff,#829cff)}.btn.secondary{background:#202e4b;color:var(--text);border:1px solid #344565}.btn.ghost{background:transparent;color:var(--accent2);border:1px solid #344565}.btn.full{width:100%}.actions{display:flex;gap:9px}.actions>*{flex:1}
 .nav{position:fixed;bottom:0;left:0;right:0;background:#0d1528f2;border-top:1px solid var(--line);padding:9px 10px calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:4px;z-index:5;backdrop-filter:blur(16px)}.nav button{background:none;border:0;color:var(--muted);font-size:10px;padding:7px 10px;border-radius:12px;min-width:65px}.nav button span{display:block;font-size:19px;margin-bottom:2px}.nav button.active{color:var(--accent2);background:#202e4b}
-.search{width:100%;background:#111b2f;border:1px solid var(--line);border-radius:13px;padding:13px;color:var(--text);outline:none;margin:10px 0 14px}.item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid #ffffff12}.avatar{width:44px;height:44px;border-radius:15px;background:linear-gradient(145deg,#425985,#253451);display:grid;place-items:center;font-weight:800;color:#dce4ff;flex:none}.itemmain{flex:1;min-width:0}.itemmain strong{display:block}.itemmain small{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.time{font-size:11px;color:var(--muted)}
+.item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid #ffffff12}.avatar{width:44px;height:44px;border-radius:15px;background:linear-gradient(145deg,#425985,#253451);display:grid;place-items:center;font-weight:800;color:#dce4ff;flex:none}.itemmain{flex:1;min-width:0}.itemmain strong{display:block}.itemmain small{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .empty{text-align:center;padding:35px 15px;color:var(--muted)}.empty .symbol{font-size:38px;margin-bottom:8px}
 .field{display:block;color:var(--muted);font-size:12px;margin:14px 0 6px}.fieldinput{width:100%;padding:13px;background:#0e1729;color:var(--text);border:1px solid var(--line);border-radius:12px;outline:none}
 .feature{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #ffffff12}.feature:last-child{border:0}.feature .ico{font-size:22px;width:34px}.feature small{display:block;color:var(--muted)}
@@ -53,7 +53,7 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
     <h2>How to chat</h2>
     <p class="sub" style="margin:5px 0 14px">1. Share your ZOYRA ID with a friend<br>2. Get their ZOYRA ID<br>3. Go to Chats → Start conversation</p>
   </div>
-  <div class="notice">ZOYRA uses Firebase for real-time messaging. Messages are stored in the cloud for this prototype. End-to-end encryption will be added in a future update.</div>
+  <div class="notice">ZOYRA uses Firebase for real-time messaging. Messages are stored in the cloud for this prototype.</div>
 </section>
 
 <section id="chats" class="screen">
@@ -107,10 +107,11 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 </nav>
 <div id="toast" class="toast" role="status"></div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<!-- Firebase SDKs (Compat version for easy use) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyDfJhbsYH8LNgciNcoNKmwhZNWAKNLsXM",
   authDomain: "zoyra-chat.firebaseapp.com",
@@ -120,12 +121,21 @@ const firebaseConfig = {
   appId: "1:499553089317:web:47a6c01285809e0ae34ccc"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-window.__db = db;
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-function makeId(){const a=new Uint32Array(12);crypto.getRandomValues(a);let s='';for(let i=0;i<12;i++){s+=alphabet[a[i]%alphabet.length];if(i%4===3&&i!==11)s+='-';}return 'ZY-'+s;}
+function makeId(){
+  const a=new Uint32Array(12);
+  if(window.crypto && crypto.getRandomValues) crypto.getRandomValues(a);
+  else for(let i=0;i<a.length;i++) a[i]=Math.random()*4294967296;
+  let s='';
+  for(let i=0;i<12;i++){
+    s+=alphabet[a[i]%alphabet.length];
+    if(i%4===3&&i!==11)s+='-';
+  }
+  return 'ZY-'+s;
+}
 
 function initId(){
   let id=localStorage.getItem('zoyra_preview_id');
@@ -134,39 +144,43 @@ function initId(){
   document.getElementById('displayName').value=localStorage.getItem('zoyra_display_name')||'';
 }
 
-window.saveProfile=function(){
+function saveProfile(){
   const field=document.getElementById('displayName');
   const name=field.value.trim();
   if(!name){showToast('Please enter a display name.');field.focus();return;}
   localStorage.setItem('zoyra_display_name',name);
   showToast('Profile saved.');
-};
+}
 
-window.copyId=function(){
+function copyId(){
   const id=document.getElementById('userId').textContent;
-  navigator.clipboard.writeText(id).then(()=>showToast('ID copied.')).catch(()=>showToast('Select and copy your ID manually.'));
-};
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(id).then(()=>showToast('ID copied.')).catch(()=>showToast('Select and copy manually.'));
+  } else {
+    showToast('Select and copy your ID manually.');
+  }
+}
 
-window.go=function(id,btn){
+function go(id,btn){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   window.scrollTo(0,0);
-};
+}
 
-window.showToast=function(message){
+function showToast(message){
   const el=document.getElementById('toast');
   el.textContent=message;el.classList.add('show');
   clearTimeout(window.toastTimer);
   window.toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
-};
+}
 
 function readContacts(){
   try{const v=JSON.parse(localStorage.getItem('zoyra_contacts')||'[]');return Array.isArray(v)?v:[];}catch(e){return [];}
 }
 
-window.renderContacts=function(){
+function renderContacts(){
   const list=document.getElementById('contactList');if(!list)return;
   const contacts=readContacts();list.replaceChildren();
   if(contacts.length===0){
@@ -187,9 +201,9 @@ window.renderContacts=function(){
     remove.addEventListener('click',()=>{const c=readContacts();c.splice(index,1);localStorage.setItem('zoyra_contacts',JSON.stringify(c));renderContacts();showToast('Contact removed.');});
     row.append(avatar,main,remove);list.appendChild(row);
   });
-};
+}
 
-window.addContact=function(){
+function addContact(){
   const id=document.getElementById('contactId').value.trim().toUpperCase();
   const name=document.getElementById('contactName').value.trim();
   if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(id)){showToast('Enter ID in format ZY-XXXX-XXXX-XXXX.');return;}
@@ -201,14 +215,14 @@ window.addContact=function(){
   document.getElementById('contactId').value='';
   document.getElementById('contactName').value='';
   renderContacts();showToast('Contact saved.');
-};
+}
 
 function getChatId(id1,id2){return [id1,id2].sort().join('|');}
 
 let activeChatId=null;
 let unsubscribeMessages=null;
 
-window.renderChats=function(){
+function renderChats(){
   const list=document.getElementById('chatList');if(!list)return;
   const contacts=readContacts();list.replaceChildren();
   if(contacts.length===0){
@@ -225,11 +239,9 @@ window.renderChats=function(){
     main.append(name,preview);row.append(av,main);
     row.addEventListener('click',()=>openChat(c.id));list.appendChild(row);
   });
-};
+}
 
-window.startChat=function(){
-  const contacts=readContacts();
-  if(!contacts.length){showToast('First add a contact in Contacts.');return;}
+function startChat(){
   const id=prompt('Enter the ZOYRA ID of the person you want to chat with:');
   if(!id)return;
   const clean=id.trim().toUpperCase();
@@ -241,7 +253,7 @@ window.startChat=function(){
     renderContacts();
   }
   openChat(clean);
-};
+}
 
 function openChat(id){
   const contact=readContacts().find(c=>c.id===id);if(!contact){showToast('Contact not found.');return;}
@@ -254,12 +266,12 @@ function openChat(id){
   document.getElementById('messageInput').focus();
 }
 
-window.closeChat=function(){
+function closeChat(){
   activeChatId=null;
   document.getElementById('chatRoom').style.display='none';
   if(unsubscribeMessages){unsubscribeMessages();unsubscribeMessages=null;}
   renderChats();
-};
+}
 
 function renderMessages(){
   if(!activeChatId)return;
@@ -267,8 +279,10 @@ function renderMessages(){
   const box=document.getElementById('messageList');box.replaceChildren();
   const myId=localStorage.getItem('zoyra_preview_id');
   const chatId=getChatId(myId,activeChatId);
-  const q=query(collection(db,'chats',chatId,'messages'),orderBy('timestamp','asc'));
-  unsubscribeMessages=onSnapshot(q,(snapshot)=>{
+  
+  const q = db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp','asc');
+  
+  unsubscribeMessages = q.onSnapshot((snapshot)=>{
     box.replaceChildren();
     if(snapshot.empty){
       const empty=document.createElement('div');empty.className='empty';empty.textContent='No messages yet. Say hi! 👋';box.appendChild(empty);return;
@@ -279,19 +293,21 @@ function renderMessages(){
       const msg=document.createElement('div');msg.className='msg '+(isMine?'mine':'theirs');
       const body=document.createElement('div');body.textContent=m.text;
       const stamp=document.createElement('small');
-      if(m.timestamp&&m.timestamp.toDate){
+      if(m.timestamp && m.timestamp.toDate){
         stamp.textContent=new Date(m.timestamp.toDate()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-      }else{stamp.textContent='sending...';}
+      } else {
+        stamp.textContent='sending...';
+      }
       msg.append(body,stamp);box.appendChild(msg);
     });
     box.scrollTop=box.scrollHeight;
   },(err)=>{
     console.error(err);
-    const empty=document.createElement('div');empty.className='empty';empty.textContent='Could not load messages. Check console.';box.appendChild(empty);
+    const empty=document.createElement('div');empty.className='empty';empty.textContent='Could not load messages. Check Firestore rules.';box.appendChild(empty);
   });
 }
 
-window.sendMessage=async function(){
+function sendMessage(){
   if(!activeChatId)return;
   const input=document.getElementById('messageInput');
   const text=input.value.trim();
@@ -299,18 +315,19 @@ window.sendMessage=async function(){
   const myId=localStorage.getItem('zoyra_preview_id');
   const myName=localStorage.getItem('zoyra_display_name')||'Anonymous';
   const chatId=getChatId(myId,activeChatId);
-  try{
-    await addDoc(collection(db,'chats',chatId,'messages'),{
-      text:text,senderId:myId,senderName:myName,timestamp:serverTimestamp()
-    });
+  
+  db.collection('chats').doc(chatId).collection('messages').add({
+    text:text,senderId:myId,senderName:myName,timestamp:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{
     input.value='';
-  }catch(e){
+  }).catch((e)=>{
     console.error(e);showToast('Failed to send. Check Firestore rules.');
-  }
-};
+  });
+}
 
 document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
+// Initialize App
 initId();
 renderContacts();
 renderChats();
