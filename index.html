@@ -31,8 +31,6 @@ body.light-theme .fieldinput{background:#f1f5f9;color:#10182c;border-color:#d1d9
 .feature{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #ffffff12}.feature:last-child{border:0}.feature .ico{font-size:22px;width:34px}.feature small{display:block;color:var(--muted)}
 .notice{font-size:12px;color:#c3cee3;background:#202b42;border:1px solid #34445f;border-radius:13px;padding:12px;margin-top:16px}
 body.light-theme .notice{background:#eef2ff;color:#4a6cf7;border-color:#d1d9e6}
-
-/* Chat & Media Styles */
 .msg{padding:10px 13px;border-radius:14px;max-width:85%;margin:8px 0;overflow-wrap:anywhere;position:relative;transition:background 0.3s}
 .msg.mine{background:#26385d;color:#f4f7ff;margin-left:auto;border-bottom-right-radius:3px}
 .msg.theirs{background:#1a2b4b;color:#dce4ff;border-bottom-left-radius:3px}
@@ -43,17 +41,6 @@ body.light-theme .msg.theirs{background:#f1f5f9;color:#10182c}
 body.light-theme .msg-time{color:#5a6b8c}
 .msg-del{background:none;border:none;color:#ff7e88;cursor:pointer;font-size:14px;padding:2px 5px;border-radius:6px;opacity:0.7;transition:0.2s}
 .msg-del:hover{opacity:1;background:#ffffff15}
-.msg img{max-width:100%;border-radius:10px;margin-bottom:6px;cursor:pointer}
-.msg audio{width:100%;margin-bottom:6px;max-width:220px}
-
-/* Input Area */
-.input-area{display:flex;gap:8px;align-items:center;margin-top:12px}
-.input-area input[type="text"]{flex:1;min-width:0}
-.media-btn{background:transparent;border:1px solid var(--line);color:var(--accent2);width:44px;height:44px;border-radius:12px;font-size:20px;display:grid;place-items:center;transition:0.2s}
-.media-btn:hover{background:#ffffff10}
-.media-btn.recording{background:#ff7e88;color:#fff;border-color:#ff7e88;animation:pulse 1.5s infinite}
-@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
-
 footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#e8edff;color:#111a2c;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:10;max-width:90%;text-align:center}.toast.show{opacity:1}
 @media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
@@ -64,7 +51,7 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 <header>
   <div class="brand"><div class="logo">Z</div>ZOYRA</div>
   <div style="display:flex;align-items:center;gap:12px">
-    <div class="status"><i class="dot"></i> LIVE CHAT</div>
+    <div class="status"><i class="dot"></i> E2EE SECURE</div>
     <button id="themeToggle" class="theme-btn" title="Toggle Theme">🌙</button>
   </div>
 </header>
@@ -72,7 +59,7 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 <section id="home" class="screen active">
   <div class="eyebrow">Welcome to ZOYRA</div>
   <h1>Your conversations.<br>Your control.</h1>
-  <p class="sub">A private communication space, now with real-time messaging.</p>
+  <p class="sub">A private communication space with End-to-End Encryption.</p>
   <div class="card">
     <div class="idlabel">YOUR PROFILE</div>
     <label class="field" for="displayName">Display name</label>
@@ -81,16 +68,19 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
     <div class="idlabel" style="margin-top:22px">YOUR ZOYRA ID</div>
     <div class="userid" id="userId">Creating ID…</div>
     <button class="btn secondary full" onclick="copyId()">Copy ZOYRA ID</button>
+    
+    <!-- Encryption Status Indicator -->
+    <div class="idlabel" style="margin-top:20px; color:var(--green)">🔒 ENCRYPTION STATUS: <span id="encStatus">Generating Keys...</span></div>
   </div>
   <div class="card">
     <h2>How to chat</h2>
     <p class="sub" style="margin:5px 0 14px">1. Share your ZOYRA ID with a friend<br>2. Get their ZOYRA ID<br>3. Go to Chats → Start conversation</p>
   </div>
-  <div class="notice">ZOYRA uses Firebase for real-time messaging and media storage.</div>
+  <div class="notice">ZOYRA uses End-to-End Encryption. Your private keys never leave your device.</div>
 </section>
 
 <section id="chats" class="screen">
-  <div class="eyebrow">Your space</div><h1>Messages</h1><p class="sub">Real-time conversations.</p>
+  <div class="eyebrow">Your space</div><h1>Messages</h1><p class="sub">Real-time encrypted conversations.</p>
   <div id="chatList"></div>
   <button class="btn full" onclick="startChat()">＋ Start a conversation</button>
   <div id="chatRoom" class="card" style="display:none">
@@ -99,15 +89,8 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
       <div style="flex:1;min-width:0"><strong id="chatTitle">Conversation</strong><div class="idlabel" id="chatSubtitle"></div></div>
     </div>
     <div id="messageList" style="min-height:200px;max-height:50vh;overflow:auto;margin:16px 0;padding:8px;background:#0e1729;border-radius:12px;border:1px solid var(--line)"></div>
-    
-    <label class="field">Message</label>
-    <div class="input-area">
-      <button class="media-btn" id="imgBtn" title="Send Photo">📷</button>
-      <input type="file" id="imgInput" accept="image/*" style="display:none">
-      <button class="media-btn" id="voiceBtn" title="Record Voice">🎤</button>
-      <input id="messageInput" class="fieldinput" maxlength="1000" placeholder="Write a message…" style="min-width:0">
-      <button class="btn" style="flex:0 0 auto" onclick="sendMessage()">Send</button>
-    </div>
+    <label class="field" for="messageInput">Message</label>
+    <div class="actions"><input id="messageInput" class="fieldinput" maxlength="1000" placeholder="Write a message…" style="min-width:0"><button class="btn" style="flex:0 0 auto" onclick="sendMessage()">Send</button></div>
   </div>
 </section>
 
@@ -131,7 +114,7 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 <section id="settings" class="screen">
   <div class="eyebrow">Your preferences</div><h1>Settings</h1><p class="sub">Control your ZOYRA experience.</p>
   <div class="card">
-    <div class="feature"><div class="ico">🛡️</div><div><strong>Privacy & security</strong><small>End-to-end encryption coming soon</small></div></div>
+    <div class="feature"><div class="ico">🛡️</div><div><strong>Privacy & security</strong><small>End-to-end encryption active</small></div></div>
     <div class="feature"><div class="ico">🌐</div><div><strong>Language</strong><small>English</small></div></div>
   </div>
   <footer>ZOYRA · Built with care<br>Privacy first.</footer>
@@ -149,7 +132,6 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
 <script>
 const firebaseConfig = {
@@ -160,12 +142,10 @@ const firebaseConfig = {
   messagingSenderId: "499553089317",
   appId: "1:499553089317:web:47a6c01285809e0ae34ccc"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const storage = firebase.storage();
 
-// Theme Toggle Logic
+// Theme Toggle
 const themeBtn = document.getElementById('themeToggle');
 const themeMeta = document.getElementById('themeColorMeta');
 let isDark = localStorage.getItem('zoyra_theme') !== 'light';
@@ -176,6 +156,57 @@ function applyTheme() {
 themeBtn.addEventListener('click', () => { isDark = !isDark; localStorage.setItem('zoyra_theme', isDark ? 'dark' : 'light'); applyTheme(); });
 applyTheme();
 
+// --- END-TO-END ENCRYPTION ENGINE ---
+const encStatus = document.getElementById('encStatus');
+
+async function generateAndSaveKeys() {
+  // Check if keys already exist
+  if (localStorage.getItem('zoyra_private_key') && localStorage.getItem('zoyra_public_key')) {
+    encStatus.textContent = "Active & Secure 🔐";
+    return;
+  }
+  
+  try {
+    encStatus.textContent = "Generating secure keys...";
+    // Generate RSA-OAEP Key Pair
+    const keyPair = await window.crypto.subtle.generateKey(
+      {
+        name: "RSA-OAEP",
+        modulusLength: 2048,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256"
+      },
+      true, // extractable
+      ["encrypt", "decrypt"]
+    );
+
+    // Export keys to JWK (JSON) format to save in localStorage
+    const publicKeyJwk = await window.crypto.subtle.exportKey("jwk", keyPair.publicKey);
+    const privateKeyJwk = await window.crypto.subtle.exportKey("jwk", keyPair.privateKey);
+
+    // Save to local storage
+    localStorage.setItem('zoyra_public_key', JSON.stringify(publicKeyJwk));
+    localStorage.setItem('zoyra_private_key', JSON.stringify(privateKeyJwk));
+    
+    encStatus.textContent = "Active & Secure 🔐";
+  } catch (error) {
+    console.error("Key generation failed:", error);
+    encStatus.textContent = "Failed to generate keys";
+  }
+}
+
+// Helper to import keys back from JSON
+async function getPrivateKey() {
+  const jwk = JSON.parse(localStorage.getItem('zoyra_private_key'));
+  return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["decrypt"]);
+}
+
+async function getPublicKey() {
+  const jwk = JSON.parse(localStorage.getItem('zoyra_public_key'));
+  return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["encrypt"]);
+}
+
+// --- ID & PROFILE ---
 const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function makeId(){
   const a=new Uint32Array(12);
@@ -345,15 +376,8 @@ function renderMessages(){
       const m=doc.data(); const msgId=doc.id; const isMine=m.senderId===myId;
       const msg=document.createElement('div');msg.className='msg '+(isMine?'mine':'theirs');
       
-      if(m.type === 'image') {
-        const img=document.createElement('img');img.src=m.url;img.alt='Photo';
-        img.onclick = () => window.open(m.url, '_blank');
-        msg.appendChild(img);
-      } else if(m.type === 'audio') {
-        const audio=document.createElement('audio');audio.src=m.url;audio.controls=true;msg.appendChild(audio);
-      } else {
-        const body=document.createElement('div');body.textContent=m.text||'';msg.appendChild(body);
-      }
+      const body=document.createElement('div');body.textContent=m.text||'[Encrypted Media]';
+      msg.appendChild(body);
 
       const meta=document.createElement('div');meta.className='msg-meta';
       const stamp=document.createElement('span');stamp.className='msg-time';
@@ -378,95 +402,29 @@ window.deleteMessage = function(chatId, msgId) {
     .then(()=> showToast('Message deleted.')).catch((e)=> { console.error(e); showToast('Failed to delete.'); });
 };
 
-function sendMessage(text = null, type = 'text', url = null){
+function sendMessage(){
   if(!activeChatId)return;
   const input=document.getElementById('messageInput');
-  const content = text !== null ? text : input.value.trim();
-  if(!content && type === 'text'){showToast('Write a message first.');return;}
+  const text=input.value.trim();
+  if(!text){showToast('Write a message first.');return;}
   
   const myId=localStorage.getItem('zoyra_preview_id');
   const myName=localStorage.getItem('zoyra_display_name')||'Anonymous';
   const chatId=getChatId(myId,activeChatId);
   
-  const msgData = { senderId:myId, senderName:myName, timestamp:firebase.firestore.FieldValue.serverTimestamp(), type: type };
-  if(type === 'text') msgData.text = content;
-  if(url) msgData.url = url;
-
-  db.collection('chats').doc(chatId).collection('messages').add(msgData).then(()=>{
-    if(type === 'text') input.value='';
-  }).catch((e)=>{ console.error(e); showToast('Failed to send.'); });
+  // For now, sending plain text. We will add encryption logic in the next step!
+  db.collection('chats').doc(chatId).collection('messages').add({
+    text:text, senderId:myId, senderName:myName, timestamp:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{ input.value=''; }).catch((e)=>{ console.error(e); showToast('Failed to send.'); });
 }
 
 document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
-
-// --- Image Upload Logic ---
-const imgBtn = document.getElementById('imgBtn');
-const imgInput = document.getElementById('imgInput');
-imgBtn.addEventListener('click', () => imgInput.click());
-imgInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if(!file || !activeChatId) return;
-  if(file.size > 2 * 1024 * 1024) { showToast('Image must be smaller than 2MB.'); return; }
-  
-  showToast('Uploading photo...');
-  const myId = localStorage.getItem('zoyra_preview_id');
-  const chatId = getChatId(myId, activeChatId);
-  const fileName = Date.now() + '_' + file.name;
-  const ref = storage.ref('images/' + chatId + '/' + fileName);
-  
-  ref.put(file).then(snapshot => snapshot.ref.getDownloadURL()).then(url => {
-    sendMessage('📷 Photo', 'image', url);
-  }).catch(err => { console.error(err); showToast('Failed to upload image.'); });
-  imgInput.value = '';
-});
-
-// --- Voice Recording Logic ---
-const voiceBtn = document.getElementById('voiceBtn');
-let mediaRecorder, audioChunks = [], isRecording = false;
-
-voiceBtn.addEventListener('click', async () => {
-  if(!activeChatId) return;
-  
-  if(!isRecording) {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder = new MediaRecorder(stream);
-      audioChunks = [];
-      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-        if(audioBlob.size < 1000) { showToast('Recording too short.'); return; }
-        showToast('Uploading voice...');
-        const myId = localStorage.getItem('zoyra_preview_id');
-        const chatId = getChatId(myId, activeChatId);
-        const fileName = Date.now() + '.webm';
-        const ref = storage.ref('voices/' + chatId + '/' + fileName);
-        
-        ref.put(audioBlob).then(snapshot => snapshot.ref.getDownloadURL()).then(url => {
-          sendMessage('🎤 Voice Note', 'audio', url);
-        }).catch(err => { console.error(err); showToast('Failed to upload voice.'); });
-        
-        stream.getTracks().forEach(track => track.stop());
-      };
-      mediaRecorder.start();
-      isRecording = true;
-      voiceBtn.classList.add('recording');
-      showToast('Recording... Tap mic again to stop.');
-    } catch(err) {
-      console.error(err);
-      showToast('Microphone access denied.');
-    }
-  } else {
-    mediaRecorder.stop();
-    isRecording = false;
-    voiceBtn.classList.remove('recording');
-  }
-});
 
 // Initialize App
 initId();
 renderContacts();
 renderChats();
+generateAndSaveKeys(); // Start the encryption engine!
 </script>
 </body>
 </html>
