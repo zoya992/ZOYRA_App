@@ -1,0 +1,461 @@
+<!doctype html>
+
+<html lang="en">  
+<head>  
+<meta charset="utf-8">  
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">  
+<meta name="theme-color" content="#0b1020">  
+<title>ZOYRA — Private conversations</title>  
+<style>  
+:root{--bg:#0b1020;--panel:#121b30;--panel2:#18243c;--line:#263552;--text:#f4f7ff;--muted:#9eacc5;--accent:#829cff;--accent2:#a8b8ff;--green:#57d6a0;--danger:#ff7e88}  
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#24365d 0%,var(--bg) 54%);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}  
+button,input{font:inherit}button{cursor:pointer}.app{max-width:520px;margin:auto;min-height:100vh;padding:env(safe-area-inset-top) 16px calc(86px + env(safe-area-inset-bottom))}  
+header{height:68px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff12}  
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.16em;font-size:19px}.logo{width:34px;height:34px;border-radius:12px;background:linear-gradient(145deg,#a9b8ff,#627df0);display:grid;place-items:center;color:#10182c;font-weight:900;letter-spacing:0}  
+.status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:6px}.dot{width:7px;height:7px;background:var(--green);border-radius:50%}  
+.screen{display:none;padding-top:20px}.screen.active{display:block}.eyebrow{color:var(--accent2);font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}  
+h1{font-size:27px;line-height:1.15;margin:8px 0 7px}h2{font-size:19px;margin:0 0 5px}.sub{color:var(--muted);font-size:13px;margin:0 0 20px}  
+.card{background:linear-gradient(155deg,#17243d,#111a2d);border:1px solid var(--line);border-radius:20px;padding:18px;margin:16px 0}  
+.idlabel{font-size:12px;color:var(--muted)}.userid{font-size:22px;letter-spacing:.06em;font-weight:800;margin:7px 0 13px;overflow-wrap:anywhere}  
+.btn{border:0;border-radius:13px;padding:13px 16px;font-weight:700;color:#10182c;background:linear-gradient(135deg,#b5c2ff,#829cff)}.btn.secondary{background:#202e4b;color:var(--text);border:1px solid #344565}.btn.ghost{background:transparent;color:var(--accent2);border:1px solid #344565}.btn.full{width:100%}.actions{display:flex;gap:9px}.actions>*{flex:1}  
+.nav{position:fixed;bottom:0;left:0;right:0;background:#0d1528f2;border-top:1px solid var(--line);padding:9px 10px calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:4px;z-index:5;backdrop-filter:blur(16px)}.nav button{background:none;border:0;color:var(--muted);font-size:10px;padding:7px 10px;border-radius:12px;min-width:65px}.nav button span{display:block;font-size:19px;margin-bottom:2px}.nav button.active{color:var(--accent2);background:#202e4b}  
+.search{width:100%;background:#111b2f;border:1px solid var(--line);border-radius:13px;padding:13px;color:var(--text);outline:none;margin:10px 0 14px}.item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid #ffffff12}.avatar{width:44px;height:44px;border-radius:15px;background:linear-gradient(145deg,#425985,#253451);display:grid;place-items:center;font-weight:800;color:#dce4ff;flex:none}.itemmain{flex:1;min-width:0}.itemmain strong{display:block}.itemmain small{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.time{font-size:11px;color:var(--muted)}  
+.empty{text-align:center;padding:35px 15px;color:var(--muted)}.empty .symbol{font-size:38px;margin-bottom:8px}  
+.field{display:block;color:var(--muted);font-size:12px;margin:14px 0 6px}.fieldinput{width:100%;padding:13px;background:#0e1729;color:var(--text);border:1px solid var(--line);border-radius:12px;outline:none}  
+.feature{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #ffffff12}.feature:last-child{border:0}.feature .ico{font-size:22px;width:34px}.feature small{display:block;color:var(--muted)}  
+.notice{font-size:12px;color:#c3cee3;background:#202b42;border:1px solid #34445f;border-radius:13px;padding:12px;margin-top:16px}  
+.calltile{border:1px solid var(--line);background:#15213a;border-radius:18px;padding:18px;text-align:center;margin:12px 0}.calltile .big{font-size:34px;margin-bottom:6px}  
+footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}  
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#e8edff;color:#111a2c;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:10;max-width:90%;text-align:center}.toast.show{opacity:1}  
+@media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}  
+</style>  
+</head>  
+<body>  
+<div class="app">  
+<header><div class="brand"><div class="logo">Z</div>ZOYRA</div><div class="status"><i class="dot"></i> PRIVATE SPACE</div></header>  <section id="home" class="screen active">  
+  <div class="eyebrow">Welcome to ZOYRA</div>  
+  <h1>Your conversations.<br>Your control.</h1>  
+  <p class="sub">A private communication space, designed with security at its heart.</p>  
+  <div class="card">  
+    <div class="idlabel">YOUR PROFILE</div>  
+    <label class="field" for="displayName">Display name</label>  
+    <input id="displayName" class="fieldinput" maxlength="32" placeholder="Enter your name">  
+    <button class="btn full" style="margin-top:12px" onclick="saveProfile()">Save profile</button>  
+    <div class="idlabel" style="margin-top:22px">YOUR ZOYRA ID · LOCAL PREVIEW</div>  
+    <div class="userid" id="userId">Creating ID…</div>  
+    <button class="btn secondary full" onclick="copyId()">Copy ZOYRA ID</button>  
+  </div>  
+  <div class="card">  
+    <h2>Start connecting</h2>  
+    <p class="sub" style="margin:5px 0 14px">Choose where you want to go.</p>  
+    <div class="feature"><div class="ico">💬</div><div><strong>Private messages</strong><small>Your chat space</small></div></div>  
+    <div class="feature"><div class="ico">🎙️</div><div><strong>Audio calls</strong><small>One-to-one voice calling</small></div></div>  
+    <div class="feature"><div class="ico">📹</div><div><strong>Video calls</strong><small>One-to-one video calling</small></div></div>  
+  </div>  
+  <div class="notice">Identity setup is currently a local prototype: your display name and preview ID are saved only in this browser on this device. This is not yet a cryptographic identity, cannot be securely recovered on a new phone, and is not proof that another person owns an ID. Do not use it for sensitive communication.</div>  
+</section>  <section id="chats" class="screen">  
+  <div class="eyebrow">Your space</div><h1>Messages</h1><p class="sub">Your conversations will appear here.</p>  
+  <input class="search" placeholder="Search conversations" aria-label="Search conversations" oninput="renderChats(this.value)">  
+  <div id="chatList"></div>  
+  <button class="btn full" onclick="startChat()">＋ Start a conversation</button>  
+  <div id="chatRoom" class="card" style="display:none">  
+    <div class="actions" style="align-items:center">  
+      <button class="btn ghost" style="flex:0 0 auto" onclick="closeChat()">← Back</button>  
+      <div style="flex:1;min-width:0"><strong id="chatTitle">Conversation</strong><div class="idlabel" id="chatSubtitle"></div></div>  
+      <button class="btn ghost" style="flex:0 0 auto;padding:8px 10px;font-size:12px" onclick="exportLocalChat()">Export</button>  
+      <button class="btn ghost" style="flex:0 0 auto;padding:8px 10px;font-size:12px" onclick="clearLocalChat()">Clear</button>  
+    </div>  
+    <label class="field" for="messageSearch">Search messages in this chat</label>  
+    <input id="messageSearch" class="fieldinput" maxlength="100" placeholder="Type to find a message…" oninput="renderMessages(this.value)">  
+    <div id="messageSearchStatus" class="idlabel" aria-live="polite" style="margin-top:6px"></div>  
+    <div id="pinnedMessagePreview" class="idlabel" style="display:none;margin-top:8px;padding:9px 11px;border-left:3px solid #f5d36b;background:#172642;border-radius:8px"></div>  
+    <div id="messageList" style="min-height:160px;max-height:42vh;overflow:auto;margin:16px 0"></div>  
+    <div id="replyPreview" class="idlabel" style="display:none;margin:8px 0;padding:9px 11px;border-left:3px solid #8aa8ff;background:#172642;border-radius:8px"></div>  
+    <label class="field" for="messageInput">Message (local preview only)</label>  
+    <div class="actions"><input id="messageInput" class="fieldinput" maxlength="1000" placeholder="Write a message…" style="min-width:0"><button class="btn" style="flex:0 0 auto" onclick="sendLocalMessage()">Send</button></div>  
+  </div>  
+  <div class="notice">This chat screen is a local interface preview. Messages are stored only in this browser on this device; they are not sent to contacts and are not end-to-end encrypted yet.</div>  
+</section>  <section id="contacts" class="screen">  
+  <div class="eyebrow">People</div><h1>Contacts</h1><p class="sub">Connect using a ZOYRA ID when contact discovery is available.</p>  
+  <div class="card">  
+    <label class="field" for="contactName">Contact name</label>  
+    <input id="contactName" class="fieldinput" maxlength="32" placeholder="Name (optional)">  
+    <label class="field" for="contactId">Their ZOYRA ID</label>  
+    <input id="contactId" class="fieldinput" maxlength="17" placeholder="ZY-XXXX-XXXX-XXXX" autocapitalize="characters">  
+    <button class="btn full" style="margin-top:12px" onclick="addContact()">Save contact on this device</button>  
+  </div>  
+  <div id="contactList"></div>  
+  <div class="notice">Contacts are saved only in this browser on this device. ZOYRA does not verify that an ID belongs to the person you expect. Confirm identity in person using a future QR / safety-number verification feature.</div>  
+</section>  <section id="calls" class="screen">  
+  <div class="eyebrow">Stay connected</div><h1>Calls</h1><p class="sub">One-to-one audio and video calling.</p>  
+  <div class="calltile"><div class="big">🎙️</div><h2>Audio call</h2><p class="sub">Voice conversations with your contacts.</p><button class="btn full" onclick="showToast('Calling is not active in this preview.')">Start audio call</button></div>  
+  <div class="calltile"><div class="big">📹</div><h2>Video call</h2><p class="sub">Face-to-face conversations.</p><button class="btn full" onclick="showToast('Video calling is not active in this preview.')">Start video call</button></div>  
+  <div class="notice">Calls are not connected yet. WebRTC, secure signaling and network relay configuration must be implemented and tested before calling is enabled.</div>  
+</section>  <section id="settings" class="screen">  
+  <div class="eyebrow">Your preferences</div><h1>Settings</h1><p class="sub">Control your ZOYRA experience.</p>  
+  <div class="card">  
+    <div class="feature"><div class="ico">🛡️</div><div><strong>Privacy & security</strong><small>Security features are under development</small></div></div>  
+    <div class="feature"><div class="ico">🔒</div><div><strong>App lock</strong><small>Device authentication integration pending</small></div></div>  
+    <div class="feature"><div class="ico">🌐</div><div><strong>Language</strong><small>English · More languages planned</small></div></div>  
+    <div class="feature"><div class="ico">🔔</div><div><strong>Notifications</strong><small>Not configured in this preview</small></div></div>  
+  </div>  
+  <div class="card">  
+    <h2>Local data backup</h2>  
+    <p class="sub" style="margin:5px 0 12px">Export or restore your profile, contacts and local chats on this device.</p>  
+    <button class="btn full" onclick="exportLocalBackup()">⬇ Export local backup</button>  
+    <label class="field" for="backupFile">Restore from backup file</label>  
+    <input id="backupFile" class="fieldinput" type="file" accept=".json,application/json" onchange="importLocalBackup(this.files&&this.files[0])">  
+    <p class="idlabel" style="margin-top:10px">Backup files are not encrypted. Anyone with the file may be able to read it. Keep it private.</p>  
+  </div>  
+  <div class="notice">ZOYRA is planned to be free worldwide and ad-free. This preview does not yet provide production account recovery, encryption, or cloud services.</div>  
+  <footer>ZOYRA · Early development preview<br>Privacy first. Built with care.</footer>  
+</section>  
+</div>  
+<nav class="nav" aria-label="Main navigation">  
+<button class="active" data-screen="home" onclick="go('home',this)"><span>⌂</span>Home</button>  
+<button data-screen="chats" onclick="go('chats',this)"><span>▤</span>Chats</button>  
+<button data-screen="contacts" onclick="go('contacts',this)"><span>♙</span>Contacts</button>  
+<button data-screen="calls" onclick="go('calls',this)"><span>◉</span>Calls</button>  
+<button data-screen="settings" onclick="go('settings',this)"><span>⚙</span>Settings</button>  
+</nav>  
+<div id="toast" class="toast" role="status"></div>  
+<script>  
+const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';  
+function makeId(){const a=new Uint32Array(12);if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(a);else for(let i=0;i<a.length;i++)a[i]=Math.random()*4294967296;let s='';for(let i=0;i<12;i++){s+=alphabet[a[i]%alphabet.length];if(i%4===3&&i!==11)s+='-';}return 'ZY-'+s;}  
+function initId(){  
+  let id=localStorage.getItem('zoyra_preview_id');  
+  if(!id){id=makeId();localStorage.setItem('zoyra_preview_id',id)}  
+  document.getElementById('userId').textContent=id;  
+  document.getElementById('displayName').value=localStorage.getItem('zoyra_display_name')||'';  
+}  
+function saveProfile(){  
+  const field=document.getElementById('displayName');  
+  const name=field.value.trim();  
+  if(!name){showToast('Please enter a display name.');field.focus();return;}  
+  localStorage.setItem('zoyra_display_name',name);  
+  showToast('Profile saved on this device.');  
+}  
+function newId(){const id=makeId();localStorage.setItem('zoyra_preview_id',id);document.getElementById('userId').textContent=id;showToast('A new local preview ID was created.');}  
+function copyId(){const id=document.getElementById('userId').textContent;if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(id).then(()=>showToast('ID copied.')).catch(()=>showToast('Select and copy your ID manually.'));else showToast('Select and copy your ID manually.');}  
+function go(id,btn){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');window.scrollTo(0,0);}  
+function showToast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.classList.remove('show'),2400);}  
+function readContacts(){  
+  try { const value=JSON.parse(localStorage.getItem('zoyra_contacts')||'[]'); return Array.isArray(value)?value:[]; }  
+  catch(e) { return []; }  
+}  
+function renderContacts(){  
+  const list=document.getElementById('contactList');  
+  if(!list)return;  
+  const contacts=readContacts();  
+  list.replaceChildren();  
+  if(contacts.length===0){  
+    const empty=document.createElement('div');  
+    empty.className='empty';  
+    empty.innerHTML='<div class="symbol">👥</div><strong>No contacts added</strong><p>Your saved contacts will appear here.</p>';  
+    list.appendChild(empty);  
+    return;  
+  }  
+  contacts.forEach((contact,index)=>{  
+    const row=document.createElement('div'); row.className='item';  
+    const avatar=document.createElement('div'); avatar.className='avatar';  
+    avatar.textContent=(contact.name||contact.id).slice(0,1).toUpperCase();  
+    const main=document.createElement('div'); main.className='itemmain';  
+    const strong=document.createElement('strong'); strong.textContent=contact.name||'ZOYRA contact';  
+    const small=document.createElement('small'); small.textContent=contact.id;  
+    main.append(strong,small);  
+    const remove=document.createElement('button'); remove.className='btn ghost'; remove.textContent='Remove';  
+    remove.style.padding='8px 10px'; remove.style.fontSize='12px';  
+    remove.addEventListener('click',()=>{const current=readContacts();current.splice(index,1);localStorage.setItem('zoyra_contacts',JSON.stringify(current));renderContacts();showToast('Contact removed from this device.');});  
+    row.append(avatar,main,remove); list.appendChild(row);  
+  });  
+}  
+function addContact(){  
+  const id=document.getElementById('contactId').value.trim().toUpperCase();  
+  const name=document.getElementById('contactName').value.trim();  
+  if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(id)){  
+    showToast('Enter an ID in the format ZY-XXXX-XXXX-XXXX.');return;  
+  }  
+  if(id===localStorage.getItem('zoyra_preview_id')){showToast('You cannot add your own ID.');return;}  
+  const contacts=readContacts();  
+  if(contacts.some(c=>c.id===id)){showToast('This ID is already in your contacts.');return;}  
+  contacts.push({id:id,name:name});  
+  localStorage.setItem('zoyra_contacts',JSON.stringify(contacts));  
+  document.getElementById('contactId').value='';  
+  document.getElementById('contactName').value='';  
+  renderContacts();  
+  showToast('Contact saved on this device.');  
+}  
+let activeChatId=null;  
+let replyingTo=null;  
+function readChats(){  
+  try { const value=JSON.parse(localStorage.getItem('zoyra_local_chats')||'{}'); return value&&typeof value==='object'&&!Array.isArray(value)?value:{}; }  
+  catch(e) { return {}; }  
+}  
+function writeChats(chats){localStorage.setItem('zoyra_local_chats',JSON.stringify(chats));}  
+function renderChats(query=''){  
+  const list=document.getElementById('chatList'); if(!list)return;  
+  const contacts=readContacts(), chats=readChats(), q=query.trim().toLowerCase();  
+  list.replaceChildren();  
+  const rows=contacts.filter(c=>{  
+    const msgs=chats[c.id]||[];  
+    return msgs.length>0 && ((c.name||'').toLowerCase().includes(q)||c.id.toLowerCase().includes(q)||msgs[msgs.length-1].text.toLowerCase().includes(q));  
+  });  
+  if(rows.length===0){  
+    const empty=document.createElement('div'); empty.className='empty';  
+    empty.innerHTML='<div class="symbol">💬</div><strong>No conversations yet</strong><p>Add a contact first, then start a local preview chat.</p>';  
+    list.appendChild(empty);return;  
+  }  
+  rows.forEach(c=>{  
+    const msgs=chats[c.id]||[], last=msgs[msgs.length-1];  
+    const row=document.createElement('button'); row.className='item'; row.style.width='100%'; row.style.textAlign='left'; row.style.color='inherit'; row.style.background='transparent'; row.style.border='0'; row.style.borderBottom='1px solid #ffffff12';  
+    const av=document.createElement('div');av.className='avatar';av.textContent=(c.name||c.id).slice(0,1).toUpperCase();  
+    const main=document.createElement('div');main.className='itemmain';  
+    const name=document.createElement('strong');name.textContent=c.name||c.id;  
+    const preview=document.createElement('small');preview.textContent=last.text;  
+    main.append(name,preview);row.append(av,main);  
+    row.addEventListener('click',()=>openChat(c.id));list.appendChild(row);  
+  });  
+}  
+function startChat(){  
+  const contacts=readContacts();  
+  if(!contacts.length){showToast('First add a contact in Contacts.');return;}  
+  openChat(contacts[0].id);  
+}  
+function openChat(id){  
+  const contact=readContacts().find(c=>c.id===id);if(!contact){showToast('Contact not found.');return;}  
+  activeChatId=id;  
+  replyingTo=null;updateReplyPreview();  
+  document.getElementById('chatRoom').style.display='block';  
+  document.getElementById('chatTitle').textContent=contact.name||'ZOYRA contact';  
+  document.getElementById('chatSubtitle').textContent=id+' · local preview';  
+  document.getElementById('messageInput').value='';  
+  document.getElementById('messageSearch').value='';  
+  renderMessages();  
+  document.getElementById('messageInput').focus();  
+}  
+function closeChat(){activeChatId=null;document.getElementById('chatRoom').style.display='none';renderChats();}  
+function renderMessages(query=''){  
+  const box=document.getElementById('messageList');if(!box||!activeChatId)return;  
+  const chats=readChats(),msgs=chats[activeChatId]||[];  
+  const term=String(query||'').trim().toLocaleLowerCase();  
+  const pinned=msgs.map((m,index)=>({m,index})).filter(x=>x.m.pinned);  
+  const pinBox=document.getElementById('pinnedMessagePreview');  
+  if(pinBox){pinBox.replaceChildren();pinBox.style.display=pinned.length?'block':'none';if(pinned.length){const title=document.createElement('strong');title.textContent='📌 Pinned messages ('+pinned.length+')';pinBox.appendChild(title);pinned.slice(0,3).forEach(x=>{const item=document.createElement('div');item.textContent='• '+String(x.m.text||'').slice(0,100);item.style.marginTop='4px';pinBox.appendChild(item);});}}  
+  const matches=msgs.map((m,index)=>({m,index})).filter(x=>!term||String(x.m.text||'').toLocaleLowerCase().includes(term));  
+  box.replaceChildren();  
+  const status=document.getElementById('messageSearchStatus');  
+  if(status)status.textContent=term?(matches.length+' matching message'+(matches.length===1?'':'s')):'';  
+  if(!msgs.length){  
+    const empty=document.createElement('div');empty.className='empty';empty.textContent='No local preview messages yet.';box.appendChild(empty);  
+  }else if(!matches.length){  
+    const empty=document.createElement('div');empty.className='empty';empty.textContent='No messages match this search.';box.appendChild(empty);  
+  }  
+  matches.forEach(({m,index})=>{  
+    const wrap=document.createElement('div');wrap.style.cssText='display:flex;justify-content:flex-end;align-items:flex-start;gap:6px;margin:8px 0';  
+    const bubble=document.createElement('div');bubble.style.cssText='max-width:82%;padding:10px 13px;border-radius:14px 14px 3px 14px;background:#26385d;color:#f4f7ff;overflow-wrap:anywhere';  
+    const body=document.createElement('div');body.textContent=m.text;  
+    if(term){  
+      const text=String(m.text||''),at=text.toLocaleLowerCase().indexOf(term);  
+      if(at>=0){  
+        body.replaceChildren();  
+        body.append(document.createTextNode(text.slice(0,at)));  
+        const mark=document.createElement('mark');mark.textContent=text.slice(at,at+term.length);mark.style.cssText='background:#f5d36b;color:#17213a;border-radius:3px;padding:0 2px';  
+        body.append(mark,document.createTextNode(text.slice(at+term.length)));  
+      }  
+    }  
+    const stamp=document.createElement('small');stamp.style.cssText='display:block;color:#bdc9e2;font-size:10px;margin-top:5px';stamp.textContent=new Date(m.time).toLocaleString();  
+    if(m.replyTo&&m.replyTo.text){  
+      const quote=document.createElement('div');quote.textContent='↪ '+m.replyTo.text;  
+      quote.style.cssText='padding:6px 8px;margin-bottom:7px;border-left:3px solid #9bb5ff;background:#1a2b4b;border-radius:5px;color:#d7e2ff;font-size:12px';  
+      bubble.appendChild(quote);  
+    }  
+    bubble.append(body,stamp);  
+    if(m.edited){  
+      const edited=document.createElement('small');edited.style.cssText='display:block;color:#bdc9e2;font-size:10px;margin-top:4px';edited.textContent='Edited';  
+      bubble.appendChild(edited);  
+    }  
+    const reactionBar=document.createElement('div');reactionBar.style.cssText='display:flex;flex-wrap:wrap;gap:5px;margin-top:8px';  
+    ['👍','❤️','😂','😮','😢','🙏'].forEach(emoji=>{  
+      const count=Array.isArray(m.reactions)?m.reactions.filter(x=>x===emoji).length:0;  
+      const reaction=document.createElement('button');reaction.type='button';reaction.textContent=emoji+(count?' '+count:'');  
+      reaction.className='btn ghost';reaction.style.cssText='padding:4px 7px;font-size:12px;min-width:32px';  
+      reaction.setAttribute('aria-label','React with '+emoji);  
+      reaction.addEventListener('click',()=>toggleLocalReaction(index,emoji));  
+      reactionBar.appendChild(reaction);  
+    });  
+    bubble.appendChild(reactionBar);  
+    const controls=document.createElement('div');controls.style.cssText='display:flex;flex-direction:column;gap:4px';  
+    const age=Date.now()-(m.time||0);  
+    if(age<=15*60*1000){  
+      const edit=document.createElement('button');edit.type='button';edit.className='btn ghost';edit.textContent='Edit';edit.setAttribute('aria-label','Edit local message');edit.style.cssText='padding:5px 8px;font-size:11px';  
+      edit.addEventListener('click',()=>editLocalMessage(index));controls.appendChild(edit);  
+    }  
+    const pin=document.createElement('button');pin.type='button';pin.className='btn ghost';pin.textContent=m.pinned?'Unpin':'Pin';pin.setAttribute('aria-label',m.pinned?'Unpin message':'Pin message');pin.style.cssText='padding:5px 8px;font-size:11px';pin.addEventListener('click',()=>toggleLocalPin(index));controls.appendChild(pin);  
+    const reply=document.createElement('button');reply.type='button';reply.className='btn ghost';reply.textContent='Reply';reply.setAttribute('aria-label','Reply to local message');reply.style.cssText='padding:5px 8px;font-size:11px';  
+    reply.addEventListener('click',()=>setReply(index));controls.appendChild(reply);  
+    const del=document.createElement('button');del.type='button';del.className='btn ghost';del.textContent='×';del.setAttribute('aria-label','Delete local message');del.style.cssText='padding:5px 9px;min-width:30px;font-size:16px';  
+    del.addEventListener('click',()=>deleteLocalMessage(index));  
+    controls.appendChild(del);  
+    wrap.append(bubble,controls);box.appendChild(wrap);  
+  });  
+  if(!term)box.scrollTop=box.scrollHeight;  
+}  
+function toggleLocalPin(index){  
+  if(!activeChatId)return;  
+  const chats=readChats(),msgs=chats[activeChatId]||[],message=msgs[index];if(!message)return;  
+  message.pinned=!message.pinned;msgs[index]=message;chats[activeChatId]=msgs;writeChats(chats);  
+  renderMessages(document.getElementById('messageSearch').value);showToast(message.pinned?'Message pinned in this local chat.':'Message unpinned.');  
+}  
+function setReply(index){  
+  if(!activeChatId)return;  
+  const msgs=readChats()[activeChatId]||[],m=msgs[index];if(!m)return;  
+  replyingTo={text:String(m.text||'').slice(0,1000),time:m.time||Date.now()};  
+  updateReplyPreview();document.getElementById('messageInput').focus();  
+}  
+function updateReplyPreview(){  
+  const el=document.getElementById('replyPreview');if(!el)return;  
+  if(!replyingTo){el.style.display='none';el.replaceChildren();return;}  
+  el.style.display='block';el.replaceChildren();  
+  const label=document.createElement('span');label.textContent='Replying to: '+replyingTo.text;  
+  const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.className='btn ghost';cancel.style.cssText='margin-left:8px;padding:3px 7px;font-size:11px';  
+  cancel.addEventListener('click',()=>{replyingTo=null;updateReplyPreview();});  
+  el.append(label,cancel);  
+}  
+function toggleLocalReaction(index,emoji){  
+  if(!activeChatId)return;  
+  const allowed=['👍','❤️','😂','😮','😢','🙏'];if(!allowed.includes(emoji))return;  
+  const chats=readChats(),msgs=chats[activeChatId]||[],message=msgs[index];if(!message)return;  
+  if(!Array.isArray(message.reactions))message.reactions=[];  
+  const existing=message.reactions.indexOf(emoji);  
+  if(existing>=0)message.reactions.splice(existing,1);else message.reactions.push(emoji);  
+  msgs[index]=message;chats[activeChatId]=msgs;writeChats(chats);  
+  renderMessages(document.getElementById('messageSearch').value);  
+}  
+function editLocalMessage(index){  
+  if(!activeChatId)return;  
+  const chats=readChats(),msgs=chats[activeChatId]||[],message=msgs[index];  
+  if(!message)return;  
+  if(Date.now()-(message.time||0)>15*60*1000){showToast('The 15-minute edit period has expired.');renderMessages();return;}  
+  const revised=window.prompt('Edit your local preview message:',message.text);  
+  if(revised===null)return;  
+  const clean=revised.trim();  
+  if(!clean){showToast('Message cannot be empty.');return;}  
+  if(clean.length>1000){showToast('Message is too long (maximum 1000 characters).');return;}  
+  message.text=clean;message.edited=true;msgs[index]=message;chats[activeChatId]=msgs;  
+  writeChats(chats);renderMessages(document.getElementById('messageSearch').value);renderChats();showToast('Local message edited.');  
+}  
+function deleteLocalMessage(index){  
+  if(!activeChatId)return;  
+  const chats=readChats(),msgs=chats[activeChatId]||[];  
+  if(index<0||index>=msgs.length)return;  
+  msgs.splice(index,1);chats[activeChatId]=msgs;writeChats(chats);  
+  renderMessages(document.getElementById('messageSearch').value);renderChats();  
+}  
+function exportLocalChat(){  
+  if(!activeChatId)return;  
+  const contact=readContacts().find(c=>c.id===activeChatId);  
+  const msgs=readChats()[activeChatId]||[];  
+  if(!msgs.length){showToast('There are no messages to export.');return;}  
+  const title='ZOYRA local chat with '+(contact?.name||activeChatId);  
+  const lines=[title,'Contact ID: '+activeChatId,'Exported: '+new Date().toLocaleString(),'','NOTE: This is a local demo export, not a verified or encrypted conversation.',''];  
+  msgs.forEach((m,i)=>{  
+    lines.push('['+new Date(m.time||Date.now()).toLocaleString()+'] '+(m.edited?'(Edited) ':'')+m.text);  
+    if(m.replyTo?.text)lines.push('  Reply to: '+m.replyTo.text);  
+    if(m.pinned)lines.push('  [Pinned locally]');  
+    if(Array.isArray(m.reactions)&&m.reactions.length)lines.push('  Reactions: '+m.reactions.join(' '));  
+    lines.push('');  
+  });  
+  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});  
+  const url=URL.createObjectURL(blob),a=document.createElement('a');  
+  a.href=url;a.download='ZOYRA-chat-'+activeChatId+'.txt';document.body.appendChild(a);a.click();a.remove();  
+  setTimeout(()=>URL.revokeObjectURL(url),1000);  
+  showToast('Local chat export created. Keep the file private.');  
+}  
+function exportLocalBackup(){  
+  const payload={  
+    app:'ZOYRA-local-backup',  
+    version:1,  
+    createdAt:new Date().toISOString(),  
+    profile:{  
+      name:localStorage.getItem('zoyra_display_name')||'',  
+      id:localStorage.getItem('zoyra_preview_id')||''  
+    },  
+    contacts:readContacts(),  
+    chats:readChats()  
+  };  
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});  
+  const url=URL.createObjectURL(blob),a=document.createElement('a');  
+  a.href=url;a.download='ZOYRA-local-backup-'+new Date().toISOString().slice(0,10)+'.json';  
+  document.body.appendChild(a);a.click();a.remove();  
+  setTimeout(()=>URL.revokeObjectURL(url),1000);  
+  showToast('Local backup created. Keep the file private.');  
+}  
+async function importLocalBackup(file){  
+  const input=document.getElementById('backupFile');if(!file)return;  
+  try{  
+    if(file.size>5*1024*1024)throw new Error('Backup file is larger than 5 MB.');  
+    const data=JSON.parse(await file.text());  
+    const validId=id=>typeof id==='string'&&/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(id);  
+    if(!data||data.app!=='ZOYRA-local-backup'||data.version!==1||  
+       !Array.isArray(data.contacts)||!data.chats||typeof data.chats!=='object'||  
+       Array.isArray(data.chats)||!data.profile||typeof data.profile!=='object')  
+      throw new Error('This is not a supported ZOYRA backup.');  
+    if(data.contacts.length>500)throw new Error('Backup contains too many contacts.');  
+    if(data.contacts.some(c=>!c||!validId(c.id)||typeof(c.name||'')!=='string'||c.name.length>32))  
+      throw new Error('Backup has an invalid contact entry.');  
+    const cleanChats={};let total=0;  
+    for(const [id,msgs] of Object.entries(data.chats)){  
+      if(!validId(id)||!Array.isArray(msgs)||msgs.length>10000)  
+        throw new Error('Backup has invalid chat data.');  
+      cleanChats[id]=msgs.map(m=>{  
+        if(!m||typeof m.text!=='string'||m.text.length>1000||!Number.isFinite(Number(m.time)))  
+          throw new Error('Backup has an invalid message.');  
+        total++;if(total>20000)throw new Error('Backup contains too many messages.');  
+        const clean={text:m.text,time:Number(m.time)};  
+        if(m.edited===true)clean.edited=true;  
+        if(m.pinned===true)clean.pinned=true;  
+        if(m.replyTo&&typeof m.replyTo.text==='string')  
+          clean.replyTo={text:m.replyTo.text.slice(0,1000),time:Number(m.replyTo.time)||0};  
+        if(Array.isArray(m.reactions))  
+          clean.reactions=m.reactions.filter(x=>['👍','❤️','😂','😮','😢','🙏'].includes(x)).slice(0,6);  
+        return clean;  
+      });  
+    }  
+    if(typeof(data.profile.name||'')!=='string'||(data.profile.name||'').length>32||  
+       !validId(data.profile.id))throw new Error('Backup profile data is invalid.');  
+    if(!window.confirm('Restore this backup? It will replace the profile, contacts and local chats currently stored in this browser.'))return;  
+    localStorage.setItem('zoyra_display_name',data.profile.name||'');  
+    localStorage.setItem('zoyra_preview_id',data.profile.id);  
+    localStorage.setItem('zoyra_contacts',JSON.stringify(data.contacts));  
+    localStorage.setItem('zoyra_local_chats',JSON.stringify(cleanChats));  
+    if(typeof initId==='function')initId();  
+    if(typeof renderContacts==='function')renderContacts();  
+    if(typeof renderChats==='function')renderChats();  
+    showToast('Backup restored on this device.');  
+  }catch(err){  
+    showToast(err&&err.message?err.message:'Could not restore this backup.');  
+  }finally{  
+    if(input)input.value='';  
+  }  
+}  
+function clearLocalChat(){  
+  if(!activeChatId)return;  
+  const chats=readChats();delete chats[activeChatId];writeChats(chats);  
+  renderMessages(document.getElementById('messageSearch').value);renderChats();showToast('Local chat history cleared.');  
+}  
+function sendLocalMessage(){  
+  if(!activeChatId)return;  
+  const input=document.getElementById('messageInput'),text=input.value.trim();  
+  if(!text){showToast('Write a message first.');return;}  
+  const chats=readChats();if(!Array.isArray(chats[activeChatId]))chats[activeChatId]=[];  
+  const message={text:text,time:Date.now()};if(replyingTo)message.replyTo={...replyingTo};  
+  chats[activeChatId].push(message);  
+  writeChats(chats);input.value='';replyingTo=null;updateReplyPreview();renderMessages(document.getElementById('messageSearch').value);renderChats();  
+}  
+document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendLocalMessage();});  
+initId();  
+renderContacts();  
+renderChats();  
+</script>  
+</body>  
+</html>
