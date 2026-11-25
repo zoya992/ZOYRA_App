@@ -15,23 +15,26 @@ header{height:68px;display:flex;align-items:center;justify-content:space-between
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.16em;font-size:19px}.logo{width:34px;height:34px;border-radius:12px;background:linear-gradient(145deg,#a9b8ff,#627df0);display:grid;place-items:center;color:#10182c;font-weight:900;letter-spacing:0}
 .status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:6px}.dot{width:7px;height:7px;background:var(--green);border-radius:50%}
 .theme-btn{background:none;border:none;font-size:22px;cursor:pointer;padding:8px;border-radius:50%;transition:0.2s}.theme-btn:hover{background:#ffffff15}
-.screen{display:none;padding-top:20px}.screen.active{display:block}.eyebrow{color:var(--accent2);font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
+.screen{display:none;padding-top:20px;animation:fadeIn 0.3s ease-out}.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.eyebrow{color:var(--accent2);font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
 h1{font-size:27px;line-height:1.15;margin:8px 0 7px}h2{font-size:19px;margin:0 0 5px}.sub{color:var(--muted);font-size:13px;margin:0 0 20px}
 .card{background:linear-gradient(155deg,#17243d,#111a2d);border:1px solid var(--line);border-radius:20px;padding:18px;margin:16px 0;transition:background 0.3s, border-color 0.3s}
 body.light-theme .card{background:#ffffff}
 .idlabel{font-size:12px;color:var(--muted)}.userid{font-size:22px;letter-spacing:.06em;font-weight:800;margin:7px 0 13px;overflow-wrap:anywhere}
-.btn{border:0;border-radius:13px;padding:13px 16px;font-weight:700;color:#10182c;background:linear-gradient(135deg,#b5c2ff,#829cff)}.btn.secondary{background:#202e4b;color:var(--text);border:1px solid #344565}.btn.ghost{background:transparent;color:var(--accent2);border:1px solid #344565}.btn.full{width:100%}.actions{display:flex;gap:9px}.actions>*{flex:1}
-.nav{position:fixed;bottom:0;left:0;right:0;background:#0d1528f2;border-top:1px solid var(--line);padding:9px 10px calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:4px;z-index:5;backdrop-filter:blur(16px);transition:background 0.3s}.nav button{background:none;border:0;color:var(--muted);font-size:10px;padding:7px 10px;border-radius:12px;min-width:65px}.nav button span{display:block;font-size:19px;margin-bottom:2px}.nav button.active{color:var(--accent2);background:#202e4b}
+.btn{border:0;border-radius:13px;padding:13px 16px;font-weight:700;color:#10182c;background:linear-gradient(135deg,#b5c2ff,#829cff);transition:transform 0.1s}.btn:active{transform:scale(0.97)}.btn.secondary{background:#202e4b;color:var(--text);border:1px solid #344565}.btn.ghost{background:transparent;color:var(--accent2);border:1px solid #344565}.btn.full{width:100%}.actions{display:flex;gap:9px}.actions>*{flex:1}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#0d1528f2;border-top:1px solid var(--line);padding:9px 10px calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:4px;z-index:5;backdrop-filter:blur(16px);transition:background 0.3s}.nav button{background:none;border:0;color:var(--muted);font-size:10px;padding:7px 10px;border-radius:12px;min-width:65px;transition:0.2s}.nav button span{display:block;font-size:19px;margin-bottom:2px}.nav button.active{color:var(--accent2);background:#202e4b}
 body.light-theme .nav{background:#fffffff2;border-top-color:#d1d9e6}
 body.light-theme .nav button.active{background:#e0e7ff;color:#4a6cf7}
-.item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid #ffffff12}.avatar{width:44px;height:44px;border-radius:15px;background:linear-gradient(145deg,#425985,#253451);display:grid;place-items:center;font-weight:800;color:#dce4ff;flex:none}.itemmain{flex:1;min-width:0}.itemmain strong{display:block}.itemmain small{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid #ffffff12}.avatar{width:44px;height:44px;border-radius:15px;background:linear-gradient(145deg,#425985,#253451);display:grid;place-items:center;font-weight:800;color:#dce4ff;flex:none;position:relative}.online-dot{position:absolute;bottom:0;right:0;width:12px;height:12px;background:var(--green);border:2px solid var(--bg);border-radius:50%}.itemmain{flex:1;min-width:0}.itemmain strong{display:block}.itemmain small{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .empty{text-align:center;padding:35px 15px;color:var(--muted)}.empty .symbol{font-size:38px;margin-bottom:8px}
 .field{display:block;color:var(--muted);font-size:12px;margin:14px 0 6px}.fieldinput{width:100%;padding:13px;background:#0e1729;color:var(--text);border:1px solid var(--line);border-radius:12px;outline:none;transition:background 0.3s}
 body.light-theme .fieldinput{background:#f1f5f9;color:#10182c;border-color:#d1d9e6}
 .feature{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #ffffff12}.feature:last-child{border:0}.feature .ico{font-size:22px;width:34px}.feature small{display:block;color:var(--muted)}
 .notice{font-size:12px;color:#c3cee3;background:#202b42;border:1px solid #34445f;border-radius:13px;padding:12px;margin-top:16px}
 body.light-theme .notice{background:#eef2ff;color:#4a6cf7;border-color:#d1d9e6}
-.msg{padding:10px 13px;border-radius:14px;max-width:85%;margin:8px 0;overflow-wrap:anywhere;position:relative;transition:background 0.3s}
+.msg{padding:10px 13px;border-radius:14px;max-width:85%;margin:8px 0;overflow-wrap:anywhere;position:relative;transition:background 0.3s;animation:msgPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)}
+@keyframes msgPop{from{opacity:0;transform:scale(0.8) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .msg.mine{background:#26385d;color:#f4f7ff;margin-left:auto;border-bottom-right-radius:3px}
 .msg.theirs{background:#1a2b4b;color:#dce4ff;border-bottom-left-radius:3px}
 body.light-theme .msg.mine{background:#e0e7ff;color:#10182c}
@@ -44,15 +47,25 @@ body.light-theme .msg-time{color:#5a6b8c}
 footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#e8edff;color:#111a2c;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:10;max-width:90%;text-align:center}.toast.show{opacity:1}
 
-/* Call Overlay Styles */
-#callOverlay{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:1000;display:none;flex-direction:column}
-#remoteVideo{width:100%;height:100%;object-fit:cover;background:#111}
-#localVideo{position:absolute;bottom:100px;right:20px;width:100px;height:150px;object-fit:cover;border-radius:12px;border:2px solid #fff;background:#333;z-index:1001}
-.call-controls{position:absolute;bottom:40px;left:0;right:0;display:flex;justify-content:center;gap:20px;z-index:1001}
-.call-btn{width:60px;height:60px;border-radius:50%;border:0;font-size:24px;display:grid;place-items:center;color:#fff;cursor:pointer}
-.btn-end{background:#ff4444}
-.btn-mute{background:#555}
-.call-info{position:absolute;top:40px;left:0;right:0;text-align:center;color:#fff;z-index:1001;text-shadow:0 2px 4px rgba(0,0,0,0.8)}
+/* Typing Indicator */
+.typing-indicator{display:none;padding:10px 13px;background:#1a2b4b;border-radius:14px;border-bottom-left-radius:3px;width:fit-content;margin-bottom:8px;animation:msgPop 0.3s}
+.typing-indicator span{display:inline-block;width:6px;height:6px;background:#bdc9e2;border-radius:50%;margin:0 2px;animation:bounce 1.4s infinite ease-in-out both}
+.typing-indicator span:nth-child(1){animation-delay:-0.32s}.typing-indicator span:nth-child(2){animation-delay:-0.16s}
+@keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+
+/* Pro Call Screen */
+#callOverlay{position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at center,#1e293b,#000);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:space-between;padding:60px 20px 40px}
+.call-avatar{width:120px;height:120px;border-radius:50%;background:linear-gradient(145deg,#a9b8ff,#627df0);display:grid;place-items:center;font-size:48px;font-weight:900;color:#10182c;margin-bottom:20px;box-shadow:0 0 0 0 rgba(130,156,255,0.7);animation:pulseRing 2s infinite}
+@keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(130,156,255,0.7)}70%{box-shadow:0 0 0 20px rgba(130,156,255,0)}100%{box-shadow:0 0 0 0 rgba(130,156,255,0)}}
+#remoteVideo{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:1}
+#localVideo{position:absolute;bottom:120px;right:20px;width:90px;height:130px;object-fit:cover;border-radius:16px;border:2px solid #fff;background:#333;z-index:2;box-shadow:0 10px 20px rgba(0,0,0,0.5)}
+.call-info{position:relative;z-index:2;text-align:center;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.8)}
+.call-info h2{margin:0 0 8px;font-size:24px;font-weight:700}
+.call-info small{color:#cbd5e1;font-size:14px;letter-spacing:1px}
+.call-controls{position:relative;z-index:2;display:flex;justify-content:center;gap:30px}
+.call-btn{width:64px;height:64px;border-radius:50%;border:0;font-size:26px;display:grid;place-items:center;color:#fff;cursor:pointer;transition:0.2s;box-shadow:0 4px 15px rgba(0,0,0,0.3)}
+.call-btn:active{transform:scale(0.9)}
+.btn-end{background:#ef4444}.btn-mute{background:#334155}.btn-video{background:#334155}
 
 @media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
 </style>
@@ -96,10 +109,14 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
   <div id="chatRoom" class="card" style="display:none">
     <div class="actions" style="align-items:center">
       <button class="btn ghost" style="flex:0 0 auto" onclick="closeChat()">← Back</button>
-      <div style="flex:1;min-width:0"><strong id="chatTitle">Conversation</strong><div class="idlabel" id="chatSubtitle"></div></div>
+      <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px">
+        <div style="position:relative"><div class="avatar" style="width:32px;height:32px;font-size:14px" id="chatAvatar">?</div><div class="online-dot" id="chatOnlineDot" style="display:none"></div></div>
+        <div><strong id="chatTitle">Conversation</strong><div class="idlabel" id="chatSubtitle" style="font-size:10px"></div></div>
+      </div>
       <button class="btn ghost" style="flex:0 0 auto;padding:8px 12px;font-size:16px" onclick="startCall()" title="Video Call">📹</button>
     </div>
     <div id="messageList" style="min-height:200px;max-height:50vh;overflow:auto;margin:16px 0;padding:8px;background:#0e1729;border-radius:12px;border:1px solid var(--line)"></div>
+    <div id="typingIndicator" class="typing-indicator"><span></span><span></span><span></span></div>
     <label class="field" for="messageInput">Message</label>
     <div class="actions"><input id="messageInput" class="fieldinput" maxlength="1000" placeholder="Write a message…" style="min-width:0"><button class="btn" style="flex:0 0 auto" onclick="sendMessage()">Send</button></div>
   </div>
@@ -141,13 +158,14 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 </nav>
 <div id="toast" class="toast" role="status"></div>
 
-<!-- Video Call Overlay -->
+<!-- Pro Video Call Overlay -->
 <div id="callOverlay">
   <video id="remoteVideo" autoplay playsinline></video>
   <video id="localVideo" autoplay playsinline muted></video>
   <div class="call-info">
-    <h2 id="callStatusText" style="margin:0;font-size:18px">Connecting...</h2>
-    <small id="callTimer" style="color:#ccc">00:00</small>
+    <div class="call-avatar" id="callAvatar">?</div>
+    <h2 id="callStatusText">Connecting...</h2>
+    <small id="callTimer">00:00</small>
   </div>
   <div class="call-controls">
     <button class="call-btn btn-mute" onclick="toggleMute()">🎤</button>
@@ -181,7 +199,6 @@ themeBtn.addEventListener('click', () => { isDark = !isDark; localStorage.setIte
 applyTheme();
 
 const encStatus = document.getElementById('encStatus');
-
 let sentMessagesCache = {};
 function loadSentCache() { try { sentMessagesCache = JSON.parse(localStorage.getItem('zoyra_sent_cache') || '{}'); } catch(e) { sentMessagesCache = {}; } }
 function saveSentCache() { localStorage.setItem('zoyra_sent_cache', JSON.stringify(sentMessagesCache)); }
@@ -193,7 +210,6 @@ function arrayBufferToBase64(buffer) {
   for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
   return window.btoa(binary);
 }
-
 function base64ToArrayBuffer(base64) {
   const binary_string = window.atob(base64);
   const bytes = new Uint8Array(binary_string.length);
@@ -243,7 +259,8 @@ async function uploadPublicKey() {
     const publicKeyJwk = JSON.parse(localStorage.getItem('zoyra_public_key'));
     await db.collection('users').doc(myId).set({
       publicKey: publicKeyJwk,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      isOnline: true,
+      lastSeen: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
     encStatus.textContent = "Active & Secure 🔐";
   } catch (error) {
@@ -251,6 +268,12 @@ async function uploadPublicKey() {
     encStatus.textContent = "Network Error";
   }
 }
+
+// Set offline on close
+window.addEventListener('beforeunload', () => {
+  const myId = localStorage.getItem('zoyra_preview_id');
+  if(myId) db.collection('users').doc(myId).update({ isOnline: false, lastSeen: firebase.firestore.FieldValue.serverTimestamp() });
+});
 
 async function getPrivateKey() {
   const jwk = JSON.parse(localStorage.getItem('zoyra_private_key'));
@@ -381,6 +404,8 @@ function getChatId(id1,id2){return [id1,id2].sort().join('|');}
 
 let activeChatId=null;
 let unsubscribeMessages=null;
+let unsubscribeTyping=null;
+let unsubscribeStatus=null;
 let lastMsgCount = 0;
 
 function renderChats(){
@@ -418,8 +443,11 @@ function openChat(id){
   document.getElementById('chatRoom').style.display='block';
   document.getElementById('chatTitle').textContent=contact.name||'ZOYRA contact';
   document.getElementById('chatSubtitle').textContent=id;
+  document.getElementById('chatAvatar').textContent=(contact.name||id).slice(0,1).toUpperCase();
   document.getElementById('messageInput').value='';
   renderMessages();
+  listenForTyping();
+  listenForStatus();
   document.getElementById('messageInput').focus();
 }
 
@@ -427,8 +455,54 @@ function closeChat(){
   activeChatId=null;
   document.getElementById('chatRoom').style.display='none';
   if(unsubscribeMessages){unsubscribeMessages();unsubscribeMessages=null;}
+  if(unsubscribeTyping){unsubscribeTyping();unsubscribeTyping=null;}
+  if(unsubscribeStatus){unsubscribeStatus();unsubscribeStatus=null;}
+  document.getElementById('typingIndicator').style.display='none';
   renderChats();
 }
+
+function listenForStatus() {
+  if(unsubscribeStatus) unsubscribeStatus();
+  unsubscribeStatus = db.collection('users').doc(activeChatId).onSnapshot(doc => {
+    if(doc.exists && doc.data().isOnline) {
+      document.getElementById('chatOnlineDot').style.display='block';
+      document.getElementById('chatSubtitle').textContent = 'Online';
+    } else {
+      document.getElementById('chatOnlineDot').style.display='none';
+      document.getElementById('chatSubtitle').textContent = 'Last seen recently';
+    }
+  });
+}
+
+function listenForTyping() {
+  if(unsubscribeTyping) unsubscribeTyping();
+  const myId = localStorage.getItem('zoyra_preview_id');
+  const chatId = getChatId(myId, activeChatId);
+  const typingRef = db.collection('chats').doc(chatId).collection('typing').doc(activeChatId);
+  
+  unsubscribeTyping = typingRef.onSnapshot(doc => {
+    if(doc.exists && doc.data().isTyping) {
+      document.getElementById('typingIndicator').style.display='block';
+    } else {
+      document.getElementById('typingIndicator').style.display='none';
+    }
+  });
+}
+
+let typingTimeout;
+document.getElementById('messageInput').addEventListener('input', () => {
+  if(!activeChatId) return;
+  const myId = localStorage.getItem('zoyra_preview_id');
+  const chatId = getChatId(myId, activeChatId);
+  const typingRef = db.collection('chats').doc(chatId).collection('typing').doc(myId);
+  
+  typingRef.set({ isTyping: true, timestamp: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+  
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => {
+    typingRef.set({ isTyping: false });
+  }, 2000);
+});
 
 async function renderMessages(){
   if(!activeChatId)return;
@@ -503,6 +577,10 @@ async function sendMessage(){
   
   const myId=localStorage.getItem('zoyra_preview_id');
   const chatId=getChatId(myId,activeChatId);
+  
+  // Stop typing
+  db.collection('chats').doc(chatId).collection('typing').doc(myId).set({ isTyping: false });
+  
   showToast('Fetching key & Encrypting... 🔒');
   
   try {
@@ -521,16 +599,19 @@ async function sendMessage(){
 document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
 // ==========================================
-// WEBRTC CALLING LOGIC
+// WEBRTC CALLING LOGIC (PRO UI)
 // ==========================================
 let localStream, remoteStream, peerConnection;
 const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 let callListener = null;
+let callTimerInterval;
 
 async function startCall() {
   if (!activeChatId) return;
   const myId = localStorage.getItem('zoyra_preview_id');
   const chatId = getChatId(myId, activeChatId);
+  const contact = readContacts().find(c=>c.id===activeChatId);
+  document.getElementById('callAvatar').textContent = (contact?.name || activeChatId).slice(0,1).toUpperCase();
   
   try {
     showToast('Requesting Camera/Mic...');
@@ -538,6 +619,7 @@ async function startCall() {
     document.getElementById('localVideo').srcObject = localStream;
     document.getElementById('callOverlay').style.display = 'flex';
     document.getElementById('callStatusText').textContent = 'Calling...';
+    startCallTimer();
 
     peerConnection = new RTCPeerConnection(servers);
     localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
@@ -568,7 +650,6 @@ async function startCall() {
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // Listen for answer
     callListener = db.collection('calls').doc(chatId).onSnapshot(async doc => {
       const data = doc.data();
       if (data && data.status === 'answering' && data.answer && !peerConnection.currentRemoteDescription) {
@@ -579,7 +660,6 @@ async function startCall() {
       }
     });
 
-    // Listen for ICE candidates from peer
     db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => {
       snapshot.docChanges().forEach(change => {
         if (change.type === 'added') {
@@ -598,12 +678,10 @@ async function startCall() {
   }
 }
 
-// Listen for incoming calls globally
 function listenForIncomingCalls() {
   const myId = localStorage.getItem('zoyra_preview_id');
   if (!myId) return;
   
-  // We check all calls where we are the callee
   db.collection('calls').where('callee', '==', myId).where('status', '==', 'offering')
     .onSnapshot(async snapshot => {
       snapshot.docChanges().forEach(async change => {
@@ -611,17 +689,20 @@ function listenForIncomingCalls() {
           const callData = change.doc.data();
           const chatId = change.doc.id;
           const callerId = callData.caller;
+          const contact = readContacts().find(c=>c.id===callerId);
+          document.getElementById('callAvatar').textContent = (contact?.name || callerId).slice(0,1).toUpperCase();
           
-          if(confirm(`Incoming Video Call from ${callerId}. Accept?`)) {
-            activeChatId = callerId; // Set active chat to caller
+          if(confirm(`Incoming Video Call from ${contact?.name || callerId}. Accept?`)) {
+            activeChatId = callerId;
             document.getElementById('chatRoom').style.display='block';
-            document.getElementById('chatTitle').textContent='Video Call';
+            document.getElementById('chatTitle').textContent=contact?.name||'Video Call';
             
             try {
               localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
               document.getElementById('localVideo').srcObject = localStream;
               document.getElementById('callOverlay').style.display = 'flex';
               document.getElementById('callStatusText').textContent = 'Connecting...';
+              startCallTimer();
 
               peerConnection = new RTCPeerConnection(servers);
               localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
@@ -667,12 +748,23 @@ function listenForIncomingCalls() {
 
             } catch(err) { console.error(err); endCallUI(); }
           } else {
-            // Reject call
             db.collection('calls').doc(chatId).update({ status: 'ended' });
           }
         }
       });
     });
+}
+
+function startCallTimer() {
+  let seconds = 0;
+  const timerEl = document.getElementById('callTimer');
+  clearInterval(callTimerInterval);
+  callTimerInterval = setInterval(() => {
+    seconds++;
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    timerEl.textContent = `${m}:${s}`;
+  }, 1000);
 }
 
 function toggleMute() {
@@ -691,7 +783,6 @@ function endCall() {
   
   if (chatId) {
     db.collection('calls').doc(chatId).update({ status: 'ended' }).catch(e=>{});
-    // Cleanup ICE subcollection
     db.collection('calls').doc(chatId).collection('ice').get().then(snap => {
       snap.forEach(doc => doc.ref.delete());
     });
@@ -700,6 +791,7 @@ function endCall() {
 }
 
 function endCallUI() {
+  clearInterval(callTimerInterval);
   if (peerConnection) peerConnection.close();
   if (localStream) localStream.getTracks().forEach(track => track.stop());
   if (callListener) callListener();
@@ -707,6 +799,7 @@ function endCallUI() {
   document.getElementById('callOverlay').style.display = 'none';
   document.getElementById('remoteVideo').srcObject = null;
   document.getElementById('localVideo').srcObject = null;
+  document.getElementById('callTimer').textContent = '00:00';
   peerConnection = null;
   localStream = null;
   showToast('Call Ended');
@@ -717,7 +810,7 @@ initId();
 renderContacts();
 renderChats();
 generateAndSaveKeys(); 
-setTimeout(listenForIncomingCalls, 2000); // Start listening for calls after keys are ready
+setTimeout(listenForIncomingCalls, 2000);
 </script>
 </body>
 </html>
