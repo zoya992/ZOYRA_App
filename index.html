@@ -143,7 +143,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Theme Toggle
 const themeBtn = document.getElementById('themeToggle');
 const themeMeta = document.getElementById('themeColorMeta');
 let isDark = localStorage.getItem('zoyra_theme') !== 'light';
@@ -154,7 +153,6 @@ function applyTheme() {
 themeBtn.addEventListener('click', () => { isDark = !isDark; localStorage.setItem('zoyra_theme', isDark ? 'dark' : 'light'); applyTheme(); });
 applyTheme();
 
-// --- END-TO-END ENCRYPTION ENGINE ---
 const encStatus = document.getElementById('encStatus');
 
 function arrayBufferToBase64(buffer) {
@@ -216,11 +214,18 @@ async function getPrivateKey() {
   return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["decrypt"]);
 }
 
-async function getPublicKeyFromDB(targetId) {
-  const doc = await db.collection('users').doc(targetId).get();
-  if (doc.exists && doc.data().publicKey) {
-    const jwk = doc.data().publicKey;
-    return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["encrypt"]);
+async function getPublicKeyFromDB(targetId, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const doc = await db.collection('users').doc(targetId).get();
+      if (doc.exists && doc.data().publicKey) {
+        const jwk = doc.data().publicKey;
+        return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["encrypt"]);
+      }
+    } catch (e) {
+      console.error(`Retry ${i+1} failed:`, e);
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }
   return null;
 }
@@ -237,7 +242,6 @@ async function decryptMessage(base64Cipher, privateKey) {
   return new TextDecoder().decode(decrypted);
 }
 
-// --- ID & PROFILE ---
 const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function makeId(){
   const a=new Uint32Array(12);
@@ -423,7 +427,7 @@ async function renderMessages(){
           body.textContent = decryptedText;
         } catch (err) {
           body.textContent = '[Decryption Failed]';
-          console.error(err);
+          console.error('Decryption error:', err);
         }
       } else {
         body.textContent = m.text || '[Encrypted Media]';
@@ -462,26 +466,31 @@ async function sendMessage(){
   const myId=localStorage.getItem('zoyra_preview_id');
   const chatId=getChatId(myId,activeChatId);
   
-  showToast('Encrypting & Sending... 🔒');
+  showToast('Encrypting... 🔒');
   
   try {
-    const friendPublicKey = await getPublicKeyFromDB(activeChatId);
-    if (!friendPublicKey) {
-      showToast('Could not find friend\'s key. Ask them to open the app.');
-      return;
+    const friendPublicKey = await getPublicKeyFromDB(activeChatId, 5);
+    
+    if (friendPublicKey) {
+      const encryptedText = await encryptMessage(text, friendPublicKey);
+      await db.collection('chats').doc(chatId).collection('messages').add({
+        text: encryptedText,
+        isEncrypted: true,
+        senderId: myId,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showToast('Sent securely! 🔐');
+    } else {
+      await db.collection('chats').doc(chatId).collection('messages').add({
+        text: text,
+        isEncrypted: false,
+        senderId: myId,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showToast('Sent (unencrypted - friend not online)');
     }
     
-    const encryptedText = await encryptMessage(text, friendPublicKey);
-    
-    await db.collection('chats').doc(chatId).collection('messages').add({
-      text: encryptedText,
-      isEncrypted: true,
-      senderId: myId,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    
     input.value='';
-    showToast('Message sent securely! 🔐');
   } catch(e) {
     console.error(e);
     showToast('Failed to send.');
@@ -490,7 +499,6 @@ async function sendMessage(){
 
 document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
-// Initialize App
 initId();
 renderContacts();
 renderChats();
