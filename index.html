@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1020" id="themeColorMeta">
+<!-- PWA Meta Tags -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ZOYRA">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQwIiBmaWxsPSIjNjI3ZGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1NSUiIGZvbnQtc2l6ZT0iMTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlo8L3RleHQ+PC9zdmc+">
+
 <title>ZOYRA — Private conversations</title>
 <style>
 :root{--bg:#0b1020;--panel:#121b30;--panel2:#18243c;--line:#263552;--text:#f4f7ff;--muted:#9eacc5;--accent:#829cff;--accent2:#a8b8ff;--green:#57d6a0;--danger:#ff7e88}
@@ -46,14 +53,10 @@ body.light-theme .msg-time{color:#5a6b8c}
 .msg-del:hover{opacity:1;background:#ffffff15}
 footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#e8edff;color:#111a2c;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:10;max-width:90%;text-align:center}.toast.show{opacity:1}
-
-/* Typing Indicator */
 .typing-indicator{display:none;padding:10px 13px;background:#1a2b4b;border-radius:14px;border-bottom-left-radius:3px;width:fit-content;margin-bottom:8px;animation:msgPop 0.3s}
 .typing-indicator span{display:inline-block;width:6px;height:6px;background:#bdc9e2;border-radius:50%;margin:0 2px;animation:bounce 1.4s infinite ease-in-out both}
 .typing-indicator span:nth-child(1){animation-delay:-0.32s}.typing-indicator span:nth-child(2){animation-delay:-0.16s}
 @keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
-
-/* Pro Call Screen */
 #callOverlay{position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at center,#1e293b,#000);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:space-between;padding:60px 20px 40px}
 .call-avatar{width:120px;height:120px;border-radius:50%;background:linear-gradient(145deg,#a9b8ff,#627df0);display:grid;place-items:center;font-size:48px;font-weight:900;color:#10182c;margin-bottom:20px;box-shadow:0 0 0 0 rgba(130,156,255,0.7);animation:pulseRing 2s infinite}
 @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(130,156,255,0.7)}70%{box-shadow:0 0 0 20px rgba(130,156,255,0)}100%{box-shadow:0 0 0 0 rgba(130,156,255,0)}}
@@ -65,8 +68,7 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 .call-controls{position:relative;z-index:2;display:flex;justify-content:center;gap:30px}
 .call-btn{width:64px;height:64px;border-radius:50%;border:0;font-size:26px;display:grid;place-items:center;color:#fff;cursor:pointer;transition:0.2s;box-shadow:0 4px 15px rgba(0,0,0,0.3)}
 .call-btn:active{transform:scale(0.9)}
-.btn-end{background:#ef4444}.btn-mute{background:#334155}.btn-video{background:#334155}
-
+.btn-end{background:#ef4444}.btn-mute{background:#334155}
 @media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
 </style>
 </head>
@@ -158,7 +160,6 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 </nav>
 <div id="toast" class="toast" role="status"></div>
 
-<!-- Pro Video Call Overlay -->
 <div id="callOverlay">
   <video id="remoteVideo" autoplay playsinline></video>
   <video id="localVideo" autoplay playsinline muted></video>
@@ -177,6 +178,13 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
+// Service Worker Registration for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
+  });
+}
+
 const firebaseConfig = {
   apiKey: "AIzaSyDfJhbsYH8LNgciNcoNKmwhZNWAKNLsXM",
   authDomain: "zoyra-chat.firebaseapp.com",
@@ -204,613 +212,200 @@ function loadSentCache() { try { sentMessagesCache = JSON.parse(localStorage.get
 function saveSentCache() { localStorage.setItem('zoyra_sent_cache', JSON.stringify(sentMessagesCache)); }
 loadSentCache();
 
-function arrayBufferToBase64(buffer) {
-  let binary = '';
-  const bytes = new Uint8Array(buffer);
-  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-  return window.btoa(binary);
-}
-function base64ToArrayBuffer(base64) {
-  const binary_string = window.atob(base64);
-  const bytes = new Uint8Array(binary_string.length);
-  for (let i = 0; i < binary_string.length; i++) bytes[i] = binary_string.charCodeAt(i);
-  return bytes.buffer;
-}
+function arrayBufferToBase64(buffer) { let binary = ''; const bytes = new Uint8Array(buffer); for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]); return window.btoa(binary); }
+function base64ToArrayBuffer(base64) { const binary_string = window.atob(base64); const bytes = new Uint8Array(binary_string.length); for (let i = 0; i < binary_string.length; i++) bytes[i] = binary_string.charCodeAt(i); return bytes.buffer; }
 
 async function generateAndSaveKeys() {
-  if (localStorage.getItem('zoyra_private_key') && localStorage.getItem('zoyra_public_key')) {
-    encStatus.textContent = "Keys Loaded. Syncing...";
-    await uploadPublicKey();
-    return;
-  }
+  if (localStorage.getItem('zoyra_private_key') && localStorage.getItem('zoyra_public_key')) { encStatus.textContent = "Keys Loaded. Syncing..."; await uploadPublicKey(); return; }
   try {
     encStatus.textContent = "Generating secure keys...";
-    const keyPair = await window.crypto.subtle.generateKey(
-      { name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
-      true, ["encrypt", "decrypt"]
-    );
+    const keyPair = await window.crypto.subtle.generateKey({ name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["encrypt", "decrypt"]);
     const publicKeyJwk = await window.crypto.subtle.exportKey("jwk", keyPair.publicKey);
     const privateKeyJwk = await window.crypto.subtle.exportKey("jwk", keyPair.privateKey);
     localStorage.setItem('zoyra_public_key', JSON.stringify(publicKeyJwk));
     localStorage.setItem('zoyra_private_key', JSON.stringify(privateKeyJwk));
-    encStatus.textContent = "Keys Generated. Syncing...";
-    await uploadPublicKey();
-  } catch (error) {
-    console.error("Key generation failed:", error);
-    encStatus.textContent = "Failed to generate keys";
-  }
+    encStatus.textContent = "Keys Generated. Syncing..."; await uploadPublicKey();
+  } catch (error) { console.error("Key generation failed:", error); encStatus.textContent = "Failed to generate keys"; }
 }
 
 window.resetKeys = async function() {
   if(!confirm('Reset encryption keys? Old messages may not decrypt.')) return;
-  localStorage.removeItem('zoyra_private_key');
-  localStorage.removeItem('zoyra_public_key');
-  sentMessagesCache = {};
-  saveSentCache();
-  encStatus.textContent = "Resetting...";
-  await generateAndSaveKeys();
-  showToast('Keys reset successfully');
+  localStorage.removeItem('zoyra_private_key'); localStorage.removeItem('zoyra_public_key'); sentMessagesCache = {}; saveSentCache();
+  encStatus.textContent = "Resetting..."; await generateAndSaveKeys(); showToast('Keys reset successfully');
 };
 
 async function uploadPublicKey() {
-  const myId = localStorage.getItem('zoyra_preview_id');
-  if (!myId) return;
+  const myId = localStorage.getItem('zoyra_preview_id'); if (!myId) return;
   try {
     const publicKeyJwk = JSON.parse(localStorage.getItem('zoyra_public_key'));
-    await db.collection('users').doc(myId).set({
-      publicKey: publicKeyJwk,
-      isOnline: true,
-      lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
+    await db.collection('users').doc(myId).set({ publicKey: publicKeyJwk, isOnline: true, lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
     encStatus.textContent = "Active & Secure 🔐";
-  } catch (error) {
-    console.error("Key upload failed:", error);
-    encStatus.textContent = "Network Error";
-  }
+  } catch (error) { console.error("Key upload failed:", error); encStatus.textContent = "Network Error"; }
 }
 
-// Set offline on close
-window.addEventListener('beforeunload', () => {
-  const myId = localStorage.getItem('zoyra_preview_id');
-  if(myId) db.collection('users').doc(myId).update({ isOnline: false, lastSeen: firebase.firestore.FieldValue.serverTimestamp() });
-});
+window.addEventListener('beforeunload', () => { const myId = localStorage.getItem('zoyra_preview_id'); if(myId) db.collection('users').doc(myId).update({ isOnline: false, lastSeen: firebase.firestore.FieldValue.serverTimestamp() }); });
 
-async function getPrivateKey() {
-  const jwk = JSON.parse(localStorage.getItem('zoyra_private_key'));
-  return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["decrypt"]);
-}
-
+async function getPrivateKey() { const jwk = JSON.parse(localStorage.getItem('zoyra_private_key')); return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["decrypt"]); }
 async function getPublicKeyFromDB(targetId, maxRetries = 5) {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      const doc = await db.collection('users').doc(targetId).get();
-      if (doc.exists && doc.data().publicKey) {
-        const jwk = doc.data().publicKey;
-        return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["encrypt"]);
-      }
-    } catch (e) { console.error(`Retry ${i+1} failed:`, e); }
-    await new Promise(resolve => setTimeout(resolve, 1500));
-  }
-  return null;
+  for (let i = 0; i < maxRetries; i++) { try { const doc = await db.collection('users').doc(targetId).get(); if (doc.exists && doc.data().publicKey) { const jwk = doc.data().publicKey; return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["encrypt"]); } } catch (e) { console.error(`Retry ${i+1} failed:`, e); } await new Promise(resolve => setTimeout(resolve, 1500)); } return null;
 }
-
-async function encryptMessage(text, publicKey) {
-  const encoded = new TextEncoder().encode(text);
-  const encrypted = await window.crypto.subtle.encrypt({ name: "RSA-OAEP" }, publicKey, encoded);
-  return arrayBufferToBase64(encrypted);
-}
-
-async function decryptMessage(base64Cipher, privateKey) {
-  const cipherBuffer = base64ToArrayBuffer(base64Cipher);
-  const decrypted = await window.crypto.subtle.decrypt({ name: "RSA-OAEP" }, privateKey, cipherBuffer);
-  return new TextDecoder().decode(decrypted);
-}
+async function encryptMessage(text, publicKey) { const encoded = new TextEncoder().encode(text); const encrypted = await window.crypto.subtle.encrypt({ name: "RSA-OAEP" }, publicKey, encoded); return arrayBufferToBase64(encrypted); }
+async function decryptMessage(base64Cipher, privateKey) { const cipherBuffer = base64ToArrayBuffer(base64Cipher); const decrypted = await window.crypto.subtle.decrypt({ name: "RSA-OAEP" }, privateKey, cipherBuffer); return new TextDecoder().decode(decrypted); }
 
 const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-function makeId(){
-  const a=new Uint32Array(12);
-  if(window.crypto && crypto.getRandomValues) crypto.getRandomValues(a);
-  else for(let i=0;i<a.length;i++) a[i]=Math.random()*4294967296;
-  let s='';
-  for(let i=0;i<12;i++){ s+=alphabet[a[i]%alphabet.length]; if(i%4===3&&i!==11)s+='-'; }
-  return 'ZY-'+s;
-}
-
-function initId(){
-  let id=localStorage.getItem('zoyra_preview_id');
-  if(!id){id=makeId();localStorage.setItem('zoyra_preview_id',id)}
-  document.getElementById('userId').textContent=id;
-  document.getElementById('displayName').value=localStorage.getItem('zoyra_display_name')||'';
-}
-
-function saveProfile(){
-  const field=document.getElementById('displayName');
-  const name=field.value.trim();
-  if(!name){showToast('Please enter a display name.');field.focus();return;}
-  localStorage.setItem('zoyra_display_name',name);
-  showToast('Profile saved.');
-}
-
-function copyId(){
-  const id=document.getElementById('userId').textContent;
-  if(navigator.clipboard) navigator.clipboard.writeText(id).then(()=>showToast('ID copied.')).catch(()=>showToast('Select and copy manually.'));
-  else showToast('Select and copy your ID manually.');
-}
-
-function go(id,btn){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  window.scrollTo(0,0);
-}
-
-function showToast(message){
-  const el=document.getElementById('toast');
-  el.textContent=message;el.classList.add('show');
-  clearTimeout(window.toastTimer);
-  window.toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
-}
-
-function playNotificationSound(){
-  try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
-    oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
-    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.15);
-  } catch(e) {}
-}
+function makeId(){ const a=new Uint32Array(12); if(window.crypto && crypto.getRandomValues) crypto.getRandomValues(a); else for(let i=0;i<a.length;i++) a[i]=Math.random()*4294967296; let s=''; for(let i=0;i<12;i++){ s+=alphabet[a[i]%alphabet.length]; if(i%4===3&&i!==11)s+='-'; } return 'ZY-'+s; }
+function initId(){ let id=localStorage.getItem('zoyra_preview_id'); if(!id){id=makeId();localStorage.setItem('zoyra_preview_id',id)} document.getElementById('userId').textContent=id; document.getElementById('displayName').value=localStorage.getItem('zoyra_display_name')||''; }
+function saveProfile(){ const field=document.getElementById('displayName'); const name=field.value.trim(); if(!name){showToast('Please enter a display name.');field.focus();return;} localStorage.setItem('zoyra_display_name',name); showToast('Profile saved.'); }
+function copyId(){ const id=document.getElementById('userId').textContent; if(navigator.clipboard) navigator.clipboard.writeText(id).then(()=>showToast('ID copied.')).catch(()=>showToast('Select and copy manually.')); else showToast('Select and copy your ID manually.'); }
+function go(id,btn){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); window.scrollTo(0,0); }
+function showToast(message){ const el=document.getElementById('toast'); el.textContent=message;el.classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>el.classList.remove('show'),2400); }
+function playNotificationSound(){ try { const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain(); oscillator.connect(gainNode); gainNode.connect(audioCtx.destination); oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.15); } catch(e) {} }
 
 function readContacts(){ try{const v=JSON.parse(localStorage.getItem('zoyra_contacts')||'[]');return Array.isArray(v)?v:[];}catch(e){return [];} }
-
 function renderContacts(){
-  const list=document.getElementById('contactList');if(!list)return;
-  const contacts=readContacts();list.replaceChildren();
-  if(contacts.length===0){
-    const empty=document.createElement('div');empty.className='empty';
-    empty.innerHTML='<div class="symbol">👥</div><strong>No contacts added</strong><p>Saved contacts will appear here.</p>';
-    list.appendChild(empty);return;
-  }
+  const list=document.getElementById('contactList');if(!list)return; const contacts=readContacts();list.replaceChildren();
+  if(contacts.length===0){ const empty=document.createElement('div');empty.className='empty'; empty.innerHTML='<div class="symbol">👥</div><strong>No contacts added</strong><p>Saved contacts will appear here.</p>'; list.appendChild(empty);return; }
   contacts.forEach((contact,index)=>{
-    const row=document.createElement('div');row.className='item';
-    const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent=(contact.name||contact.id).slice(0,1).toUpperCase();
-    const main=document.createElement('div');main.className='itemmain';
-    const strong=document.createElement('strong');strong.textContent=contact.name||'ZOYRA contact';
-    const small=document.createElement('small');small.textContent=contact.id;
-    main.append(strong,small);
+    const row=document.createElement('div');row.className='item'; const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent=(contact.name||contact.id).slice(0,1).toUpperCase();
+    const main=document.createElement('div');main.className='itemmain'; const strong=document.createElement('strong');strong.textContent=contact.name||'ZOYRA contact'; const small=document.createElement('small');small.textContent=contact.id; main.append(strong,small);
     const remove=document.createElement('button');remove.className='btn ghost';remove.textContent='Remove';remove.style.padding='8px 10px';remove.style.fontSize='12px';
     remove.addEventListener('click',()=>{const c=readContacts();c.splice(index,1);localStorage.setItem('zoyra_contacts',JSON.stringify(c));renderContacts();showToast('Contact removed.');});
     row.append(avatar,main,remove);list.appendChild(row);
   });
 }
-
 function addContact(){
-  const id=document.getElementById('contactId').value.trim().toUpperCase();
-  const name=document.getElementById('contactName').value.trim();
+  const id=document.getElementById('contactId').value.trim().toUpperCase(); const name=document.getElementById('contactName').value.trim();
   if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(id)){showToast('Enter ID in format ZY-XXXX-XXXX-XXXX.');return;}
   if(id===localStorage.getItem('zoyra_preview_id')){showToast('You cannot add your own ID.');return;}
-  const contacts=readContacts();
-  if(contacts.some(c=>c.id===id)){showToast('ID already in contacts.');return;}
-  contacts.push({id,name});
-  localStorage.setItem('zoyra_contacts',JSON.stringify(contacts));
-  document.getElementById('contactId').value='';document.getElementById('contactName').value='';
-  renderContacts();showToast('Contact saved.');
+  const contacts=readContacts(); if(contacts.some(c=>c.id===id)){showToast('ID already in contacts.');return;}
+  contacts.push({id,name}); localStorage.setItem('zoyra_contacts',JSON.stringify(contacts));
+  document.getElementById('contactId').value='';document.getElementById('contactName').value=''; renderContacts();showToast('Contact saved.');
 }
-
 function getChatId(id1,id2){return [id1,id2].sort().join('|');}
-
-let activeChatId=null;
-let unsubscribeMessages=null;
-let unsubscribeTyping=null;
-let unsubscribeStatus=null;
-let lastMsgCount = 0;
+let activeChatId=null; let unsubscribeMessages=null; let unsubscribeTyping=null; let unsubscribeStatus=null; let lastMsgCount = 0;
 
 function renderChats(){
-  const list=document.getElementById('chatList');if(!list)return;
-  const contacts=readContacts();list.replaceChildren();
-  if(contacts.length===0){
-    const empty=document.createElement('div');empty.className='empty';
-    empty.innerHTML='<div class="symbol">💬</div><strong>No conversations yet</strong><p>Add a contact first.</p>';
-    list.appendChild(empty);return;
-  }
+  const list=document.getElementById('chatList');if(!list)return; const contacts=readContacts();list.replaceChildren();
+  if(contacts.length===0){ const empty=document.createElement('div');empty.className='empty'; empty.innerHTML='<div class="symbol">💬</div><strong>No conversations yet</strong><p>Add a contact first.</p>'; list.appendChild(empty);return; }
   contacts.forEach(c=>{
     const row=document.createElement('button');row.className='item';row.style.cssText='width:100%;text-align:left;color:inherit;background:transparent;border:0;border-bottom:1px solid #ffffff12;cursor:pointer';
     const av=document.createElement('div');av.className='avatar';av.textContent=(c.name||c.id).slice(0,1).toUpperCase();
-    const main=document.createElement('div');main.className='itemmain';
-    const name=document.createElement('strong');name.textContent=c.name||c.id;
-    const preview=document.createElement('small');preview.textContent='Tap to open chat';
-    main.append(name,preview);row.append(av,main);
+    const main=document.createElement('div');main.className='itemmain'; const name=document.createElement('strong');name.textContent=c.name||c.id; const preview=document.createElement('small');preview.textContent='Tap to open chat'; main.append(name,preview);row.append(av,main);
     row.addEventListener('click',()=>openChat(c.id));list.appendChild(row);
   });
 }
-
-function startChat(){
-  const id=prompt('Enter the ZOYRA ID of the person you want to chat with:');
-  if(!id)return;
-  const clean=id.trim().toUpperCase();
-  if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(clean)){showToast('Invalid ID format.');return;}
-  const contacts=readContacts();
-  if(!contacts.some(c=>c.id===clean)){ contacts.push({id:clean,name:''}); localStorage.setItem('zoyra_contacts',JSON.stringify(contacts)); renderContacts(); }
-  openChat(clean);
-}
-
+function startChat(){ const id=prompt('Enter the ZOYRA ID of the person you want to chat with:'); if(!id)return; const clean=id.trim().toUpperCase(); if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(clean)){showToast('Invalid ID format.');return;} const contacts=readContacts(); if(!contacts.some(c=>c.id===clean)){ contacts.push({id:clean,name:''}); localStorage.setItem('zoyra_contacts',JSON.stringify(contacts)); renderContacts(); } openChat(clean); }
 function openChat(id){
   const contact=readContacts().find(c=>c.id===id);if(!contact){showToast('Contact not found.');return;}
-  activeChatId=id; lastMsgCount = 0;
-  document.getElementById('chatRoom').style.display='block';
-  document.getElementById('chatTitle').textContent=contact.name||'ZOYRA contact';
-  document.getElementById('chatSubtitle').textContent=id;
+  activeChatId=id; lastMsgCount = 0; document.getElementById('chatRoom').style.display='block';
+  document.getElementById('chatTitle').textContent=contact.name||'ZOYRA contact'; document.getElementById('chatSubtitle').textContent=id;
   document.getElementById('chatAvatar').textContent=(contact.name||id).slice(0,1).toUpperCase();
-  document.getElementById('messageInput').value='';
-  renderMessages();
-  listenForTyping();
-  listenForStatus();
-  document.getElementById('messageInput').focus();
+  document.getElementById('messageInput').value=''; renderMessages(); listenForTyping(); listenForStatus(); document.getElementById('messageInput').focus();
 }
+function closeChat(){ activeChatId=null; document.getElementById('chatRoom').style.display='none'; if(unsubscribeMessages){unsubscribeMessages();unsubscribeMessages=null;} if(unsubscribeTyping){unsubscribeTyping();unsubscribeTyping=null;} if(unsubscribeStatus){unsubscribeStatus();unsubscribeStatus=null;} document.getElementById('typingIndicator').style.display='none'; renderChats(); }
 
-function closeChat(){
-  activeChatId=null;
-  document.getElementById('chatRoom').style.display='none';
-  if(unsubscribeMessages){unsubscribeMessages();unsubscribeMessages=null;}
-  if(unsubscribeTyping){unsubscribeTyping();unsubscribeTyping=null;}
-  if(unsubscribeStatus){unsubscribeStatus();unsubscribeStatus=null;}
-  document.getElementById('typingIndicator').style.display='none';
-  renderChats();
-}
-
-function listenForStatus() {
-  if(unsubscribeStatus) unsubscribeStatus();
-  unsubscribeStatus = db.collection('users').doc(activeChatId).onSnapshot(doc => {
-    if(doc.exists && doc.data().isOnline) {
-      document.getElementById('chatOnlineDot').style.display='block';
-      document.getElementById('chatSubtitle').textContent = 'Online';
-    } else {
-      document.getElementById('chatOnlineDot').style.display='none';
-      document.getElementById('chatSubtitle').textContent = 'Last seen recently';
-    }
-  });
-}
-
+function listenForStatus() { if(unsubscribeStatus) unsubscribeStatus(); unsubscribeStatus = db.collection('users').doc(activeChatId).onSnapshot(doc => { if(doc.exists && doc.data().isOnline) { document.getElementById('chatOnlineDot').style.display='block'; document.getElementById('chatSubtitle').textContent = 'Online'; } else { document.getElementById('chatOnlineDot').style.display='none'; document.getElementById('chatSubtitle').textContent = 'Last seen recently'; } }); }
 function listenForTyping() {
-  if(unsubscribeTyping) unsubscribeTyping();
-  const myId = localStorage.getItem('zoyra_preview_id');
-  const chatId = getChatId(myId, activeChatId);
+  if(unsubscribeTyping) unsubscribeTyping(); const myId = localStorage.getItem('zoyra_preview_id'); const chatId = getChatId(myId, activeChatId);
   const typingRef = db.collection('chats').doc(chatId).collection('typing').doc(activeChatId);
-  
-  unsubscribeTyping = typingRef.onSnapshot(doc => {
-    if(doc.exists && doc.data().isTyping) {
-      document.getElementById('typingIndicator').style.display='block';
-    } else {
-      document.getElementById('typingIndicator').style.display='none';
-    }
-  });
+  unsubscribeTyping = typingRef.onSnapshot(doc => { if(doc.exists && doc.data().isTyping) { document.getElementById('typingIndicator').style.display='block'; } else { document.getElementById('typingIndicator').style.display='none'; } });
 }
-
 let typingTimeout;
 document.getElementById('messageInput').addEventListener('input', () => {
-  if(!activeChatId) return;
-  const myId = localStorage.getItem('zoyra_preview_id');
-  const chatId = getChatId(myId, activeChatId);
+  if(!activeChatId) return; const myId = localStorage.getItem('zoyra_preview_id'); const chatId = getChatId(myId, activeChatId);
   const typingRef = db.collection('chats').doc(chatId).collection('typing').doc(myId);
-  
   typingRef.set({ isTyping: true, timestamp: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-  
-  clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(() => {
-    typingRef.set({ isTyping: false });
-  }, 2000);
+  clearTimeout(typingTimeout); typingTimeout = setTimeout(() => { typingRef.set({ isTyping: false }); }, 2000);
 });
 
 async function renderMessages(){
-  if(!activeChatId)return;
-  if(unsubscribeMessages){unsubscribeMessages();}
-  const box=document.getElementById('messageList');box.replaceChildren();
-  const myId=localStorage.getItem('zoyra_preview_id');
-  const chatId=getChatId(myId,activeChatId);
-  const q = db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp','asc');
-  
-  const myPrivateKey = await getPrivateKey();
-
+  if(!activeChatId)return; if(unsubscribeMessages){unsubscribeMessages();} const box=document.getElementById('messageList');box.replaceChildren();
+  const myId=localStorage.getItem('zoyra_preview_id'); const chatId=getChatId(myId,activeChatId);
+  const q = db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp','asc'); const myPrivateKey = await getPrivateKey();
   unsubscribeMessages = q.onSnapshot(async (snapshot)=>{
-    box.replaceChildren();
-    if(snapshot.empty){ 
-        const empty=document.createElement('div');empty.className='empty';empty.textContent='No messages yet. Say hi! 👋';box.appendChild(empty); 
-        lastMsgCount = 0; 
-        return; 
-    }
-    if(!snapshot.empty && snapshot.size > lastMsgCount && lastMsgCount !== 0) {
-      const lastDoc = snapshot.docs[snapshot.docs.length - 1];
-      if(lastDoc.data().senderId !== myId) playNotificationSound();
-    }
+    box.replaceChildren(); if(snapshot.empty){ const empty=document.createElement('div');empty.className='empty';empty.textContent='No messages yet. Say hi! 👋';box.appendChild(empty); lastMsgCount = 0; return; }
+    if(!snapshot.empty && snapshot.size > lastMsgCount && lastMsgCount !== 0) { const lastDoc = snapshot.docs[snapshot.docs.length - 1]; if(lastDoc.data().senderId !== myId) playNotificationSound(); }
     lastMsgCount = snapshot.size;
-
     for (const doc of snapshot.docs) {
-      const m = doc.data(); 
-      const msgId = doc.id; 
-      const isMine = m.senderId === myId;
-      const msg = document.createElement('div');
-      msg.className = 'msg ' + (isMine ? 'mine' : 'theirs');
-      const body = document.createElement('div');
-      
-      if (isMine && sentMessagesCache[msgId]) {
-        body.textContent = sentMessagesCache[msgId];
-      } else if (m.isEncrypted && m.text) {
-        try {
-          const decryptedText = await decryptMessage(m.text, myPrivateKey);
-          body.textContent = decryptedText;
-        } catch (err) { body.textContent = '[Decryption Failed]'; }
-      } else { body.textContent = '[Blocked: Unencrypted]'; }
-      msg.appendChild(body);
-
-      const meta=document.createElement('div');meta.className='msg-meta';
-      const stamp=document.createElement('span');stamp.className='msg-time';
-      if(m.timestamp && m.timestamp.toDate) stamp.textContent=new Date(m.timestamp.toDate()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-      else stamp.textContent='sending...';
-      meta.appendChild(stamp);
-
-      if(isMine){
-        const delBtn=document.createElement('button');delBtn.className='msg-del';delBtn.innerHTML='🗑️';
-        delBtn.addEventListener('click',()=>deleteMessage(chatId, msgId));
-        meta.appendChild(delBtn);
-      }
+      const m = doc.data(); const msgId = doc.id; const isMine = m.senderId === myId; const msg = document.createElement('div'); msg.className = 'msg ' + (isMine ? 'mine' : 'theirs'); const body = document.createElement('div');
+      if (isMine && sentMessagesCache[msgId]) { body.textContent = sentMessagesCache[msgId]; } else if (m.isEncrypted && m.text) { try { const decryptedText = await decryptMessage(m.text, myPrivateKey); body.textContent = decryptedText; } catch (err) { body.textContent = '[Decryption Failed]'; } } else { body.textContent = '[Blocked: Unencrypted]'; }
+      msg.appendChild(body); const meta=document.createElement('div');meta.className='msg-meta'; const stamp=document.createElement('span');stamp.className='msg-time'; if(m.timestamp && m.timestamp.toDate) stamp.textContent=new Date(m.timestamp.toDate()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); else stamp.textContent='sending...'; meta.appendChild(stamp);
+      if(isMine){ const delBtn=document.createElement('button');delBtn.className='msg-del';delBtn.innerHTML='🗑️'; delBtn.addEventListener('click',()=>deleteMessage(chatId, msgId)); meta.appendChild(delBtn); }
       msg.appendChild(meta);box.appendChild(msg);
-    }
-    box.scrollTop=box.scrollHeight;
+    } box.scrollTop=box.scrollHeight;
   },(err)=>{ console.error(err); });
 }
-
-window.deleteMessage = function(chatId, msgId) {
-  if(!confirm('Delete this message?')) return;
-  db.collection('chats').doc(chatId).collection('messages').doc(msgId).delete()
-    .then(()=> { delete sentMessagesCache[msgId]; saveSentCache(); showToast('Message deleted.'); })
-    .catch((e)=> showToast('Failed to delete.'));
-};
+window.deleteMessage = function(chatId, msgId) { if(!confirm('Delete this message?')) return; db.collection('chats').doc(chatId).collection('messages').doc(msgId).delete().then(()=> { delete sentMessagesCache[msgId]; saveSentCache(); showToast('Message deleted.'); }).catch((e)=> showToast('Failed to delete.')); };
 
 async function sendMessage(){
-  if(!activeChatId)return;
-  const input=document.getElementById('messageInput');
-  const text=input.value.trim();
-  if(!text){showToast('Write a message first.');return;}
-  
-  const myId=localStorage.getItem('zoyra_preview_id');
-  const chatId=getChatId(myId,activeChatId);
-  
-  // Stop typing
+  if(!activeChatId)return; const input=document.getElementById('messageInput'); const text=input.value.trim(); if(!text){showToast('Write a message first.');return;}
+  const myId=localStorage.getItem('zoyra_preview_id'); const chatId=getChatId(myId,activeChatId);
   db.collection('chats').doc(chatId).collection('typing').doc(myId).set({ isTyping: false });
-  
   showToast('Fetching key & Encrypting... 🔒');
-  
   try {
-    const friendPublicKey = await getPublicKeyFromDB(activeChatId, 5);
-    if (!friendPublicKey) { showToast('❌ Friend\'s key not found! Ask them to open the app.'); return; }
+    const friendPublicKey = await getPublicKeyFromDB(activeChatId, 5); if (!friendPublicKey) { showToast('❌ Friend\'s key not found! Ask them to open the app.'); return; }
     const encryptedText = await encryptMessage(text, friendPublicKey);
-    const docRef = await db.collection('chats').doc(chatId).collection('messages').add({
-      text: encryptedText, isEncrypted: true, senderId: myId,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    sentMessagesCache[docRef.id] = text; saveSentCache();
-    showToast('Sent securely! 🔐'); input.value='';
+    const docRef = await db.collection('chats').doc(chatId).collection('messages').add({ text: encryptedText, isEncrypted: true, senderId: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    sentMessagesCache[docRef.id] = text; saveSentCache(); showToast('Sent securely! 🔐'); input.value='';
   } catch(e) { console.error(e); showToast('Failed to send.'); }
 }
-
 document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
 // ==========================================
 // WEBRTC CALLING LOGIC (PRO UI)
 // ==========================================
-let localStream, remoteStream, peerConnection;
-const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
-let callListener = null;
-let callTimerInterval;
+let localStream, remoteStream, peerConnection; const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }; let callListener = null; let callTimerInterval;
 
 async function startCall() {
-  if (!activeChatId) return;
-  const myId = localStorage.getItem('zoyra_preview_id');
-  const chatId = getChatId(myId, activeChatId);
-  const contact = readContacts().find(c=>c.id===activeChatId);
-  document.getElementById('callAvatar').textContent = (contact?.name || activeChatId).slice(0,1).toUpperCase();
-  
+  if (!activeChatId) return; const myId = localStorage.getItem('zoyra_preview_id'); const chatId = getChatId(myId, activeChatId);
+  const contact = readContacts().find(c=>c.id===activeChatId); document.getElementById('callAvatar').textContent = (contact?.name || activeChatId).slice(0,1).toUpperCase();
   try {
-    showToast('Requesting Camera/Mic...');
-    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    document.getElementById('localVideo').srcObject = localStream;
-    document.getElementById('callOverlay').style.display = 'flex';
-    document.getElementById('callStatusText').textContent = 'Calling...';
-    startCallTimer();
-
-    peerConnection = new RTCPeerConnection(servers);
-    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-    
-    peerConnection.onicecandidate = event => {
-      if (event.candidate) {
-        db.collection('calls').doc(chatId).collection('ice').add({
-          candidate: event.candidate.toJSON(),
-          sender: myId,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      }
-    };
-
-    peerConnection.ontrack = event => {
-      document.getElementById('remoteVideo').srcObject = event.streams[0];
-      document.getElementById('callStatusText').textContent = 'Connected';
-    };
-
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
-
-    await db.collection('calls').doc(chatId).set({
-      offer: { type: offer.type, sdp: offer.sdp },
-      caller: myId,
-      callee: activeChatId,
-      status: 'offering',
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    callListener = db.collection('calls').doc(chatId).onSnapshot(async doc => {
-      const data = doc.data();
-      if (data && data.status === 'answering' && data.answer && !peerConnection.currentRemoteDescription) {
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-      }
-      if (data && data.status === 'ended') {
-        endCallUI();
-      }
-    });
-
-    db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === 'added') {
-          const data = change.doc.data();
-          if (data.sender !== myId) {
-            peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e));
-          }
-        }
-      });
-    });
-
-  } catch (err) {
-    console.error(err);
-    showToast('Camera/Mic access denied or error.');
-    endCallUI();
-  }
+    showToast('Requesting Camera/Mic...'); localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    document.getElementById('localVideo').srcObject = localStream; document.getElementById('callOverlay').style.display = 'flex';
+    document.getElementById('callStatusText').textContent = 'Calling...'; startCallTimer();
+    peerConnection = new RTCPeerConnection(servers); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+    peerConnection.onicecandidate = event => { if (event.candidate) { db.collection('calls').doc(chatId).collection('ice').add({ candidate: event.candidate.toJSON(), sender: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); } };
+    peerConnection.ontrack = event => { document.getElementById('remoteVideo').srcObject = event.streams[0]; document.getElementById('callStatusText').textContent = 'Connected'; };
+    const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer);
+    await db.collection('calls').doc(chatId).set({ offer: { type: offer.type, sdp: offer.sdp }, caller: myId, callee: activeChatId, status: 'offering', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    callListener = db.collection('calls').doc(chatId).onSnapshot(async doc => { const data = doc.data(); if (data && data.status === 'answering' && data.answer && !peerConnection.currentRemoteDescription) { await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer)); } if (data && data.status === 'ended') { endCallUI(); } });
+    db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { const data = change.doc.data(); if (data.sender !== myId) { peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e)); } } }); });
+  } catch (err) { console.error(err); showToast('Camera/Mic access denied or error.'); endCallUI(); }
 }
 
 function listenForIncomingCalls() {
-  const myId = localStorage.getItem('zoyra_preview_id');
-  if (!myId) return;
-  
-  db.collection('calls').where('callee', '==', myId).where('status', '==', 'offering')
-    .onSnapshot(async snapshot => {
-      snapshot.docChanges().forEach(async change => {
-        if (change.type === 'added') {
-          const callData = change.doc.data();
-          const chatId = change.doc.id;
-          const callerId = callData.caller;
-          const contact = readContacts().find(c=>c.id===callerId);
-          document.getElementById('callAvatar').textContent = (contact?.name || callerId).slice(0,1).toUpperCase();
-          
-          if(confirm(`Incoming Video Call from ${contact?.name || callerId}. Accept?`)) {
-            activeChatId = callerId;
-            document.getElementById('chatRoom').style.display='block';
-            document.getElementById('chatTitle').textContent=contact?.name||'Video Call';
-            
-            try {
-              localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-              document.getElementById('localVideo').srcObject = localStream;
-              document.getElementById('callOverlay').style.display = 'flex';
-              document.getElementById('callStatusText').textContent = 'Connecting...';
-              startCallTimer();
-
-              peerConnection = new RTCPeerConnection(servers);
-              localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-              
-              peerConnection.onicecandidate = event => {
-                if (event.candidate) {
-                  db.collection('calls').doc(chatId).collection('ice').add({
-                    candidate: event.candidate.toJSON(),
-                    sender: myId,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                  });
-                }
-              };
-
-              peerConnection.ontrack = event => {
-                document.getElementById('remoteVideo').srcObject = event.streams[0];
-                document.getElementById('callStatusText').textContent = 'Connected';
-              };
-
-              await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
-              const answer = await peerConnection.createAnswer();
-              await peerConnection.setLocalDescription(answer);
-
-              await db.collection('calls').doc(chatId).update({
-                answer: { type: answer.type, sdp: answer.sdp },
-                status: 'answering'
-              });
-
-              callListener = db.collection('calls').doc(chatId).onSnapshot(doc => {
-                if (doc.data().status === 'ended') endCallUI();
-              });
-
-              db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => {
-                snapshot.docChanges().forEach(change => {
-                  if (change.type === 'added') {
-                    const data = change.doc.data();
-                    if (data.sender !== myId) {
-                      peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e));
-                    }
-                  }
-                });
-              });
-
-            } catch(err) { console.error(err); endCallUI(); }
-          } else {
-            db.collection('calls').doc(chatId).update({ status: 'ended' });
-          }
-        }
-      });
+  const myId = localStorage.getItem('zoyra_preview_id'); if (!myId) return;
+  db.collection('calls').where('callee', '==', myId).where('status', '==', 'offering').onSnapshot(async snapshot => {
+    snapshot.docChanges().forEach(async change => {
+      if (change.type === 'added') {
+        const callData = change.doc.data(); const chatId = change.doc.id; const callerId = callData.caller;
+        const contact = readContacts().find(c=>c.id===callerId); document.getElementById('callAvatar').textContent = (contact?.name || callerId).slice(0,1).toUpperCase();
+        if(confirm(`Incoming Video Call from ${contact?.name || callerId}. Accept?`)) {
+          activeChatId = callerId; document.getElementById('chatRoom').style.display='block'; document.getElementById('chatTitle').textContent=contact?.name||'Video Call';
+          try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById('localVideo').srcObject = localStream; document.getElementById('callOverlay').style.display = 'flex';
+            document.getElementById('callStatusText').textContent = 'Connecting...'; startCallTimer();
+            peerConnection = new RTCPeerConnection(servers); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            peerConnection.onicecandidate = event => { if (event.candidate) { db.collection('calls').doc(chatId).collection('ice').add({ candidate: event.candidate.toJSON(), sender: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); } };
+            peerConnection.ontrack = event => { document.getElementById('remoteVideo').srcObject = event.streams[0]; document.getElementById('callStatusText').textContent = 'Connected'; };
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer)); const answer = await peerConnection.createAnswer(); await peerConnection.setLocalDescription(answer);
+            await db.collection('calls').doc(chatId).update({ answer: { type: answer.type, sdp: answer.sdp }, status: 'answering' });
+            callListener = db.collection('calls').doc(chatId).onSnapshot(doc => { if (doc.data().status === 'ended') endCallUI(); });
+            db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { const data = change.doc.data(); if (data.sender !== myId) { peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e)); } } }); });
+          } catch(err) { console.error(err); endCallUI(); }
+        } else { db.collection('calls').doc(chatId).update({ status: 'ended' }); }
+      }
     });
+  });
 }
 
-function startCallTimer() {
-  let seconds = 0;
-  const timerEl = document.getElementById('callTimer');
-  clearInterval(callTimerInterval);
-  callTimerInterval = setInterval(() => {
-    seconds++;
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
-    timerEl.textContent = `${m}:${s}`;
-  }, 1000);
-}
+function startCallTimer() { let seconds = 0; const timerEl = document.getElementById('callTimer'); clearInterval(callTimerInterval); callTimerInterval = setInterval(() => { seconds++; const m = Math.floor(seconds / 60).toString().padStart(2, '0'); const s = (seconds % 60).toString().padStart(2, '0'); timerEl.textContent = `${m}:${s}`; }, 1000); }
+function toggleMute() { if (localStream) { const audioTrack = localStream.getAudioTracks()[0]; if (audioTrack) { audioTrack.enabled = !audioTrack.enabled; showToast(audioTrack.enabled ? 'Unmuted' : 'Muted'); } } }
+function endCall() { const myId = localStorage.getItem('zoyra_preview_id'); const chatId = activeChatId ? getChatId(myId, activeChatId) : null; if (chatId) { db.collection('calls').doc(chatId).update({ status: 'ended' }).catch(e=>{}); db.collection('calls').doc(chatId).collection('ice').get().then(snap => { snap.forEach(doc => doc.ref.delete()); }); } endCallUI(); }
+function endCallUI() { clearInterval(callTimerInterval); if (peerConnection) peerConnection.close(); if (localStream) localStream.getTracks().forEach(track => track.stop()); if (callListener) callListener(); document.getElementById('callOverlay').style.display = 'none'; document.getElementById('remoteVideo').srcObject = null; document.getElementById('localVideo').srcObject = null; document.getElementById('callTimer').textContent = '00:00'; peerConnection = null; localStream = null; showToast('Call Ended'); }
 
-function toggleMute() {
-  if (localStream) {
-    const audioTrack = localStream.getAudioTracks()[0];
-    if (audioTrack) {
-      audioTrack.enabled = !audioTrack.enabled;
-      showToast(audioTrack.enabled ? 'Unmuted' : 'Muted');
-    }
-  }
-}
-
-function endCall() {
-  const myId = localStorage.getItem('zoyra_preview_id');
-  const chatId = activeChatId ? getChatId(myId, activeChatId) : null;
-  
-  if (chatId) {
-    db.collection('calls').doc(chatId).update({ status: 'ended' }).catch(e=>{});
-    db.collection('calls').doc(chatId).collection('ice').get().then(snap => {
-      snap.forEach(doc => doc.ref.delete());
-    });
-  }
-  endCallUI();
-}
-
-function endCallUI() {
-  clearInterval(callTimerInterval);
-  if (peerConnection) peerConnection.close();
-  if (localStream) localStream.getTracks().forEach(track => track.stop());
-  if (callListener) callListener();
-  
-  document.getElementById('callOverlay').style.display = 'none';
-  document.getElementById('remoteVideo').srcObject = null;
-  document.getElementById('localVideo').srcObject = null;
-  document.getElementById('callTimer').textContent = '00:00';
-  peerConnection = null;
-  localStream = null;
-  showToast('Call Ended');
-}
-
-// Initialize App
-initId();
-renderContacts();
-renderChats();
-generateAndSaveKeys(); 
-setTimeout(listenForIncomingCalls, 2000);
+initId(); renderContacts(); renderChats(); generateAndSaveKeys(); setTimeout(listenForIncomingCalls, 2000);
 </script>
 </body>
 </html>
