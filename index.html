@@ -41,6 +41,7 @@ body.light-theme .msg.theirs{background:#f1f5f9;color:#10182c}
 body.light-theme .msg-time{color:#5a6b8c}
 .msg-del{background:none;border:none;color:#ff7e88;cursor:pointer;font-size:14px;padding:2px 5px;border-radius:6px;opacity:0.7;transition:0.2s}
 .msg-del:hover{opacity:1;background:#ffffff15}
+.msg-status{font-size:9px;color:var(--muted);margin-top:2px}
 footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#e8edff;color:#111a2c;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:10;max-width:90%;text-align:center}.toast.show{opacity:1}
 @media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
@@ -69,6 +70,7 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
     <div class="userid" id="userId">Creating ID…</div>
     <button class="btn secondary full" onclick="copyId()">Copy ZOYRA ID</button>
     <div class="idlabel" style="margin-top:20px; color:var(--green)">🔒 ENCRYPTION STATUS: <span id="encStatus">Generating Keys...</span></div>
+    <button class="btn ghost full" style="margin-top:12px;font-size:11px" onclick="resetKeys()">🔄 Reset Encryption Keys</button>
   </div>
   <div class="card">
     <h2>How to chat</h2>
@@ -155,6 +157,16 @@ applyTheme();
 
 const encStatus = document.getElementById('encStatus');
 
+// Local cache for sent messages (so sender can see their own messages)
+let sentMessagesCache = {};
+function loadSentCache() {
+  try { sentMessagesCache = JSON.parse(localStorage.getItem('zoyra_sent_cache') || '{}'); } catch(e) { sentMessagesCache = {}; }
+}
+function saveSentCache() {
+  localStorage.setItem('zoyra_sent_cache', JSON.stringify(sentMessagesCache));
+}
+loadSentCache();
+
 function arrayBufferToBase64(buffer) {
   let binary = '';
   const bytes = new Uint8Array(buffer);
@@ -193,6 +205,17 @@ async function generateAndSaveKeys() {
   }
 }
 
+window.resetKeys = async function() {
+  if(!confirm('Reset encryption keys? Old messages may not decrypt.')) return;
+  localStorage.removeItem('zoyra_private_key');
+  localStorage.removeItem('zoyra_public_key');
+  sentMessagesCache = {};
+  saveSentCache();
+  encStatus.textContent = "Resetting...";
+  await generateAndSaveKeys();
+  showToast('Keys reset successfully');
+};
+
 async function uploadPublicKey() {
   const myId = localStorage.getItem('zoyra_preview_id');
   if (!myId) return;
@@ -214,7 +237,7 @@ async function getPrivateKey() {
   return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["decrypt"]);
 }
 
-async function getPublicKeyFromDB(targetId, maxRetries = 3) {
+async function getPublicKeyFromDB(targetId, maxRetries = 5) {
   for (let i = 0; i < maxRetries; i++) {
     try {
       const doc = await db.collection('users').doc(targetId).get();
@@ -225,7 +248,7 @@ async function getPublicKeyFromDB(targetId, maxRetries = 3) {
     } catch (e) {
       console.error(`Retry ${i+1} failed:`, e);
     }
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1500));
   }
   return null;
 }
@@ -421,7 +444,11 @@ async function renderMessages(){
       msg.className = 'msg ' + (isMine ? 'mine' : 'theirs');
       
       const body = document.createElement('div');
-      if (m.isEncrypted && m.text) {
+      
+      // KEY FIX: For "mine" messages, use local cache first
+      if (isMine && sentMessagesCache[msgId]) {
+        body.textContent = sentMessagesCache[msgId];
+      } else if (m.isEncrypted && m.text) {
         try {
           const decryptedText = await decryptMessage(m.text, myPrivateKey);
           body.textContent = decryptedText;
@@ -454,7 +481,12 @@ async function renderMessages(){
 window.deleteMessage = function(chatId, msgId) {
   if(!confirm('Delete this message?')) return;
   db.collection('chats').doc(chatId).collection('messages').doc(msgId).delete()
-    .then(()=> showToast('Message deleted.')).catch((e)=> { console.error(e); showToast('Failed to delete.'); });
+    .then(()=> { 
+      delete sentMessagesCache[msgId];
+      saveSentCache();
+      showToast('Message deleted.');
+    })
+    .catch((e)=> { console.error(e); showToast('Failed to delete.'); });
 };
 
 async function sendMessage(){
@@ -473,21 +505,26 @@ async function sendMessage(){
     
     if (friendPublicKey) {
       const encryptedText = await encryptMessage(text, friendPublicKey);
-      await db.collection('chats').doc(chatId).collection('messages').add({
+      const docRef = await db.collection('chats').doc(chatId).collection('messages').add({
         text: encryptedText,
         isEncrypted: true,
         senderId: myId,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
+      // Save plaintext in local cache so sender can see it
+      sentMessagesCache[docRef.id] = text;
+      saveSentCache();
       showToast('Sent securely! 🔐');
     } else {
-      await db.collection('chats').doc(chatId).collection('messages').add({
+      const docRef = await db.collection('chats').doc(chatId).collection('messages').add({
         text: text,
         isEncrypted: false,
         senderId: myId,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
-      showToast('Sent (unencrypted - friend not online)');
+      sentMessagesCache[docRef.id] = text;
+      saveSentCache();
+      showToast('Sent (unencrypted - friend key not found)');
     }
     
     input.value='';
