@@ -160,50 +160,64 @@ applyTheme();
 const encStatus = document.getElementById('encStatus');
 
 async function generateAndSaveKeys() {
-  // Check if keys already exist
   if (localStorage.getItem('zoyra_private_key') && localStorage.getItem('zoyra_public_key')) {
-    encStatus.textContent = "Active & Secure 🔐";
+    encStatus.textContent = "Keys Loaded. Uploading Public Key...";
+    await uploadPublicKey();
     return;
   }
   
   try {
     encStatus.textContent = "Generating secure keys...";
-    // Generate RSA-OAEP Key Pair
     const keyPair = await window.crypto.subtle.generateKey(
-      {
-        name: "RSA-OAEP",
-        modulusLength: 2048,
-        publicExponent: new Uint8Array([1, 0, 1]),
-        hash: "SHA-256"
-      },
-      true, // extractable
-      ["encrypt", "decrypt"]
+      { name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
+      true, ["encrypt", "decrypt"]
     );
 
-    // Export keys to JWK (JSON) format to save in localStorage
     const publicKeyJwk = await window.crypto.subtle.exportKey("jwk", keyPair.publicKey);
     const privateKeyJwk = await window.crypto.subtle.exportKey("jwk", keyPair.privateKey);
 
-    // Save to local storage
     localStorage.setItem('zoyra_public_key', JSON.stringify(publicKeyJwk));
     localStorage.setItem('zoyra_private_key', JSON.stringify(privateKeyJwk));
     
-    encStatus.textContent = "Active & Secure 🔐";
+    encStatus.textContent = "Keys Generated. Uploading Public Key...";
+    await uploadPublicKey();
   } catch (error) {
     console.error("Key generation failed:", error);
     encStatus.textContent = "Failed to generate keys";
   }
 }
 
-// Helper to import keys back from JSON
+async function uploadPublicKey() {
+  const myId = localStorage.getItem('zoyra_preview_id');
+  if (!myId) return;
+  
+  try {
+    const publicKeyJwk = JSON.parse(localStorage.getItem('zoyra_public_key'));
+    // Save public key to Firestore so others can use it to encrypt messages for you
+    await db.collection('users').doc(myId).set({
+      publicKey: publicKeyJwk,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    
+    encStatus.textContent = "Active & Secure 🔐";
+  } catch (error) {
+    console.error("Key upload failed:", error);
+    encStatus.textContent = "Network Error (Check Firestore Rules)";
+  }
+}
+
 async function getPrivateKey() {
   const jwk = JSON.parse(localStorage.getItem('zoyra_private_key'));
   return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["decrypt"]);
 }
 
-async function getPublicKey() {
-  const jwk = JSON.parse(localStorage.getItem('zoyra_public_key'));
-  return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["encrypt"]);
+async function getPublicKeyFromDB(targetId) {
+  const doc = await db.collection('users').doc(targetId).get();
+  if (doc.exists && doc.data().publicKey) {
+    const jwk = doc.data().publicKey;
+    return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["encrypt"]);
+  }
+  return null;
 }
 
 // --- ID & PROFILE ---
@@ -412,7 +426,6 @@ function sendMessage(){
   const myName=localStorage.getItem('zoyra_display_name')||'Anonymous';
   const chatId=getChatId(myId,activeChatId);
   
-  // For now, sending plain text. We will add encryption logic in the next step!
   db.collection('chats').doc(chatId).collection('messages').add({
     text:text, senderId:myId, senderName:myName, timestamp:firebase.firestore.FieldValue.serverTimestamp()
   }).then(()=>{ input.value=''; }).catch((e)=>{ console.error(e); showToast('Failed to send.'); });
@@ -424,7 +437,7 @@ document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key=
 initId();
 renderContacts();
 renderChats();
-generateAndSaveKeys(); // Start the encryption engine!
+generateAndSaveKeys(); 
 </script>
 </body>
 </html>
