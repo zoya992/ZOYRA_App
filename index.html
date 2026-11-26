@@ -27,7 +27,7 @@ h1{font-size:27px;line-height:1.15;margin:8px 0 7px}h2{font-size:19px;margin:0 0
 .card{background:linear-gradient(155deg,#17243d,#111a2d);border:1px solid var(--line);border-radius:20px;padding:18px;margin:16px 0;transition:background 0.3s, border-color 0.3s}
 body.light-theme .card{background:#ffffff}
 .idlabel{font-size:12px;color:var(--muted)}.userid{font-size:22px;letter-spacing:.06em;font-weight:800;margin:7px 0 13px;overflow-wrap:anywhere}
-.btn{border:0;border-radius:13px;padding:13px 16px;font-weight:700;color:#10182c;background:linear-gradient(135deg,#b5c2ff,#829cff);transition:transform 0.1s}.btn:active{transform:scale(0.97)}.btn.secondary{background:#202e4b;color:var(--text);border:1px solid #344565}.btn.ghost{background:transparent;color:var(--accent2);border:1px solid #344565}.btn.full{width:100%}.btn.warn{background:linear-gradient(135deg,#ffd27a,#f59e0b)}.btn.danger{background:linear-gradient(135deg,#ff9ea3,#ef4444);color:#fff}.actions{display:flex;gap:9px}.actions>*{flex:1}
+.btn{border:0;border-radius:13px;padding:13px 16px;font-weight:700;color:#10182c;background:linear-gradient(135deg,#b5c2ff,#829cff);transition:transform 0.1s}.btn:active{transform:scale(0.97)}.btn.secondary{background:#202e4b;color:var(--text);border:1px solid #344565}.btn.ghost{background:transparent;color:var(--accent2);border:1px solid #344565}.btn.full{width:100%}.actions{display:flex;gap:9px}.actions>*{flex:1}
 .nav{position:fixed;bottom:0;left:0;right:0;background:#0d1528f2;border-top:1px solid var(--line);padding:9px 10px calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:4px;z-index:5;backdrop-filter:blur(16px);transition:background 0.3s}.nav button{background:none;border:0;color:var(--muted);font-size:10px;padding:7px 10px;border-radius:12px;min-width:65px;transition:0.2s;position:relative}.nav button span{display:block;font-size:19px;margin-bottom:2px}.nav button.active{color:var(--accent2);background:#202e4b}.nav-badge{position:absolute;top:4px;right:6px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;min-width:16px;text-align:center}
 body.light-theme .nav{background:#fffffff2;border-top-color:#d1d9e6}
 body.light-theme .nav button.active{background:#e0e7ff;color:#4a6cf7}
@@ -113,7 +113,7 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
     <h2>How to chat</h2>
     <p class="sub" style="margin:5px 0 14px">1. Share your ZOYRA ID with a friend<br>2. Get their ZOYRA ID<br>3. Go to Chats → Start conversation</p>
   </div>
-  <div class="notice">ZOYRA uses Strict End-to-End Encryption. Unencrypted messages are never sent. Unknown messages appear in Requests.</div>
+  <div class="notice">ZOYRA uses Strict End-to-End Encryption. Unknown messages appear in Requests.</div>
 </section>
 
 <section id="chats" class="screen">
@@ -303,7 +303,7 @@ function addContact(){
 function getChatId(id1,id2){return [id1,id2].sort().join('|');}
 let activeChatId=null; let unsubscribeMessages=null; let unsubscribeTyping=null; let unsubscribeStatus=null; let unsubscribeInbox=null; let lastMsgCount = 0;
 
-// ========== INBOX / MESSAGE REQUESTS ==========
+// ========== SMART INBOX SYSTEM ==========
 function listenForInbox() {
   if(unsubscribeInbox) unsubscribeInbox();
   const myId = localStorage.getItem('zoyra_preview_id');
@@ -316,37 +316,40 @@ function listenForInbox() {
     const requestsSection = document.getElementById('requestsSection');
     const requestsCount = document.getElementById('requestsCount');
     const navBadge = document.getElementById('navBadge');
+    const contacts = readContacts();
     
-    if(snapshot.empty) {
-      requestsSection.style.display = 'none';
-      navBadge.style.display = 'none';
-      return;
-    }
-    
-    requestsSection.style.display = 'block';
-    const count = snapshot.size;
-    requestsCount.textContent = `${count} new`;
-    navBadge.textContent = count;
-    navBadge.style.display = 'block';
-    
+    let requestCount = 0;
     requestsList.replaceChildren();
     
     snapshot.forEach(doc => {
       const data = doc.data();
       const reqId = doc.id;
+      const senderId = data.senderId;
+      
+      // KEY FIX: Check if sender is in contacts
+      const isSavedContact = contacts.some(c => c.id === senderId);
+      
+      if (isSavedContact) {
+        // If saved contact, delete from inbox immediately (let chat handle it)
+        db.collection('users').doc(myId).collection('inbox').doc(reqId).delete().catch(e => console.error(e));
+        return;
+      }
+      
+      // Only show unknown senders in requests
+      requestCount++;
       const item = document.createElement('div');
       item.className = 'request-item';
       
       const avatar = document.createElement('div');
       avatar.className = 'avatar';
-      avatar.textContent = (data.senderName || data.senderId || '?').slice(0,1).toUpperCase();
+      avatar.textContent = (data.senderName || senderId || '?').slice(0,1).toUpperCase();
       
       const info = document.createElement('div');
       info.className = 'req-info';
       const nameEl = document.createElement('strong');
       nameEl.textContent = data.senderName || 'Unknown';
       const idEl = document.createElement('small');
-      idEl.textContent = data.senderId;
+      idEl.textContent = senderId;
       info.append(nameEl, idEl);
       
       const actions = document.createElement('div');
@@ -355,17 +358,27 @@ function listenForInbox() {
       const acceptBtn = document.createElement('button');
       acceptBtn.className = 'req-accept';
       acceptBtn.textContent = '✓ Accept';
-      acceptBtn.onclick = () => acceptRequest(data.senderId, data.senderName, data.chatId, reqId);
+      acceptBtn.onclick = () => acceptRequest(senderId, data.senderName, data.chatId, reqId);
       
       const blockBtn = document.createElement('button');
       blockBtn.className = 'req-block';
       blockBtn.textContent = '✕ Block';
-      blockBtn.onclick = () => blockRequest(reqId, data.senderId);
+      blockBtn.onclick = () => blockRequest(reqId, senderId);
       
       actions.append(acceptBtn, blockBtn);
       item.append(avatar, info, actions);
       requestsList.appendChild(item);
     });
+    
+    if (requestCount > 0) {
+      requestsSection.style.display = 'block';
+      requestsCount.textContent = `${requestCount} new`;
+      navBadge.textContent = requestCount;
+      navBadge.style.display = 'block';
+    } else {
+      requestsSection.style.display = 'none';
+      navBadge.style.display = 'none';
+    }
   });
 }
 
@@ -382,6 +395,7 @@ async function acceptRequest(senderId, senderName, chatId, reqId) {
   
   showToast('Contact accepted! Opening chat...');
   renderContacts();
+  renderChats();
   openChat(senderId);
 }
 
@@ -444,7 +458,7 @@ async function renderMessages(){
     lastMsgCount = snapshot.size;
     for (const doc of snapshot.docs) {
       const m = doc.data(); const msgId = doc.id; const isMine = m.senderId === myId; const msg = document.createElement('div'); msg.className = 'msg ' + (isMine ? 'mine' : 'theirs'); const body = document.createElement('div');
-      if (isMine && sentMessagesCache[msgId]) { body.textContent = sentMessagesCache[msgId]; } else if (m.isEncrypted && m.text) { try { const decryptedText = await decryptMessage(m.text, myPrivateKey); body.textContent = decryptedText; } catch (err) { body.textContent = '[Decryption Failed]'; } } else { body.textContent = '[Blocked: Unencrypted]'; }
+      if (isMine && sentMessagesCache[msgId]) { body.textContent = sentMessagesCache[msgId]; } else if (m.isEncrypted && m.text) { try { const decryptedText = await decryptMessage(m.text, myPrivateKey); body.textContent = decryptedText; } catch (, err) { body.textContent = '[Decryption Failed]'; } } else { body.textContent = '[Blocked: Unencrypted]'; }
       msg.appendChild(body); const meta=document.createElement('div');meta.className='msg-meta'; const stamp=document.createElement('span');stamp.className='msg-time'; if(m.timestamp && m.timestamp.toDate) stamp.textContent=new Date(m.timestamp.toDate()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); else stamp.textContent='sending...'; meta.appendChild(stamp);
       if(isMine){ const delBtn=document.createElement('button');delBtn.className='msg-del';delBtn.innerHTML='🗑️'; delBtn.addEventListener('click',()=>deleteMessage(chatId, msgId)); meta.appendChild(delBtn); }
       msg.appendChild(meta);box.appendChild(msg);
@@ -463,6 +477,18 @@ async function sendMessage(){
     const encryptedText = await encryptMessage(text, friendPublicKey);
     const docRef = await db.collection('chats').doc(chatId).collection('messages').add({ text: encryptedText, isEncrypted: true, senderId: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
     sentMessagesCache[docRef.id] = text; saveSentCache();
+    
+    // Always send to recipient's inbox for notification
+    const myName = localStorage.getItem('zoyra_display_name') || 'Anonymous';
+    await db.collection('users').doc(activeChatId).collection('inbox').doc(docRef.id).set({
+      chatId: chatId,
+      senderId: myId,
+      senderName: myName,
+      text: encryptedText,
+      isEncrypted: true,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
     showToast('Sent securely! 🔐'); input.value='';
   } catch(e) { console.error(e); showToast('Failed to send.'); }
 }
