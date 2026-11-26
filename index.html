@@ -10,7 +10,7 @@
 body.light-theme{--bg:#f4f7ff;--panel:#ffffff;--panel2:#eef2ff;--line:#d1d9e6;--text:#10182c;--muted:#5a6b8c;--accent:#4a6cf7;--accent2:#627df0;--green:#10b981;--danger:#ef4444;--warn:#f59e0b}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#24365d 0%,var(--bg) 54%);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;transition:background 0.3s, color 0.3s}
 body.light-theme{background:radial-gradient(ellipse at 50% -15%,#e0e7ff 0%,var(--bg) 54%)}
-button,input{font:inherit}button{cursor:pointer}.app{max-width:520px;margin:auto;min-height:100vh;padding:env(safe-area-inset-top) 16px calc(86px + env(safe-area-inset-bottom))}
+button,input,textarea{font:inherit}button{cursor:pointer}.app{max-width:520px;margin:auto;min-height:100vh;padding:env(safe-area-inset-top) 16px calc(86px + env(safe-area-inset-bottom))}
 header{height:68px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff12}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.16em;font-size:19px}.logo{width:34px;height:34px;border-radius:12px;background:linear-gradient(145deg,#a9b8ff,#627df0);display:grid;place-items:center;color:#10182c;font-weight:900;letter-spacing:0}
 .status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:6px}.dot{width:7px;height:7px;background:var(--green);border-radius:50%}
@@ -88,14 +88,18 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 .call-icon.outgoing{color:var(--accent)}
 .call-icon.missed{color:var(--danger)}
 .saved-success{color:var(--green);font-size:13px;font-weight:700;margin-top:10px;display:none}
-.recovery-box{background:#0e1729;border:1px dashed var(--warn);border-radius:12px;padding:14px;margin-top:12px;font-family:monospace;font-size:13px;word-break:break-all;color:var(--warn)}
+.recovery-box{background:#0e1729;border:1px dashed var(--warn);border-radius:12px;padding:14px;margin-top:12px;font-family:monospace;font-size:13px;word-break:break-all;color:var(--warn);line-height:1.6}
+.word-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0}
+.word-grid .w{background:#0e1729;border:1px solid var(--line);border-radius:8px;padding:6px;font-size:12px;text-align:center;color:var(--accent2)}
+.choice-row{display:flex;gap:9px;margin:12px 0}
+.choice-row button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--line);background:#202e4b;color:var(--text);font-weight:700;cursor:pointer}
+.choice-row button.active{background:linear-gradient(135deg,#b5c2ff,#829cff);color:#10182c;border-color:transparent}
 .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.show{display:flex}
-.modal{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px;max-width:400px;width:100%;max-height:80vh;overflow:auto}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px;max-width:420px;width:100%;max-height:85vh;overflow:auto}
 .modal h3{margin:0 0 12px;font-size:18px}
-.modal p{color:var(--muted);font-size:13px;margin:0 0 16px}
+.modal p{color:var(--muted);font-size:13px;margin:0 0 14px;line-height:1.5}
 .modal .btn{margin-top:8px}
-.key-display{background:#0e1729;border-radius:8px;padding:10px;font-family:monospace;font-size:11px;word-break:break-all;max-height:150px;overflow:auto;margin:10px 0;color:var(--accent2)}
 @media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
 </style>
 </head>
@@ -124,7 +128,7 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
     <button class="btn secondary full" onclick="copyId()">Copy ZOYRA ID</button>
     <div class="idlabel" style="margin-top:20px; color:var(--green)">🔒 ENCRYPTION STATUS: <span id="encStatus">Generating Keys...</span></div>
     <div id="recoveryWarning" style="display:none;margin-top:12px;padding:12px;background:#3d2817;border:1px solid var(--warn);border-radius:12px;font-size:12px;color:var(--warn)">
-      ⚠️ <strong>Important:</strong> Save your Recovery Code from Settings! If you lose your phone, this is the only way to get your ID back.
+      ⚠️ <strong>Important:</strong> Save your Recovery Words from Settings! If you lose your phone, this is the only way to get your ID back.
     </div>
   </div>
   <div class="card">
@@ -184,17 +188,13 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 <section id="settings" class="screen">
   <div class="eyebrow">Your preferences</div><h1>Settings</h1><p class="sub">Control your ZOYRA experience.</p>
   <div class="card">
-    <div class="feature" onclick="showRecoveryCode()">
+    <div class="feature" onclick="openBackupModal()">
       <div class="ico">🔑</div>
-      <div><strong>Backup & Recovery Code</strong><small>Save this to restore your ID on a new phone</small></div>
+      <div><strong>Backup & Recovery Words</strong><small>Save these to restore your ID on a new phone</small></div>
     </div>
-    <div class="feature" onclick="showRestoreModal()">
+    <div class="feature" onclick="openRestoreModal()">
       <div class="ico">📥</div>
-      <div><strong>Restore from Recovery Code</strong><small>Lost your phone? Restore your ID here</small></div>
-    </div>
-    <div class="feature" onclick="showKeysModal()">
-      <div class="ico">🔐</div>
-      <div><strong>View My Keys</strong><small>See your Public and Private keys</small></div>
+      <div><strong>Restore from Recovery Words</strong><small>Lost your phone? Restore your ID here</small></div>
     </div>
     <div class="feature" onclick="resetKeys()">
       <div class="ico">🔄</div>
@@ -229,39 +229,31 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   </div>
 </div>
 
-<!-- Modal for Recovery Code -->
-<div class="modal-overlay" id="recoveryModal">
+<!-- Backup Modal -->
+<div class="modal-overlay" id="backupModal">
   <div class="modal">
-    <h3>🔑 Your Recovery Code</h3>
-    <p>Save this code somewhere safe (write it down or screenshot it). If you lose your phone, this is the ONLY way to get your ID and messages back.</p>
-    <div class="recovery-box" id="recoveryCodeDisplay"></div>
-    <button class="btn full" onclick="copyRecoveryCode()">📋 Copy Code</button>
-    <button class="btn secondary full" style="margin-top:8px" onclick="closeModal('recoveryModal')">Close</button>
+    <h3>🔑 Backup Your ID</h3>
+    <p>Choose how many words you want. More words = stronger security. Write them down on paper and keep them safe.</p>
+    <div class="choice-row">
+      <button id="choice12" class="active" onclick="setBackupLen(12)">12 Words</button>
+      <button id="choice24" onclick="setBackupLen(24)">24 Words</button>
+    </div>
+    <div class="word-grid" id="backupWordGrid"></div>
+    <button class="btn full" onclick="copyBackupWords()">📋 Copy Words</button>
+    <button class="btn warn full" style="margin-top:8px" onclick="saveBackup()">☁️ Save Backup to Cloud</button>
+    <button class="btn secondary full" style="margin-top:8px" onclick="closeModal('backupModal')">Close</button>
   </div>
 </div>
 
-<!-- Modal for Restore -->
+<!-- Restore Modal -->
 <div class="modal-overlay" id="restoreModal">
   <div class="modal">
     <h3>📥 Restore Your ID</h3>
-    <p>Paste your Recovery Code below to restore your ID and keys. This will replace your current keys.</p>
-    <label class="field">Recovery Code</label>
-    <textarea id="restoreCodeInput" class="fieldinput" style="min-height:80px;font-family:monospace;font-size:12px" placeholder="Paste your recovery code here..."></textarea>
-    <button class="btn full" onclick="restoreFromCode()">Restore ID</button>
+    <p>Enter your recovery words (12 or 24) separated by spaces. This will replace your current ID with the saved one.</p>
+    <label class="field">Recovery Words</label>
+    <textarea id="restoreInput" class="fieldinput" style="min-height:90px;font-family:monospace;font-size:13px" placeholder="apple river mountain sky ..."></textarea>
+    <button class="btn full" onclick="doRestore()">Restore ID</button>
     <button class="btn secondary full" style="margin-top:8px" onclick="closeModal('restoreModal')">Cancel</button>
-  </div>
-</div>
-
-<!-- Modal for Keys -->
-<div class="modal-overlay" id="keysModal">
-  <div class="modal">
-    <h3>🔐 Your Encryption Keys</h3>
-    <p><strong>Public Key (Lock):</strong> Shared with others so they can send you encrypted messages.</p>
-    <div class="key-display" id="publicKeyDisplay"></div>
-    <p><strong>Private Key (Key):</strong> NEVER share this! Only stored on your device.</p>
-    <div class="key-display" id="privateKeyDisplay"></div>
-    <button class="btn full" onclick="copyPrivateKey()">📋 Copy Private Key</button>
-    <button class="btn secondary full" style="margin-top:8px" onclick="closeModal('keysModal')">Close</button>
   </div>
 </div>
 
@@ -280,6 +272,9 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// ===== 256-WORD LIST (1 word = 1 byte) =====
+const WORDS = ["apple","river","mountain","sky","tiger","ocean","bridge","forest","candle","mirror","thunder","garden","rocket","pillow","desert","volcano","winter","summer","autumn","spring","morning","evening","night","noon","red","blue","green","yellow","white","black","gold","silver","bread","water","sugar","salt","pepper","lemon","mango","banana","house","door","window","roof","wall","floor","ceiling","stairs","cat","dog","bird","fish","horse","mouse","snake","eagle","sun","moon","star","cloud","rain","snow","wind","storm","book","pen","paper","ink","page","cover","word","letter","car","train","plane","boat","bike","bus","truck","ship","fire","ice","rock","sand","metal","wood","glass","stone","king","queen","knight","castle","sword","shield","crown","throne","happy","sad","angry","calm","fast","slow","hot","cold","left","right","up","down","front","back","near","far","one","two","three","four","five","six","seven","eight","nine","ten","zero","half","whole","part","piece","bit","light","dark","bright","dim","clear","fuzzy","sharp","soft","big","small","tall","short","wide","thin","thick","long","new","old","young","ancient","fresh","stale","clean","dirty","open","close","start","stop","begin","end","first","last","yes","no","maybe","sure","true","false","real","fake","here","there","where","when","why","how","what","who","north","south","east","west","center","edge","corner","middle","music","dance","song","tune","rhythm","melody","note","beat","color","shape","size","form","line","curve","angle","circle","square","triangle","oval","sphere","heart","diamond","hexagon","octagon","fruit","berry","nut","seed","leaf","root","stem","branch","flower","grass","tree","bush","vine","moss","fern","cactus","fog","mist","dew","frost","hail","sleet","breeze","gale","wave","tide","shore","beach","reef","coral","shell","pearl","cave","cliff","valley","hill","peak","ridge","plain","plateau","stream","creek","pond","lake","pool","drain","well","faucet"];
+
 const themeBtn = document.getElementById('themeToggle');
 const themeMeta = document.getElementById('themeColorMeta');
 let isDark = localStorage.getItem('zoyra_theme') !== 'light';
@@ -295,17 +290,17 @@ let sentMessagesCache = {};
 function loadSentCache() { try { sentMessagesCache = JSON.parse(localStorage.getItem('zoyra_sent_cache') || '{}'); } catch(e) { sentMessagesCache = {}; } }
 function saveSentCache() { localStorage.setItem('zoyra_sent_cache', JSON.stringify(sentMessagesCache)); }
 loadSentCache();
-
 let unreadMessages = {};
 
 function arrayBufferToBase64(buffer) { let binary = ''; const bytes = new Uint8Array(buffer); for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]); return window.btoa(binary); }
 function base64ToArrayBuffer(base64) { const binary_string = window.atob(base64); const bytes = new Uint8Array(binary_string.length); for (let i = 0; i < binary_string.length; i++) bytes[i] = binary_string.charCodeAt(i); return bytes.buffer; }
+function bytesToHex(bytes){ return Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join(''); }
 
 async function generateAndSaveKeys() {
   if (localStorage.getItem('zoyra_private_key') && localStorage.getItem('zoyra_public_key')) { 
     encStatus.textContent = "Keys Loaded. Syncing..."; 
     await uploadPublicKey(); 
-    checkRecoveryCode();
+    checkRecoveryStatus();
     return; 
   }
   try {
@@ -317,90 +312,135 @@ async function generateAndSaveKeys() {
     localStorage.setItem('zoyra_private_key', JSON.stringify(privateKeyJwk));
     encStatus.textContent = "Keys Generated. Syncing..."; 
     await uploadPublicKey();
-    checkRecoveryCode();
+    checkRecoveryStatus();
   } catch (error) { console.error("Key generation failed:", error); encStatus.textContent = "Failed to generate keys"; }
 }
 
-function checkRecoveryCode() {
-  const recoveryCode = localStorage.getItem('zoyra_recovery_code');
-  if (!recoveryCode) {
-    document.getElementById('recoveryWarning').style.display = 'block';
+function checkRecoveryStatus() {
+  const done = localStorage.getItem('zoyra_backup_done');
+  document.getElementById('recoveryWarning').style.display = done ? 'none' : 'block';
+}
+
+// ===== RECOVERY WORDS SYSTEM =====
+let backupLen = 12;
+let currentBackupSecret = null; // Uint8Array
+
+function setBackupLen(n){
+  backupLen = n;
+  document.getElementById('choice12').classList.toggle('active', n===12);
+  document.getElementById('choice24').classList.toggle('active', n===24);
+  renderBackupWords();
+}
+
+function openBackupModal(){
+  // generate fresh secret for backup display (or reuse existing)
+  let existing = localStorage.getItem('zoyra_backup_secret');
+  if (existing) {
+    currentBackupSecret = new Uint8Array(JSON.parse(existing));
   } else {
-    document.getElementById('recoveryWarning').style.display = 'none';
+    currentBackupSecret = window.crypto.getRandomValues(new Uint8Array(backupLen));
+    localStorage.setItem('zoyra_backup_secret', JSON.stringify(Array.from(currentBackupSecret)));
+  }
+  renderBackupWords();
+  document.getElementById('backupModal').classList.add('show');
+}
+
+function renderBackupWords(){
+  const grid = document.getElementById('backupWordGrid');
+  grid.innerHTML = '';
+  for (let i=0;i<backupLen;i++){
+    const word = WORDS[currentBackupSecret[i]];
+    const d = document.createElement('div');
+    d.className='w'; d.textContent = (i+1)+'. '+word;
+    grid.appendChild(d);
   }
 }
 
-function generateRecoveryCode() {
-  const privateKey = localStorage.getItem('zoyra_private_key');
-  const publicKey = localStorage.getItem('zoyra_public_key');
-  const userId = localStorage.getItem('zoyra_preview_id');
-  
-  if (!privateKey || !publicKey || !userId) return null;
-  
-  // Create recovery data
-  const recoveryData = {
-    id: userId,
-    privateKey: privateKey,
-    publicKey: publicKey,
-    created: Date.now()
-  };
-  
-  // Encode to base64
-  const jsonStr = JSON.stringify(recoveryData);
-  const encoded = window.btoa(unescape(encodeURIComponent(jsonStr)));
-  
-  // Split into chunks of 8 characters for readability
-  const chunks = [];
-  for (let i = 0; i < encoded.length; i += 8) {
-    chunks.push(encoded.substring(i, i + 8));
-  }
-  
-  return chunks.join('-');
+function copyBackupWords(){
+  const words = Array.from(currentBackupSecret).map(b=>WORDS[b]).join(' ');
+  if(navigator.clipboard) navigator.clipboard.writeText(words).then(()=>showToast('Words copied! Write them down.'));
+  else showToast('Select and copy manually.');
 }
 
-async function restoreFromRecoveryCode(code) {
+async function aesKeyFromSecret(secretBytes){
+  const hash = await window.crypto.subtle.digest('SHA-256', secretBytes);
+  return await window.crypto.subtle.importKey('raw', hash, {name:'AES-GCM'}, false, ['encrypt','decrypt']);
+}
+
+async function saveBackup(){
   try {
-    // Remove dashes and decode
-    const cleanCode = code.replace(/-/g, '').replace(/\s/g, '');
-    const jsonStr = decodeURIComponent(escape(window.atob(cleanCode)));
-    const recoveryData = JSON.parse(jsonStr);
-    
-    if (!recoveryData.id || !recoveryData.privateKey || !recoveryData.publicKey) {
-      throw new Error('Invalid recovery code');
-    }
-    
-    // Save restored keys
-    localStorage.setItem('zoyra_preview_id', recoveryData.id);
-    localStorage.setItem('zoyra_private_key', recoveryData.privateKey);
-    localStorage.setItem('zoyra_public_key', recoveryData.publicKey);
-    localStorage.setItem('zoyra_recovery_code', code);
-    
-    // Update UI
-    document.getElementById('userId').textContent = recoveryData.id;
+    showToast('Encrypting backup... 🔒');
+    const key = await aesKeyFromSecret(currentBackupSecret);
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const blob = JSON.stringify({
+      id: localStorage.getItem('zoyra_preview_id'),
+      pub: localStorage.getItem('zoyra_public_key'),
+      priv: localStorage.getItem('zoyra_private_key')
+    });
+    const cipher = await window.crypto.subtle.encrypt({name:'AES-GCM', iv}, key, new TextEncoder().encode(blob));
+    const hash = await window.crypto.subtle.digest('SHA-256', currentBackupSecret);
+    const docId = bytesToHex(new Uint8Array(hash).slice(0,16));
+    await db.collection('backups').doc(docId).set({
+      data: arrayBufferToBase64(iv) + '.' + arrayBufferToBase64(cipher),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    localStorage.setItem('zoyra_backup_done','1');
+    checkRecoveryStatus();
+    showToast('✅ Backup saved to cloud!');
+    closeModal('backupModal');
+  } catch(e){ console.error(e); showToast('❌ Backup failed.'); }
+}
+
+function openRestoreModal(){
+  document.getElementById('restoreInput').value='';
+  document.getElementById('restoreModal').classList.add('show');
+}
+
+async function doRestore(){
+  const text = document.getElementById('restoreInput').value.trim().toLowerCase();
+  const words = text.split(/\s+/).filter(Boolean);
+  if (words.length !== 12 && words.length !== 24){ showToast('Enter 12 or 24 words.'); return; }
+  const secret = new Uint8Array(words.length);
+  for (let i=0;i<words.length;i++){
+    const idx = WORDS.indexOf(words[i]);
+    if (idx === -1){ showToast('Word "'+words[i]+'" not valid.'); return; }
+    secret[i] = idx;
+  }
+  try {
+    showToast('Restoring... 📥');
+    const key = await aesKeyFromSecret(secret);
+    const hash = await window.crypto.subtle.digest('SHA-256', secret);
+    const docId = bytesToHex(new Uint8Array(hash).slice(0,16));
+    const snap = await db.collection('backups').doc(docId).get();
+    if (!snap.exists){ showToast('❌ No backup found for these words.'); return; }
+    const [ivB64, cipherB64] = snap.data().data.split('.');
+    const plain = await window.crypto.subtle.decrypt({name:'AES-GCM', iv: new Uint8Array(base64ToArrayBuffer(ivB64))}, key, base64ToArrayBuffer(cipherB64));
+    const blob = JSON.parse(new TextDecoder().decode(plain));
+    localStorage.setItem('zoyra_preview_id', blob.id);
+    localStorage.setItem('zoyra_public_key', blob.pub);
+    localStorage.setItem('zoyra_private_key', blob.priv);
+    localStorage.setItem('zoyra_backup_secret', JSON.stringify(Array.from(secret)));
+    localStorage.setItem('zoyra_backup_done','1');
+    sentMessagesCache = {}; saveSentCache();
+    document.getElementById('userId').textContent = blob.id;
     encStatus.textContent = "Keys Restored! Syncing...";
     await uploadPublicKey();
-    
-    showToast('✅ ID and keys restored successfully!');
-    checkRecoveryCode();
-    return true;
-  } catch (e) {
-    console.error('Restore failed:', e);
-    showToast('❌ Invalid recovery code');
-    return false;
-  }
+    checkRecoveryStatus();
+    closeModal('restoreModal');
+    showToast('✅ ID restored successfully!');
+    renderContacts(); renderChats();
+  } catch(e){ console.error(e); showToast('❌ Wrong words or corrupted backup.'); }
 }
 
 window.resetKeys = async function() {
-  if(!confirm('Reset encryption keys? Old messages may not decrypt. Your Recovery Code will also be reset.')) return;
-  localStorage.removeItem('zoyra_private_key'); 
-  localStorage.removeItem('zoyra_public_key'); 
-  localStorage.removeItem('zoyra_recovery_code');
-  localStorage.removeItem('zoyra_preview_id');
-  sentMessagesCache = {}; 
-  saveSentCache();
+  if(!confirm('Reset encryption keys? Old messages may not decrypt. You will need to make a NEW backup.')) return;
+  localStorage.removeItem('zoyra_private_key'); localStorage.removeItem('zoyra_public_key'); 
+  localStorage.removeItem('zoyra_preview_id'); localStorage.removeItem('zoyra_backup_secret'); localStorage.removeItem('zoyra_backup_done');
+  sentMessagesCache = {}; saveSentCache();
   encStatus.textContent = "Resetting..."; 
+  initId();
   await generateAndSaveKeys(); 
-  showToast('Keys reset successfully');
+  showToast('New ID & keys generated');
 };
 
 async function uploadPublicKey() {
@@ -426,35 +466,26 @@ function makeId(){ const a=new Uint32Array(12); if(window.crypto && crypto.getRa
 function initId(){ let id=localStorage.getItem('zoyra_preview_id'); if(!id){id=makeId();localStorage.setItem('zoyra_preview_id',id)} document.getElementById('userId').textContent=id; document.getElementById('displayName').value=localStorage.getItem('zoyra_display_name')||''; }
 
 function saveProfile(){ 
-  const field=document.getElementById('displayName'); 
-  const name=field.value.trim(); 
+  const field=document.getElementById('displayName'); const name=field.value.trim(); 
   if(!name){showToast('Please enter a display name.');field.focus();return;} 
   localStorage.setItem('zoyra_display_name',name); 
   document.getElementById('saveProfileBtn').style.display = 'none';
   document.getElementById('profileSavedMsg').style.display = 'block';
   showToast('Profile saved.'); 
 }
-
 function copyId(){ const id=document.getElementById('userId').textContent; if(navigator.clipboard) navigator.clipboard.writeText(id).then(()=>showToast('ID copied.')).catch(()=>showToast('Select and copy manually.')); else showToast('Select and copy your ID manually.'); }
-
 function go(id,btn){ 
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); 
   document.getElementById(id).classList.add('active'); 
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); 
   btn.classList.add('active'); 
   window.scrollTo(0,0);
-  if (id === 'chats' && !activeChatId) {
-    document.getElementById('startChatBtn').style.display = 'block';
-    document.getElementById('chatList').style.display = 'block';
-    document.getElementById('chatRoom').style.display = 'none';
-  }
-  if (id === 'calls') {
-    renderCallHistory();
-  }
+  if (id === 'chats' && !activeChatId) { document.getElementById('startChatBtn').style.display='block'; document.getElementById('chatList').style.display='block'; document.getElementById('chatRoom').style.display='none'; }
+  if (id === 'calls') renderCallHistory();
 }
-
 function showToast(message){ const el=document.getElementById('toast'); el.textContent=message;el.classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>el.classList.remove('show'),3000); }
 function playNotificationSound(){ try { const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain(); oscillator.connect(gainNode); gainNode.connect(audioCtx.destination); oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.15); } catch(e) {} }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
 
 function readContacts(){ try{const v=JSON.parse(localStorage.getItem('zoyra_contacts')||'[]');return Array.isArray(v)?v:[];}catch(e){return [];} }
 function renderContacts(){
@@ -465,35 +496,14 @@ function renderContacts(){
     const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent=(contact.name||contact.id).slice(0,1).toUpperCase();
     const main=document.createElement('div');main.className='itemmain'; 
     const strong=document.createElement('strong');strong.textContent=contact.name||'ZOYRA contact'; 
-    const small=document.createElement('small');small.textContent=contact.id; 
-    main.append(strong,small);
-    
-    row.addEventListener('click', (e) => {
-      if (e.target.tagName === 'BUTTON') return;
-      openChatFromContacts(contact.id);
-    });
-    
+    const small=document.createElement('small');small.textContent=contact.id; main.append(strong,small);
+    row.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') return; openChatFromContacts(contact.id); });
     const remove=document.createElement('button');remove.className='btn ghost';remove.textContent='Remove';remove.style.padding='8px 10px';remove.style.fontSize='12px';
-    remove.addEventListener('click',(e)=>{
-      e.stopPropagation();
-      // FIX 6: Confirmation before removing
-      if(confirm(`Are you sure you want to remove "${contact.name || contact.id}" from your contacts?`)) {
-        const c=readContacts();c.splice(index,1);localStorage.setItem('zoyra_contacts',JSON.stringify(c));renderContacts();showToast('Contact removed.');
-      }
-    });
+    remove.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm(`Remove "${contact.name || contact.id}" from contacts?`)){ const c=readContacts();c.splice(index,1);localStorage.setItem('zoyra_contacts',JSON.stringify(c));renderContacts();showToast('Contact removed.'); } });
     row.append(avatar,main,remove);list.appendChild(row);
   });
 }
-
-function openChatFromContacts(contactId) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('chats').classList.add('active');
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-  document.querySelector('[data-screen="chats"]').classList.add('active');
-  window.scrollTo(0,0);
-  openChat(contactId);
-}
-
+function openChatFromContacts(contactId){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('chats').classList.add('active'); document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); document.querySelector('[data-screen="chats"]').classList.add('active'); window.scrollTo(0,0); openChat(contactId); }
 function addContact(){
   const id=document.getElementById('contactId').value.trim().toUpperCase(); const name=document.getElementById('contactName').value.trim();
   if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(id)){showToast('Enter ID in format ZY-XXXX-XXXX-XXXX.');return;}
@@ -507,198 +517,85 @@ let activeChatId=null; let unsubscribeMessages=null; let unsubscribeTyping=null;
 
 function listenForInbox() {
   if(unsubscribeInbox) unsubscribeInbox();
-  const myId = localStorage.getItem('zoyra_preview_id');
-  if(!myId) return;
-  
+  const myId = localStorage.getItem('zoyra_preview_id'); if(!myId) return;
   const inboxRef = db.collection('users').doc(myId).collection('inbox').orderBy('timestamp','desc');
-  
   unsubscribeInbox = inboxRef.onSnapshot(async (snapshot) => {
     const requestsList = document.getElementById('requestsList');
     const requestsSection = document.getElementById('requestsSection');
     const requestsCount = document.getElementById('requestsCount');
     const navBadge = document.getElementById('navBadge');
     const contacts = readContacts();
-    
-    let requestCount = 0;
-    requestsList.replaceChildren();
-    
+    let requestCount = 0; requestsList.replaceChildren();
     snapshot.forEach(doc => {
-      const data = doc.data();
-      const reqId = doc.id;
-      const senderId = data.senderId;
-      
+      const data = doc.data(); const reqId = doc.id; const senderId = data.senderId;
       const isSavedContact = contacts.some(c => c.id === senderId);
-      
       if (isSavedContact) {
-        if (activeChatId !== senderId) {
-          playNotificationSound();
-          showToast(`New message from ${data.senderName || senderId}`);
-          unreadMessages[senderId] = (unreadMessages[senderId] || 0) + 1;
-          renderChats();
-        }
+        if (activeChatId !== senderId) { playNotificationSound(); showToast(`New message from ${data.senderName || senderId}`); unreadMessages[senderId] = (unreadMessages[senderId] || 0) + 1; renderChats(); }
         db.collection('users').doc(myId).collection('inbox').doc(reqId).delete().catch(e => console.error(e));
         return;
       }
-      
       requestCount++;
-      const item = document.createElement('div');
-      item.className = 'request-item';
-      
-      const avatar = document.createElement('div');
-      avatar.className = 'avatar';
-      avatar.textContent = (data.senderName || senderId || '?').slice(0,1).toUpperCase();
-      
-      const info = document.createElement('div');
-      info.className = 'req-info';
-      const nameEl = document.createElement('strong');
-      nameEl.textContent = data.senderName || 'Unknown';
-      const idEl = document.createElement('small');
-      idEl.textContent = senderId;
-      info.append(nameEl, idEl);
-      
-      const actions = document.createElement('div');
-      actions.className = 'request-actions';
-      
-      const acceptBtn = document.createElement('button');
-      acceptBtn.className = 'req-accept';
-      acceptBtn.textContent = '✓ Accept';
-      acceptBtn.onclick = () => acceptRequest(senderId, data.senderName, data.chatId, reqId);
-      
-      const blockBtn = document.createElement('button');
-      blockBtn.className = 'req-block';
-      blockBtn.textContent = '✕ Block';
-      blockBtn.onclick = () => blockRequest(reqId, senderId);
-      
-      actions.append(acceptBtn, blockBtn);
-      item.append(avatar, info, actions);
-      requestsList.appendChild(item);
+      const item = document.createElement('div'); item.className = 'request-item';
+      const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = (data.senderName || senderId || '?').slice(0,1).toUpperCase();
+      const info = document.createElement('div'); info.className = 'req-info';
+      const nameEl = document.createElement('strong'); nameEl.textContent = data.senderName || 'Unknown';
+      const idEl = document.createElement('small'); idEl.textContent = senderId; info.append(nameEl, idEl);
+      const actions = document.createElement('div'); actions.className = 'request-actions';
+      const acceptBtn = document.createElement('button'); acceptBtn.className = 'req-accept'; acceptBtn.textContent = '✓ Accept'; acceptBtn.onclick = () => acceptRequest(senderId, data.senderName, data.chatId, reqId);
+      const blockBtn = document.createElement('button'); blockBtn.className = 'req-block'; blockBtn.textContent = '✕ Block'; blockBtn.onclick = () => blockRequest(reqId, senderId);
+      actions.append(acceptBtn, blockBtn); item.append(avatar, info, actions); requestsList.appendChild(item);
     });
-    
-    if (requestCount > 0) {
-      requestsSection.style.display = 'block';
-      requestsCount.textContent = `${requestCount} new`;
-      navBadge.textContent = requestCount;
-      navBadge.style.display = 'block';
-    } else {
-      requestsSection.style.display = 'none';
-      navBadge.style.display = 'none';
-    }
+    if (requestCount > 0) { requestsSection.style.display = 'block'; requestsCount.textContent = `${requestCount} new`; navBadge.textContent = requestCount; navBadge.style.display = 'block'; }
+    else { requestsSection.style.display = 'none'; navBadge.style.display = 'none'; }
   });
 }
-
 async function acceptRequest(senderId, senderName, chatId, reqId) {
-  const myId = localStorage.getItem('zoyra_preview_id');
-  const contacts = readContacts();
-  if(!contacts.some(c => c.id === senderId)) {
-    contacts.push({ id: senderId, name: senderName || '' });
-    localStorage.setItem('zoyra_contacts', JSON.stringify(contacts));
-  }
+  const myId = localStorage.getItem('zoyra_preview_id'); const contacts = readContacts();
+  if(!contacts.some(c => c.id === senderId)) { contacts.push({ id: senderId, name: senderName || '' }); localStorage.setItem('zoyra_contacts', JSON.stringify(contacts)); }
   await db.collection('users').doc(myId).collection('inbox').doc(reqId).delete();
-  showToast('Contact accepted! Opening chat...');
-  renderContacts();
-  renderChats();
-  openChat(senderId);
+  showToast('Contact accepted! Opening chat...'); renderContacts(); renderChats(); openChat(senderId);
 }
-
 async function blockRequest(reqId, senderId) {
-  const myId = localStorage.getItem('zoyra_preview_id');
-  if(!confirm(`Block messages from ${senderId}?`)) return;
-  const blocked = JSON.parse(localStorage.getItem('zoyra_blocked') || '[]');
-  if(!blocked.includes(senderId)) {
-    blocked.push(senderId);
-    localStorage.setItem('zoyra_blocked', JSON.stringify(blocked));
-  }
-  await db.collection('users').doc(myId).collection('inbox').doc(reqId).delete();
-  showToast('User blocked.');
+  const myId = localStorage.getItem('zoyra_preview_id'); if(!confirm(`Block messages from ${senderId}?`)) return;
+  const blocked = JSON.parse(localStorage.getItem('zoyra_blocked') || '[]'); if(!blocked.includes(senderId)) { blocked.push(senderId); localStorage.setItem('zoyra_blocked', JSON.stringify(blocked)); }
+  await db.collection('users').doc(myId).collection('inbox').doc(reqId).delete(); showToast('User blocked.');
 }
-
 function renderChats(){
   const list=document.getElementById('chatList');if(!list)return; const contacts=readContacts();list.replaceChildren();
   if(contacts.length===0){ const empty=document.createElement('div');empty.className='empty'; empty.innerHTML='<div class="symbol">💬</div><strong>No conversations yet</strong><p>Add a contact or accept a request.</p>'; list.appendChild(empty);return; }
   contacts.forEach(c=>{
     const row=document.createElement('button');row.className='item';row.style.cssText='width:100%;text-align:left;color:inherit;background:transparent;border:0;border-bottom:1px solid #ffffff12;cursor:pointer';
     const av=document.createElement('div');av.className='avatar';av.textContent=(c.name||c.id).slice(0,1).toUpperCase();
-    
     const main=document.createElement('div');main.className='itemmain';
-    
-    const topRow = document.createElement('div');
-    topRow.style.display = 'flex'; topRow.style.justifyContent = 'space-between'; topRow.style.alignItems = 'center';
+    const topRow = document.createElement('div'); topRow.style.display='flex'; topRow.style.justifyContent='space-between'; topRow.style.alignItems='center';
     const name=document.createElement('strong');name.textContent=c.name||c.id;
-    
-    if(unreadMessages[c.id] && unreadMessages[c.id] > 0) {
-      const badge = document.createElement('span');
-      badge.textContent = unreadMessages[c.id];
-      badge.style.cssText = 'background:var(--danger);color:#fff;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:bold;';
-      topRow.append(name, badge);
-    } else {
-      topRow.appendChild(name);
-    }
-    
-    const preview=document.createElement('small');preview.textContent='Tap to open chat';
-    main.append(topRow, preview);
-    row.append(av,main);
+    if(unreadMessages[c.id] && unreadMessages[c.id] > 0) { const badge = document.createElement('span'); badge.textContent = unreadMessages[c.id]; badge.style.cssText='background:var(--danger);color:#fff;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:bold;'; topRow.append(name, badge); } else { topRow.appendChild(name); }
+    const preview=document.createElement('small');preview.textContent='Tap to open chat'; main.append(topRow, preview); row.append(av,main);
     row.addEventListener('click',()=>openChat(c.id));list.appendChild(row);
   });
 }
-
 function startChat(){ const id=prompt('Enter the ZOYRA ID of the person you want to chat with:'); if(!id)return; const clean=id.trim().toUpperCase(); if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(clean)){showToast('Invalid ID format.');return;} const contacts=readContacts(); if(!contacts.some(c=>c.id===clean)){ contacts.push({id:clean,name:''}); localStorage.setItem('zoyra_contacts',JSON.stringify(contacts)); renderContacts(); } openChat(clean); }
-
 function openChat(id){
   const contact=readContacts().find(c=>c.id===id);if(!contact){showToast('Contact not found.');return;}
-  activeChatId=id; lastMsgCount = 0; 
-  
-  unreadMessages[id] = 0;
-  renderChats();
-  
+  activeChatId=id; lastMsgCount = 0; unreadMessages[id] = 0; renderChats();
   document.getElementById('chatList').style.display = 'none';
   document.getElementById('startChatBtn').style.display = 'none';
-  
   document.getElementById('chatRoom').style.display='block';
   document.getElementById('chatTitle').textContent=contact.name||'ZOYRA contact'; document.getElementById('chatSubtitle').textContent=id;
   document.getElementById('chatAvatar').textContent=(contact.name||id).slice(0,1).toUpperCase();
   document.getElementById('messageInput').value=''; renderMessages(); listenForTyping(); listenForStatus(); document.getElementById('messageInput').focus();
 }
-
 function closeChat(){ 
-  activeChatId=null; 
-  document.getElementById('chatRoom').style.display='none'; 
-  document.getElementById('chatList').style.display = 'block';
-  document.getElementById('startChatBtn').style.display = 'block';
-  
-  if(unsubscribeMessages){unsubscribeMessages();unsubscribeMessages=null;} 
-  if(unsubscribeTyping){unsubscribeTyping();unsubscribeTyping=null;} 
-  if(unsubscribeStatus){unsubscribeStatus();unsubscribeStatus=null;} 
-  document.getElementById('typingIndicator').style.display='none'; 
-  renderChats(); 
+  activeChatId=null; document.getElementById('chatRoom').style.display='none'; 
+  document.getElementById('chatList').style.display = 'block'; document.getElementById('startChatBtn').style.display = 'block';
+  if(unsubscribeMessages){unsubscribeMessages();unsubscribeMessages=null;} if(unsubscribeTyping){unsubscribeTyping();unsubscribeTyping=null;} if(unsubscribeStatus){unsubscribeStatus();unsubscribeStatus=null;} 
+  document.getElementById('typingIndicator').style.display='none'; renderChats(); 
 }
-
-// FIX 5: Delete entire chat
 async function deleteCurrentChat() {
-  if (!activeChatId) return;
-  if (!confirm(`Delete entire chat with ${activeChatId}? This cannot be undone.`)) return;
-  
-  const myId = localStorage.getItem('zoyra_preview_id');
-  const chatId = getChatId(myId, activeChatId);
-  
-  try {
-    const snapshot = await db.collection('chats').doc(chatId).collection('messages').get();
-    const batch = db.batch();
-    snapshot.forEach(doc => {
-      batch.delete(doc.ref);
-    });
-    await batch.commit();
-    
-    sentMessagesCache = {};
-    saveSentCache();
-    
-    showToast('Chat deleted.');
-    closeChat();
-  } catch (e) {
-    console.error(e);
-    showToast('Failed to delete chat.');
-  }
+  if (!activeChatId) return; if (!confirm(`Delete entire chat with ${activeChatId}? This cannot be undone.`)) return;
+  const myId = localStorage.getItem('zoyra_preview_id'); const chatId = getChatId(myId, activeChatId);
+  try { const snapshot = await db.collection('chats').doc(chatId).collection('messages').get(); const batch = db.batch(); snapshot.forEach(doc => batch.delete(doc.ref)); await batch.commit(); sentMessagesCache = {}; saveSentCache(); showToast('Chat deleted.'); closeChat(); } catch (e) { console.error(e); showToast('Failed to delete chat.'); }
 }
-
 function listenForStatus() { if(unsubscribeStatus) unsubscribeStatus(); unsubscribeStatus = db.collection('users').doc(activeChatId).onSnapshot(doc => { if(doc.exists && doc.data().isOnline) { document.getElementById('chatOnlineDot').style.display='block'; document.getElementById('chatSubtitle').textContent = 'Online'; } else { document.getElementById('chatOnlineDot').style.display='none'; document.getElementById('chatSubtitle').textContent = 'Last seen recently'; } }); }
 function listenForTyping() {
   if(unsubscribeTyping) unsubscribeTyping(); const myId = localStorage.getItem('zoyra_preview_id'); const chatId = getChatId(myId, activeChatId);
@@ -712,7 +609,6 @@ document.getElementById('messageInput').addEventListener('input', () => {
   typingRef.set({ isTyping: true, timestamp: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
   clearTimeout(typingTimeout); typingTimeout = setTimeout(() => { typingRef.set({ isTyping: false }); }, 2000);
 });
-
 async function renderMessages(){
   if(!activeChatId)return; if(unsubscribeMessages){unsubscribeMessages();} const box=document.getElementById('messageList');box.replaceChildren();
   const myId=localStorage.getItem('zoyra_preview_id'); const chatId=getChatId(myId,activeChatId);
@@ -723,31 +619,18 @@ async function renderMessages(){
     lastMsgCount = snapshot.size;
     for (const doc of snapshot.docs) {
       const m = doc.data(); const msgId = doc.id; const isMine = m.senderId === myId; const msg = document.createElement('div'); msg.className = 'msg ' + (isMine ? 'mine' : 'theirs'); const body = document.createElement('div');
-      if (isMine && sentMessagesCache[msgId]) { body.textContent = sentMessagesCache[msgId]; } else if (m.isEncrypted && m.text) { try { const decryptedText = await decryptMessage(m.text, myPrivateKey); body.textContent = decryptedText; } catch (err) { body.textContent = '[Decryption Failed]'; } } else { body.textContent = '[Blocked: Unencrypted]'; }
-      msg.appendChild(body); 
-      const meta=document.createElement('div');meta.className='msg-meta'; 
-      const stamp=document.createElement('span');stamp.className='msg-time'; 
-      if(m.timestamp && m.timestamp.toDate) stamp.textContent=new Date(m.timestamp.toDate()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); 
-      else stamp.textContent='sending...';
-      
-      // FIX 4: Message ticks
-      if (isMine) {
-        const ticks = document.createElement('span');
-        ticks.className = 'msg-ticks delivered';
-        ticks.textContent = '✓✓';
-        meta.appendChild(stamp);
-        meta.appendChild(ticks);
-      } else {
-        meta.appendChild(stamp);
-      }
-      
+      if (isMine && sentMessagesCache[msgId]) { body.textContent = sentMessagesCache[msgId]; } else if (m.isEncrypted && m.text) { try { body.textContent = await decryptMessage(m.text, myPrivateKey); } catch (err) { body.textContent = '[Decryption Failed]'; } } else { body.textContent = '[Blocked: Unencrypted]'; }
+      msg.appendChild(body);
+      const meta=document.createElement('div');meta.className='msg-meta';
+      const stamp=document.createElement('span');stamp.className='msg-time';
+      if(m.timestamp && m.timestamp.toDate) stamp.textContent=new Date(m.timestamp.toDate()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); else stamp.textContent='sending...';
+      if (isMine) { const ticks = document.createElement('span'); ticks.className='msg-ticks delivered'; ticks.textContent='✓✓'; meta.appendChild(stamp); meta.appendChild(ticks); } else { meta.appendChild(stamp); }
       if(isMine){ const delBtn=document.createElement('button');delBtn.className='msg-del';delBtn.innerHTML='🗑️'; delBtn.addEventListener('click',()=>deleteMessage(chatId, msgId)); meta.appendChild(delBtn); }
       msg.appendChild(meta);box.appendChild(msg);
     } box.scrollTop=box.scrollHeight;
   },(err)=>{ console.error(err); });
 }
 window.deleteMessage = function(chatId, msgId) { if(!confirm('Delete this message?')) return; db.collection('chats').doc(chatId).collection('messages').doc(msgId).delete().then(()=> { delete sentMessagesCache[msgId]; saveSentCache(); showToast('Message deleted.'); }).catch((e)=> showToast('Failed to delete.')); };
-
 async function sendMessage(){
   if(!activeChatId)return; const input=document.getElementById('messageInput'); const text=input.value.trim(); if(!text){showToast('Write a message first.');return;}
   const myId=localStorage.getItem('zoyra_preview_id'); const chatId=getChatId(myId,activeChatId);
@@ -758,35 +641,24 @@ async function sendMessage(){
     const encryptedText = await encryptMessage(text, friendPublicKey);
     const docRef = await db.collection('chats').doc(chatId).collection('messages').add({ text: encryptedText, isEncrypted: true, senderId: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
     sentMessagesCache[docRef.id] = text; saveSentCache();
-    
     const myName = localStorage.getItem('zoyra_display_name') || 'Anonymous';
-    await db.collection('users').doc(activeChatId).collection('inbox').doc(docRef.id).set({
-      chatId: chatId,
-      senderId: myId,
-      senderName: myName,
-      text: encryptedText,
-      isEncrypted: true,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    
+    await db.collection('users').doc(activeChatId).collection('inbox').doc(docRef.id).set({ chatId, senderId: myId, senderName: myName, text: encryptedText, isEncrypted: true, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
     showToast('Sent securely! 🔐'); input.value='';
   } catch(e) { console.error(e); showToast('Failed to send.'); }
 }
 document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
-let localStream, remoteStream, peerConnection; const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }; let callListener = null; let callTimerInterval; let callStartTime = 0; let currentCallType = 'video';
+let localStream, peerConnection; const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }; let callListener = null; let callTimerInterval; let callStartTime = 0; let currentCallType = 'video';
 
 async function startCall(type = 'video') {
   if (!activeChatId) return; const myId = localStorage.getItem('zoyra_preview_id'); const chatId = getChatId(myId, activeChatId);
   const contact = readContacts().find(c=>c.id===activeChatId); document.getElementById('callAvatar').textContent = (contact?.name || activeChatId).slice(0,1).toUpperCase();
   currentCallType = type;
   try {
-    showToast(`Requesting ${type === 'audio' ? 'Microphone' : 'Camera & Mic'}...`); 
+    showToast(`Requesting ${type === 'audio' ? 'Microphone' : 'Camera & Mic'}...`);
     localStream = await navigator.mediaDevices.getUserMedia(type === 'audio' ? { audio: true } : { video: true, audio: true });
     document.getElementById('localVideo').srcObject = localStream; document.getElementById('callOverlay').style.display = 'flex';
-    document.getElementById('callStatusText').textContent = 'Calling...'; 
-    callStartTime = Date.now();
-    startCallTimer();
+    document.getElementById('callStatusText').textContent = 'Calling...'; callStartTime = Date.now(); startCallTimer();
     peerConnection = new RTCPeerConnection(servers); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
     peerConnection.onicecandidate = event => { if (event.candidate) { db.collection('calls').doc(chatId).collection('ice').add({ candidate: event.candidate.toJSON(), sender: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); } };
     peerConnection.ontrack = event => { document.getElementById('remoteVideo').srcObject = event.streams[0]; document.getElementById('callStatusText').textContent = 'Connected'; };
@@ -794,9 +666,8 @@ async function startCall(type = 'video') {
     await db.collection('calls').doc(chatId).set({ offer: { type: offer.type, sdp: offer.sdp }, caller: myId, callee: activeChatId, callType: type, status: 'offering', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
     callListener = db.collection('calls').doc(chatId).onSnapshot(async doc => { const data = doc.data(); if (data && data.status === 'answering' && data.answer && !peerConnection.currentRemoteDescription) { await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer)); } if (data && data.status === 'ended') { endCallUI(); } });
     db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { const data = change.doc.data(); if (data.sender !== myId) { peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e)); } } }); });
-  } catch (err) { console.error(err); showToast('Camera/Mic access denied or error.'); endCallUI(); }
+  } catch (err) { console.error(err); showToast('Camera/Mic access denied.'); endCallUI(); }
 }
-
 function listenForIncomingCalls() {
   const myId = localStorage.getItem('zoyra_preview_id'); if (!myId) return;
   db.collection('calls').where('callee', '==', myId).where('status', '==', 'offering').onSnapshot(async snapshot => {
@@ -806,205 +677,57 @@ function listenForIncomingCalls() {
         const contact = readContacts().find(c=>c.id===callerId); document.getElementById('callAvatar').textContent = (contact?.name || callerId).slice(0,1).toUpperCase();
         if(confirm(`Incoming ${callType === 'audio' ? 'Audio' : 'Video'} Call from ${contact?.name || callerId}. Accept?`)) {
           activeChatId = callerId; document.getElementById('chatRoom').style.display='block'; document.getElementById('chatTitle').textContent=contact?.name||'Call';
-          document.getElementById('startChatBtn').style.display = 'none';
-          document.getElementById('chatList').style.display = 'none';
-          currentCallType = callType;
+          document.getElementById('startChatBtn').style.display='none'; document.getElementById('chatList').style.display='none'; currentCallType = callType;
           try {
             localStream = await navigator.mediaDevices.getUserMedia(callType === 'audio' ? { audio: true } : { video: true, audio: true });
             document.getElementById('localVideo').srcObject = localStream; document.getElementById('callOverlay').style.display = 'flex';
-            document.getElementById('callStatusText').textContent = 'Connecting...'; 
-            callStartTime = Date.now();
-            startCallTimer();
+            document.getElementById('callStatusText').textContent = 'Connecting...'; callStartTime = Date.now(); startCallTimer();
             peerConnection = new RTCPeerConnection(servers); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
             peerConnection.onicecandidate = event => { if (event.candidate) { db.collection('calls').doc(chatId).collection('ice').add({ candidate: event.candidate.toJSON(), sender: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); } };
             peerConnection.ontrack = event => { document.getElementById('remoteVideo').srcObject = event.streams[0]; document.getElementById('callStatusText').textContent = 'Connected'; };
             await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer)); const answer = await peerConnection.createAnswer(); await peerConnection.setLocalDescription(answer);
             await db.collection('calls').doc(chatId).update({ answer: { type: answer.type, sdp: answer.sdp }, status: 'answering' });
             callListener = db.collection('calls').doc(chatId).onSnapshot(doc => { if (doc.data().status === 'ended') endCallUI(); });
-            db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { const data = change.doc.data(); if (data.sender !== myId) { peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e)); } } }); });
+            db.collection('calls').doc(chatId).collection('ice').onSnapshot(snap => { snap.docChanges().forEach(ch => { if (ch.type === 'added') { const d = ch.doc.data(); if (d.sender !== myId) { peerConnection.addIceCandidate(new RTCIceCandidate(d.candidate)).catch(e=>console.error(e)); } } }); });
           } catch(err) { console.error(err); endCallUI(); }
-        } else { 
-          db.collection('calls').doc(chatId).update({ status: 'ended' }); 
-          saveCallHistory(callerId, callType, 'missed', 0, myId);
-          saveCallHistory(myId, callType, 'missed', 0, callerId);
-        }
+        } else { db.collection('calls').doc(chatId).update({ status: 'ended' }); saveCallHistory(myId, callType, 'missed', 0, callerId); }
       }
     });
   });
 }
-
-function startCallTimer() { let seconds = 0; const timerEl = document.getElementById('callTimer'); clearInterval(callTimerInterval); callTimerInterval = setInterval(() => { seconds++; const m = Math.floor(seconds / 60).toString().padStart(2, '0'); const s = (seconds % 60).toString().padStart(2, '0'); timerEl.textContent = `${m}:${s}`; }, 1000); }
-function toggleMute() { if (localStream) { const audioTrack = localStream.getAudioTracks()[0]; if (audioTrack) { audioTrack.enabled = !audioTrack.enabled; showToast(audioTrack.enabled ? 'Unmuted' : 'Muted'); } } }
-function endCall() { 
-  const myId = localStorage.getItem('zoyra_preview_id'); 
-  const chatId = activeChatId ? getChatId(myId, activeChatId) : null; 
-  if (chatId) { 
-    db.collection('calls').doc(chatId).update({ status: 'ended' }).catch(e=>{}); 
-    db.collection('calls').doc(chatId).collection('ice').get().then(snap => { snap.forEach(doc => doc.ref.delete()); }); 
-  } 
-  const duration = Math.floor((Date.now() - callStartTime) / 1000);
-  if (activeChatId) {
-    // FIX 1: Save call history for both caller and receiver
-    saveCallHistory(myId, currentCallType, 'outgoing', duration, activeChatId);
-    saveCallHistory(activeChatId, currentCallType, 'incoming', duration, myId);
-  }
-  endCallUI(); 
+function startCallTimer() { let s=0; const t=document.getElementById('callTimer'); clearInterval(callTimerInterval); callTimerInterval=setInterval(()=>{s++; t.textContent=`${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;},1000); }
+function toggleMute() { if (localStream) { const a=localStream.getAudioTracks()[0]; if(a){ a.enabled=!a.enabled; showToast(a.enabled?'Unmuted':'Muted'); } } }
+function endCall() {
+  const myId = localStorage.getItem('zoyra_preview_id'); const chatId = activeChatId ? getChatId(myId, activeChatId) : null;
+  if (chatId) { db.collection('calls').doc(chatId).update({ status: 'ended' }).catch(()=>{}); db.collection('calls').doc(chatId).collection('ice').get().then(s=>s.forEach(d=>d.ref.delete())); }
+  const duration = Math.floor((Date.now() - callStartTime)/1000);
+  if (activeChatId) { saveCallHistory(myId, currentCallType, 'outgoing', duration, activeChatId); saveCallHistory(activeChatId, currentCallType, 'incoming', duration, myId); }
+  endCallUI();
 }
-function endCallUI() { 
-  clearInterval(callTimerInterval); 
-  if (peerConnection) peerConnection.close(); 
-  if (localStream) localStream.getTracks().forEach(track => track.stop()); 
-  if (callListener) callListener(); 
-  document.getElementById('callOverlay').style.display = 'none'; 
-  document.getElementById('remoteVideo').srcObject = null; 
-  document.getElementById('localVideo').srcObject = null; 
-  document.getElementById('callTimer').textContent = '00:00'; 
-  peerConnection = null; 
-  localStream = null; 
-  showToast('Call Ended'); 
-}
-
+function endCallUI() { clearInterval(callTimerInterval); if (peerConnection) peerConnection.close(); if (localStream) localStream.getTracks().forEach(t=>t.stop()); if (callListener) callListener(); document.getElementById('callOverlay').style.display='none'; document.getElementById('remoteVideo').srcObject=null; document.getElementById('localVideo').srcObject=null; document.getElementById('callTimer').textContent='00:00'; peerConnection=null; localStream=null; showToast('Call Ended'); }
 async function saveCallHistory(userId, callType, callStatus, duration, contactId) {
   const contact = readContacts().find(c => c.id === contactId);
-  const contactName = contact?.name || contactId;
-  
-  try {
-    await db.collection('users').doc(userId).collection('callHistory').add({
-      contactId: contactId,
-      contactName: contactName,
-      callType: callType,
-      callStatus: callStatus,
-      duration: duration,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  } catch(e) {
-    console.error('Failed to save call history:', e);
-  }
+  try { await db.collection('users').doc(userId).collection('callHistory').add({ contactId, contactName: contact?.name||contactId, callType, callStatus, duration, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); } catch(e){ console.error(e); }
 }
-
 function renderCallHistory() {
-  const list = document.getElementById('callHistoryList');
-  if (!list) return;
-  
-  const myId = localStorage.getItem('zoyra_preview_id');
-  if (!myId) return;
-  
-  list.innerHTML = '';
-  
-  db.collection('users').doc(myId).collection('callHistory')
-    .orderBy('timestamp', 'desc')
-    .limit(20)
-    .get()
-    .then(snapshot => {
-      if (snapshot.empty) {
-        const empty = document.createElement('div');
-        empty.className = 'empty';
-        empty.innerHTML = '<div class="symbol">📞</div><strong>No call history</strong><p>Your recent calls will appear here.</p>';
-        list.appendChild(empty);
-        return;
-      }
-      
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const item = document.createElement('div');
-        item.className = 'call-history-item';
-        
-        const avatar = document.createElement('div');
-        avatar.className = 'avatar';
-        avatar.textContent = (data.contactName || '?').slice(0,1).toUpperCase();
-        
-        const info = document.createElement('div');
-        info.className = 'call-info-text';
-        const name = document.createElement('strong');
-        name.textContent = data.contactName || data.contactId;
-        const details = document.createElement('small');
-        const typeIcon = data.callType === 'audio' ? '📞' : '📹';
-        const statusText = data.callStatus === 'incoming' ? 'Incoming' : data.callStatus === 'outgoing' ? 'Outgoing' : 'Missed';
-        const durationText = data.duration > 0 ? ` ${Math.floor(data.duration/60)}:${(data.duration%60).toString().padStart(2,'0')}` : '';
-        details.textContent = `${typeIcon} ${statusText}${durationText}`;
-        info.append(name, details);
-        
-        const icon = document.createElement('div');
-        icon.className = `call-icon ${data.callStatus}`;
-        icon.textContent = data.callStatus === 'incoming' ? '↙' : data.callStatus === 'outgoing' ? '↗' : '✕';
-        
-        item.append(avatar, info, icon);
-        list.appendChild(item);
-      });
-    })
-    .catch(err => {
-      console.error('Failed to load call history:', err);
+  const list = document.getElementById('callHistoryList'); if (!list) return;
+  const myId = localStorage.getItem('zoyra_preview_id'); if (!myId) return; list.innerHTML = '';
+  db.collection('users').doc(myId).collection('callHistory').orderBy('timestamp','desc').limit(20).get().then(snapshot => {
+    if (snapshot.empty) { const e=document.createElement('div'); e.className='empty'; e.innerHTML='<div class="symbol">📞</div><strong>No call history</strong><p>Your recent calls will appear here.</p>'; list.appendChild(e); return; }
+    snapshot.forEach(doc => {
+      const d = doc.data(); const item=document.createElement('div'); item.className='call-history-item';
+      const av=document.createElement('div'); av.className='avatar'; av.textContent=(d.contactName||'?').slice(0,1).toUpperCase();
+      const info=document.createElement('div'); info.className='call-info-text';
+      const nm=document.createElement('strong'); nm.textContent=d.contactName||d.contactId;
+      const det=document.createElement('small'); const ti=d.callType==='audio'?'📞':'📹'; const st=d.callStatus==='incoming'?'Incoming':d.callStatus==='outgoing'?'Outgoing':'Missed'; const du=d.duration>0?` ${Math.floor(d.duration/60)}:${(d.duration%60).toString().padStart(2,'0')}`:''; det.textContent=`${ti} ${st}${du}`;
+      info.append(nm,det);
+      const ic=document.createElement('div'); ic.className=`call-icon ${d.callStatus}`; ic.textContent=d.callStatus==='incoming'?'↙':d.callStatus==='outgoing'?'↗':'✕';
+      item.append(av,info,ic); list.appendChild(item);
     });
+  }).catch(err=>console.error(err));
 }
 
-// Modal functions
-function showRecoveryCode() {
-  const code = generateRecoveryCode();
-  if (!code) {
-    showToast('No keys found. Please wait for keys to generate.');
-    return;
-  }
-  // Save recovery code
-  localStorage.setItem('zoyra_recovery_code', code);
-  document.getElementById('recoveryCodeDisplay').textContent = code;
-  document.getElementById('recoveryModal').classList.add('show');
-  checkRecoveryCode();
-}
-
-function copyRecoveryCode() {
-  const code = document.getElementById('recoveryCodeDisplay').textContent;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(code).then(() => showToast('Recovery code copied!'));
-  } else {
-    showToast('Select and copy manually.');
-  }
-}
-
-function showRestoreModal() {
-  document.getElementById('restoreCodeInput').value = '';
-  document.getElementById('restoreModal').classList.add('show');
-}
-
-async function restoreFromCode() {
-  const code = document.getElementById('restoreCodeInput').value.trim();
-  if (!code) {
-    showToast('Please enter a recovery code');
-    return;
-  }
-  
-  if (!confirm('This will replace your current keys and ID. Continue?')) return;
-  
-  const success = await restoreFromRecoveryCode(code);
-  if (success) {
-    closeModal('restoreModal');
-    renderContacts();
-    renderChats();
-  }
-}
-
-function showKeysModal() {
-  const publicKey = localStorage.getItem('zoyra_public_key');
-  const privateKey = localStorage.getItem('zoyra_private_key');
-  
-  document.getElementById('publicKeyDisplay').textContent = publicKey || 'No public key found';
-  document.getElementById('privateKeyDisplay').textContent = privateKey || 'No private key found';
-  document.getElementById('keysModal').classList.add('show');
-}
-
-function copyPrivateKey() {
-  const key = document.getElementById('privateKeyDisplay').textContent;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(key).then(() => showToast('Private key copied! Keep it safe.'));
-  } else {
-    showToast('Select and copy manually.');
-  }
-}
-
-function closeModal(modalId) {
-  document.getElementById(modalId).classList.remove('show');
-}
-
-initId(); renderContacts(); renderChats(); generateAndSaveKeys(); 
+initId(); renderContacts(); renderChats(); generateAndSaveKeys();
 setTimeout(() => { listenForIncomingCalls(); listenForInbox(); }, 2000);
 </script>
 </body>
