@@ -267,7 +267,19 @@ function makeId(){ const a=new Uint32Array(12); if(window.crypto && crypto.getRa
 function initId(){ let id=localStorage.getItem('zoyra_preview_id'); if(!id){id=makeId();localStorage.setItem('zoyra_preview_id',id)} document.getElementById('userId').textContent=id; document.getElementById('displayName').value=localStorage.getItem('zoyra_display_name')||''; }
 function saveProfile(){ const field=document.getElementById('displayName'); const name=field.value.trim(); if(!name){showToast('Please enter a display name.');field.focus();return;} localStorage.setItem('zoyra_display_name',name); showToast('Profile saved.'); }
 function copyId(){ const id=document.getElementById('userId').textContent; if(navigator.clipboard) navigator.clipboard.writeText(id).then(()=>showToast('ID copied.')).catch(()=>showToast('Select and copy manually.')); else showToast('Select and copy your ID manually.'); }
-function go(id,btn){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); window.scrollTo(0,0); }
+
+function go(id,btn){ 
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); 
+  document.getElementById(id).classList.add('active'); 
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); 
+  btn.classList.add('active'); 
+  window.scrollTo(0,0);
+  // When switching to Chats tab, show button if no chat is open
+  if (id === 'chats' && !activeChatId) {
+    document.getElementById('startChatBtn').style.display = 'block';
+  }
+}
+
 function showToast(message){ const el=document.getElementById('toast'); el.textContent=message;el.classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>el.classList.remove('show'),3000); }
 function playNotificationSound(){ try { const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain(); oscillator.connect(gainNode); gainNode.connect(audioCtx.destination); oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.15); } catch(e) {} }
 
@@ -441,7 +453,7 @@ function openChat(id){
   unreadMessages[id] = 0;
   renderChats();
   
-  // ✅ KEY FIX: Hide "Start a conversation" button when chat opens
+  // ✅ Hide "Start a conversation" button when chat opens
   document.getElementById('startChatBtn').style.display = 'none';
   
   document.getElementById('chatRoom').style.display='block';
@@ -454,7 +466,7 @@ function closeChat(){
   activeChatId=null; 
   document.getElementById('chatRoom').style.display='none'; 
   
-  // ✅ KEY FIX: Show "Start a conversation" button when back
+  // ✅ Show "Start a conversation" button when back
   document.getElementById('startChatBtn').style.display = 'block';
   
   if(unsubscribeMessages){unsubscribeMessages();unsubscribeMessages=null;} 
