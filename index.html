@@ -67,8 +67,6 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 .call-btn{width:64px;height:64px;border-radius:50%;border:0;font-size:26px;display:grid;place-items:center;color:#fff;cursor:pointer;transition:0.2s;box-shadow:0 4px 15px rgba(0,0,0,0.3)}
 .call-btn:active{transform:scale(0.9)}
 .btn-end{background:#ef4444}.btn-mute{background:#334155}
-
-/* Inbox/Requests Styles */
 .requests-section{margin-bottom:16px}
 .requests-header{display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid #ffffff12;margin-bottom:8px}
 .requests-header strong{color:var(--warn);font-size:13px;letter-spacing:.05em}
@@ -83,7 +81,6 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 .request-actions button{padding:8px 10px;font-size:11px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
 .req-accept{background:var(--green);color:#fff}
 .req-block{background:#334155;color:#fff}
-
 @media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
 </style>
 </head>
@@ -333,7 +330,6 @@ function listenForInbox() {
     navBadge.style.display = 'block';
     
     requestsList.replaceChildren();
-    const myPrivateKey = await getPrivateKey();
     
     snapshot.forEach(doc => {
       const data = doc.data();
@@ -376,14 +372,12 @@ function listenForInbox() {
 async function acceptRequest(senderId, senderName, chatId, reqId) {
   const myId = localStorage.getItem('zoyra_preview_id');
   
-  // Save as contact if not already
   const contacts = readContacts();
   if(!contacts.some(c => c.id === senderId)) {
     contacts.push({ id: senderId, name: senderName || '' });
     localStorage.setItem('zoyra_contacts', JSON.stringify(contacts));
   }
   
-  // Delete from inbox
   await db.collection('users').doc(myId).collection('inbox').doc(reqId).delete();
   
   showToast('Contact accepted! Opening chat...');
@@ -395,7 +389,6 @@ async function blockRequest(reqId, senderId) {
   const myId = localStorage.getItem('zoyra_preview_id');
   if(!confirm(`Block messages from ${senderId}?`)) return;
   
-  // Save to blocked list
   const blocked = JSON.parse(localStorage.getItem('zoyra_blocked') || '[]');
   if(!blocked.includes(senderId)) {
     blocked.push(senderId);
@@ -404,11 +397,6 @@ async function blockRequest(reqId, senderId) {
   
   await db.collection('users').doc(myId).collection('inbox').doc(reqId).delete();
   showToast('User blocked.');
-}
-
-function isBlocked(userId) {
-  const blocked = JSON.parse(localStorage.getItem('zoyra_blocked') || '[]');
-  return blocked.includes(userId);
 }
 
 // ========== CHAT LIST ==========
@@ -475,18 +463,6 @@ async function sendMessage(){
     const encryptedText = await encryptMessage(text, friendPublicKey);
     const docRef = await db.collection('chats').doc(chatId).collection('messages').add({ text: encryptedText, isEncrypted: true, senderId: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
     sentMessagesCache[docRef.id] = text; saveSentCache();
-    
-    // Also send to recipient's inbox (for message requests)
-    const myName = localStorage.getItem('zoyra_display_name') || 'Anonymous';
-    await db.collection('users').doc(activeChatId).collection('inbox').doc(docRef.id).set({
-      chatId: chatId,
-      senderId: myId,
-      senderName: myName,
-      text: encryptedText,
-      isEncrypted: true,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    
     showToast('Sent securely! 🔐'); input.value='';
   } catch(e) { console.error(e); showToast('Failed to send.'); }
 }
