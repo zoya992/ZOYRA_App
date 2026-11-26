@@ -22,11 +22,11 @@ h1{font-size:27px;line-height:1.15;margin:8px 0 7px}h2{font-size:19px;margin:0 0
 .card{background:linear-gradient(155deg,#17243d,#111a2d);border:1px solid var(--line);border-radius:20px;padding:18px;margin:16px 0;transition:background 0.3s, border-color 0.3s}
 body.light-theme .card{background:#ffffff}
 .idlabel{font-size:12px;color:var(--muted)}.userid{font-size:22px;letter-spacing:.06em;font-weight:800;margin:7px 0 13px;overflow-wrap:anywhere}
-.btn{border:0;border-radius:13px;padding:13px 16px;font-weight:700;color:#10182c;background:linear-gradient(135deg,#b5c2ff,#829cff);transition:transform 0.1s}.btn:active{transform:scale(0.97)}.btn.secondary{background:#202e4b;color:var(--text);border:1px solid #344565}.btn.ghost{background:transparent;color:var(--accent2);border:1px solid #344565}.btn.full{width:100%}.actions{display:flex;gap:9px}.actions>*{flex:1}
+.btn{border:0;border-radius:13px;padding:13px 16px;font-weight:700;color:#10182c;background:linear-gradient(135deg,#b5c2ff,#829cff);transition:transform 0.1s}.btn:active{transform:scale(0.97)}.btn.secondary{background:#202e4b;color:var(--text);border:1px solid #344565}.btn.ghost{background:transparent;color:var(--accent2);border:1px solid #344565}.btn.full{width:100%}.btn.danger{background:linear-gradient(135deg,#ff9ea3,#ef4444);color:#fff}.actions{display:flex;gap:9px}.actions>*{flex:1}
 .nav{position:fixed;bottom:0;left:0;right:0;background:#0d1528f2;border-top:1px solid var(--line);padding:9px 10px calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:4px;z-index:5;backdrop-filter:blur(16px);transition:background 0.3s}.nav button{background:none;border:0;color:var(--muted);font-size:10px;padding:7px 10px;border-radius:12px;min-width:65px;transition:0.2s;position:relative}.nav button span{display:block;font-size:19px;margin-bottom:2px}.nav button.active{color:var(--accent2);background:#202e4b}.nav-badge{position:absolute;top:4px;right:6px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;min-width:16px;text-align:center}
 body.light-theme .nav{background:#fffffff2;border-top-color:#d1d9e6}
 body.light-theme .nav button.active{background:#e0e7ff;color:#4a6cf7}
-.item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid #ffffff12}.avatar{width:44px;height:44px;border-radius:15px;background:linear-gradient(145deg,#425985,#253451);display:grid;place-items:center;font-weight:800;color:#dce4ff;flex:none;position:relative}.online-dot{position:absolute;bottom:0;right:0;width:12px;height:12px;background:var(--green);border:2px solid var(--bg);border-radius:50%}.itemmain{flex:1;min-width:0}.itemmain strong{display:block}.itemmain small{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid #ffffff12;cursor:pointer}.avatar{width:44px;height:44px;border-radius:15px;background:linear-gradient(145deg,#425985,#253451);display:grid;place-items:center;font-weight:800;color:#dce4ff;flex:none;position:relative}.online-dot{position:absolute;bottom:0;right:0;width:12px;height:12px;background:var(--green);border:2px solid var(--bg);border-radius:50%}.itemmain{flex:1;min-width:0}.itemmain strong{display:block}.itemmain small{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .empty{text-align:center;padding:35px 15px;color:var(--muted)}.empty .symbol{font-size:38px;margin-bottom:8px}
 .field{display:block;color:var(--muted);font-size:12px;margin:14px 0 6px}.fieldinput{width:100%;padding:13px;background:#0e1729;color:var(--text);border:1px solid var(--line);border-radius:12px;outline:none;transition:background 0.3s}
 body.light-theme .fieldinput{background:#f1f5f9;color:#10182c;border-color:#d1d9e6}
@@ -76,6 +76,16 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 .request-actions button{padding:8px 10px;font-size:11px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
 .req-accept{background:var(--green);color:#fff}
 .req-block{background:#334155;color:#fff}
+.call-history-item{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #ffffff12}
+.call-history-item .avatar{width:40px;height:40px;font-size:16px}
+.call-history-item .call-info-text{flex:1}
+.call-history-item .call-info-text strong{display:block;font-size:14px}
+.call-history-item .call-info-text small{display:block;color:var(--muted);font-size:11px}
+.call-icon{font-size:20px}
+.call-icon.incoming{color:var(--green)}
+.call-icon.outgoing{color:var(--accent)}
+.call-icon.missed{color:var(--danger)}
+.saved-success{color:var(--green);font-size:13px;font-weight:700;margin-top:10px;display:none}
 @media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
 </style>
 </head>
@@ -97,12 +107,12 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
     <div class="idlabel">YOUR PROFILE</div>
     <label class="field" for="displayName">Display name</label>
     <input id="displayName" class="fieldinput" maxlength="32" placeholder="Enter your name">
-    <button class="btn full" style="margin-top:12px" onclick="saveProfile()">Save profile</button>
+    <button class="btn full" id="saveProfileBtn" style="margin-top:12px" onclick="saveProfile()">Save profile</button>
+    <div id="profileSavedMsg" class="saved-success">✓ Profile Saved</div>
     <div class="idlabel" style="margin-top:22px">YOUR ZOYRA ID</div>
     <div class="userid" id="userId">Creating ID…</div>
     <button class="btn secondary full" onclick="copyId()">Copy ZOYRA ID</button>
     <div class="idlabel" style="margin-top:20px; color:var(--green)">🔒 ENCRYPTION STATUS: <span id="encStatus">Generating Keys...</span></div>
-    <button class="btn ghost full" style="margin-top:12px;font-size:11px" onclick="resetKeys()">🔄 Reset Encryption Keys</button>
   </div>
   <div class="card">
     <h2>How to chat</h2>
@@ -153,6 +163,7 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 
 <section id="calls" class="screen">
   <div class="eyebrow">Stay connected</div><h1>Calls</h1><p class="sub">P2P Encrypted Calls.</p>
+  <div id="callHistoryList"></div>
   <div class="notice">Audio and video calling uses WebRTC. Media goes directly from device to device. Not stored on any server.</div>
 </section>
 
@@ -160,6 +171,10 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   <div class="eyebrow">Your preferences</div><h1>Settings</h1><p class="sub">Control your ZOYRA experience.</p>
   <div class="card">
     <div class="feature"><div class="ico">🛡️</div><div><strong>Privacy & security</strong><small>Strict E2EE active</small></div></div>
+    <div class="feature" style="cursor:pointer" onclick="resetKeys()">
+      <div class="ico">🔄</div>
+      <div><strong>Reset encryption keys</strong><small>Generate new keys. Old messages may not decrypt.</small></div>
+    </div>
     <div class="feature"><div class="ico">🌐</div><div><strong>Language</strong><small>English</small></div></div>
   </div>
   <footer>ZOYRA · Built with care<br>Privacy first.</footer>
@@ -265,7 +280,18 @@ async function decryptMessage(base64Cipher, privateKey) { const cipherBuffer = b
 const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function makeId(){ const a=new Uint32Array(12); if(window.crypto && crypto.getRandomValues) crypto.getRandomValues(a); else for(let i=0;i<a.length;i++) a[i]=Math.random()*4294967296; let s=''; for(let i=0;i<12;i++){ s+=alphabet[a[i]%alphabet.length]; if(i%4===3&&i!==11)s+='-'; } return 'ZY-'+s; }
 function initId(){ let id=localStorage.getItem('zoyra_preview_id'); if(!id){id=makeId();localStorage.setItem('zoyra_preview_id',id)} document.getElementById('userId').textContent=id; document.getElementById('displayName').value=localStorage.getItem('zoyra_display_name')||''; }
-function saveProfile(){ const field=document.getElementById('displayName'); const name=field.value.trim(); if(!name){showToast('Please enter a display name.');field.focus();return;} localStorage.setItem('zoyra_display_name',name); showToast('Profile saved.'); }
+
+function saveProfile(){ 
+  const field=document.getElementById('displayName'); 
+  const name=field.value.trim(); 
+  if(!name){showToast('Please enter a display name.');field.focus();return;} 
+  localStorage.setItem('zoyra_display_name',name); 
+  // ✅ FIX 2: Hide button, show success message
+  document.getElementById('saveProfileBtn').style.display = 'none';
+  document.getElementById('profileSavedMsg').style.display = 'block';
+  showToast('Profile saved.'); 
+}
+
 function copyId(){ const id=document.getElementById('userId').textContent; if(navigator.clipboard) navigator.clipboard.writeText(id).then(()=>showToast('ID copied.')).catch(()=>showToast('Select and copy manually.')); else showToast('Select and copy your ID manually.'); }
 
 function go(id,btn){ 
@@ -274,9 +300,15 @@ function go(id,btn){
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); 
   btn.classList.add('active'); 
   window.scrollTo(0,0);
-  // When switching to Chats tab, show button if no chat is open
+  // When switching to Chats tab, show button and list if no chat is open
   if (id === 'chats' && !activeChatId) {
     document.getElementById('startChatBtn').style.display = 'block';
+    document.getElementById('chatList').style.display = 'block';
+    document.getElementById('chatRoom').style.display = 'none';
+  }
+  // Load call history when Calls tab is opened
+  if (id === 'calls') {
+    renderCallHistory();
   }
 }
 
@@ -288,13 +320,40 @@ function renderContacts(){
   const list=document.getElementById('contactList');if(!list)return; const contacts=readContacts();list.replaceChildren();
   if(contacts.length===0){ const empty=document.createElement('div');empty.className='empty'; empty.innerHTML='<div class="symbol">👥</div><strong>No contacts added</strong><p>Saved contacts will appear here.</p>'; list.appendChild(empty);return; }
   contacts.forEach((contact,index)=>{
-    const row=document.createElement('div');row.className='item'; const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent=(contact.name||contact.id).slice(0,1).toUpperCase();
-    const main=document.createElement('div');main.className='itemmain'; const strong=document.createElement('strong');strong.textContent=contact.name||'ZOYRA contact'; const small=document.createElement('small');small.textContent=contact.id; main.append(strong,small);
+    const row=document.createElement('div');row.className='item';
+    const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent=(contact.name||contact.id).slice(0,1).toUpperCase();
+    const main=document.createElement('div');main.className='itemmain'; 
+    const strong=document.createElement('strong');strong.textContent=contact.name||'ZOYRA contact'; 
+    const small=document.createElement('small');small.textContent=contact.id; 
+    main.append(strong,small);
+    
+    // ✅ FIX 5: Click on contact row opens chat
+    row.addEventListener('click', (e) => {
+      // Don't open chat if Remove button was clicked
+      if (e.target.tagName === 'BUTTON') return;
+      openChatFromContacts(contact.id);
+    });
+    
     const remove=document.createElement('button');remove.className='btn ghost';remove.textContent='Remove';remove.style.padding='8px 10px';remove.style.fontSize='12px';
-    remove.addEventListener('click',()=>{const c=readContacts();c.splice(index,1);localStorage.setItem('zoyra_contacts',JSON.stringify(c));renderContacts();showToast('Contact removed.');});
+    remove.addEventListener('click',(e)=>{
+      e.stopPropagation(); // Prevent row click
+      const c=readContacts();c.splice(index,1);localStorage.setItem('zoyra_contacts',JSON.stringify(c));renderContacts();showToast('Contact removed.');
+    });
     row.append(avatar,main,remove);list.appendChild(row);
   });
 }
+
+function openChatFromContacts(contactId) {
+  // Switch to Chats tab
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('chats').classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.querySelector('[data-screen="chats"]').classList.add('active');
+  window.scrollTo(0,0);
+  // Open the chat
+  openChat(contactId);
+}
+
 function addContact(){
   const id=document.getElementById('contactId').value.trim().toUpperCase(); const name=document.getElementById('contactName').value.trim();
   if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(id)){showToast('Enter ID in format ZY-XXXX-XXXX-XXXX.');return;}
@@ -453,7 +512,8 @@ function openChat(id){
   unreadMessages[id] = 0;
   renderChats();
   
-  // ✅ Hide "Start a conversation" button when chat opens
+  // ✅ FIX 1: Hide chat list and start button when chat opens
+  document.getElementById('chatList').style.display = 'none';
   document.getElementById('startChatBtn').style.display = 'none';
   
   document.getElementById('chatRoom').style.display='block';
@@ -466,7 +526,8 @@ function closeChat(){
   activeChatId=null; 
   document.getElementById('chatRoom').style.display='none'; 
   
-  // ✅ Show "Start a conversation" button when back
+  // ✅ FIX 1: Show chat list and start button when back
+  document.getElementById('chatList').style.display = 'block';
   document.getElementById('startChatBtn').style.display = 'block';
   
   if(unsubscribeMessages){unsubscribeMessages();unsubscribeMessages=null;} 
@@ -538,7 +599,7 @@ document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key=
 // ==========================================
 // WEBRTC CALLING LOGIC (AUDIO & VIDEO)
 // ==========================================
-let localStream, remoteStream, peerConnection; const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }; let callListener = null; let callTimerInterval;
+let localStream, remoteStream, peerConnection; const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }; let callListener = null; let callTimerInterval; let callStartTime = 0;
 
 async function startCall(type = 'video') {
   if (!activeChatId) return; const myId = localStorage.getItem('zoyra_preview_id'); const chatId = getChatId(myId, activeChatId);
@@ -547,7 +608,9 @@ async function startCall(type = 'video') {
     showToast(`Requesting ${type === 'audio' ? 'Microphone' : 'Camera & Mic'}...`); 
     localStream = await navigator.mediaDevices.getUserMedia(type === 'audio' ? { audio: true } : { video: true, audio: true });
     document.getElementById('localVideo').srcObject = localStream; document.getElementById('callOverlay').style.display = 'flex';
-    document.getElementById('callStatusText').textContent = 'Calling...'; startCallTimer();
+    document.getElementById('callStatusText').textContent = 'Calling...'; 
+    callStartTime = Date.now();
+    startCallTimer();
     peerConnection = new RTCPeerConnection(servers); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
     peerConnection.onicecandidate = event => { if (event.candidate) { db.collection('calls').doc(chatId).collection('ice').add({ candidate: event.candidate.toJSON(), sender: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); } };
     peerConnection.ontrack = event => { document.getElementById('remoteVideo').srcObject = event.streams[0]; document.getElementById('callStatusText').textContent = 'Connected'; };
@@ -568,10 +631,13 @@ function listenForIncomingCalls() {
         if(confirm(`Incoming ${callType === 'audio' ? 'Audio' : 'Video'} Call from ${contact?.name || callerId}. Accept?`)) {
           activeChatId = callerId; document.getElementById('chatRoom').style.display='block'; document.getElementById('chatTitle').textContent=contact?.name||'Call';
           document.getElementById('startChatBtn').style.display = 'none';
+          document.getElementById('chatList').style.display = 'none';
           try {
             localStream = await navigator.mediaDevices.getUserMedia(callType === 'audio' ? { audio: true } : { video: true, audio: true });
             document.getElementById('localVideo').srcObject = localStream; document.getElementById('callOverlay').style.display = 'flex';
-            document.getElementById('callStatusText').textContent = 'Connecting...'; startCallTimer();
+            document.getElementById('callStatusText').textContent = 'Connecting...'; 
+            callStartTime = Date.now();
+            startCallTimer();
             peerConnection = new RTCPeerConnection(servers); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
             peerConnection.onicecandidate = event => { if (event.candidate) { db.collection('calls').doc(chatId).collection('ice').add({ candidate: event.candidate.toJSON(), sender: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); } };
             peerConnection.ontrack = event => { document.getElementById('remoteVideo').srcObject = event.streams[0]; document.getElementById('callStatusText').textContent = 'Connected'; };
@@ -580,7 +646,11 @@ function listenForIncomingCalls() {
             callListener = db.collection('calls').doc(chatId).onSnapshot(doc => { if (doc.data().status === 'ended') endCallUI(); });
             db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { const data = change.doc.data(); if (data.sender !== myId) { peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e)); } } }); });
           } catch(err) { console.error(err); endCallUI(); }
-        } else { db.collection('calls').doc(chatId).update({ status: 'ended' }); }
+        } else { 
+          db.collection('calls').doc(chatId).update({ status: 'ended' }); 
+          // Save missed call
+          saveCallHistory(callerId, callType, 'missed', 0);
+        }
       }
     });
   });
@@ -588,8 +658,108 @@ function listenForIncomingCalls() {
 
 function startCallTimer() { let seconds = 0; const timerEl = document.getElementById('callTimer'); clearInterval(callTimerInterval); callTimerInterval = setInterval(() => { seconds++; const m = Math.floor(seconds / 60).toString().padStart(2, '0'); const s = (seconds % 60).toString().padStart(2, '0'); timerEl.textContent = `${m}:${s}`; }, 1000); }
 function toggleMute() { if (localStream) { const audioTrack = localStream.getAudioTracks()[0]; if (audioTrack) { audioTrack.enabled = !audioTrack.enabled; showToast(audioTrack.enabled ? 'Unmuted' : 'Muted'); } } }
-function endCall() { const myId = localStorage.getItem('zoyra_preview_id'); const chatId = activeChatId ? getChatId(myId, activeChatId) : null; if (chatId) { db.collection('calls').doc(chatId).update({ status: 'ended' }).catch(e=>{}); db.collection('calls').doc(chatId).collection('ice').get().then(snap => { snap.forEach(doc => doc.ref.delete()); }); } endCallUI(); }
-function endCallUI() { clearInterval(callTimerInterval); if (peerConnection) peerConnection.close(); if (localStream) localStream.getTracks().forEach(track => track.stop()); if (callListener) callListener(); document.getElementById('callOverlay').style.display = 'none'; document.getElementById('remoteVideo').srcObject = null; document.getElementById('localVideo').srcObject = null; document.getElementById('callTimer').textContent = '00:00'; peerConnection = null; localStream = null; showToast('Call Ended'); }
+function endCall() { 
+  const myId = localStorage.getItem('zoyra_preview_id'); 
+  const chatId = activeChatId ? getChatId(myId, activeChatId) : null; 
+  if (chatId) { 
+    db.collection('calls').doc(chatId).update({ status: 'ended' }).catch(e=>{}); 
+    db.collection('calls').doc(chatId).collection('ice').get().then(snap => { snap.forEach(doc => doc.ref.delete()); }); 
+  } 
+  // ✅ FIX 4: Save call history
+  const duration = Math.floor((Date.now() - callStartTime) / 1000);
+  if (activeChatId) {
+    saveCallHistory(activeChatId, 'video', 'outgoing', duration);
+  }
+  endCallUI(); 
+}
+function endCallUI() { 
+  clearInterval(callTimerInterval); 
+  if (peerConnection) peerConnection.close(); 
+  if (localStream) localStream.getTracks().forEach(track => track.stop()); 
+  if (callListener) callListener(); 
+  document.getElementById('callOverlay').style.display = 'none'; 
+  document.getElementById('remoteVideo').srcObject = null; 
+  document.getElementById('localVideo').srcObject = null; 
+  document.getElementById('callTimer').textContent = '00:00'; 
+  peerConnection = null; 
+  localStream = null; 
+  showToast('Call Ended'); 
+}
+
+// ✅ FIX 4: Call History Functions
+async function saveCallHistory(contactId, callType, callStatus, duration) {
+  const myId = localStorage.getItem('zoyra_preview_id');
+  const contact = readContacts().find(c => c.id === contactId);
+  const contactName = contact?.name || contactId;
+  
+  try {
+    await db.collection('users').doc(myId).collection('callHistory').add({
+      contactId: contactId,
+      contactName: contactName,
+      callType: callType,
+      callStatus: callStatus,
+      duration: duration,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) {
+    console.error('Failed to save call history:', e);
+  }
+}
+
+function renderCallHistory() {
+  const list = document.getElementById('callHistoryList');
+  if (!list) return;
+  
+  const myId = localStorage.getItem('zoyra_preview_id');
+  if (!myId) return;
+  
+  list.innerHTML = '';
+  
+  db.collection('users').doc(myId).collection('callHistory')
+    .orderBy('timestamp', 'desc')
+    .limit(20)
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.innerHTML = '<div class="symbol">📞</div><strong>No call history</strong><p>Your recent calls will appear here.</p>';
+        list.appendChild(empty);
+        return;
+      }
+      
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const item = document.createElement('div');
+        item.className = 'call-history-item';
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar';
+        avatar.textContent = (data.contactName || '?').slice(0,1).toUpperCase();
+        
+        const info = document.createElement('div');
+        info.className = 'call-info-text';
+        const name = document.createElement('strong');
+        name.textContent = data.contactName || data.contactId;
+        const details = document.createElement('small');
+        const typeIcon = data.callType === 'audio' ? '📞' : '📹';
+        const statusText = data.callStatus === 'incoming' ? 'Incoming' : data.callStatus === 'outgoing' ? 'Outgoing' : 'Missed';
+        const durationText = data.duration > 0 ? ` ${Math.floor(data.duration/60)}:${(data.duration%60).toString().padStart(2,'0')}` : '';
+        details.textContent = `${typeIcon} ${statusText}${durationText}`;
+        info.append(name, details);
+        
+        const icon = document.createElement('div');
+        icon.className = `call-icon ${data.callStatus}`;
+        icon.textContent = data.callStatus === 'incoming' ? '↙' : data.callStatus === 'outgoing' ? '↗' : '✕';
+        
+        item.append(avatar, info, icon);
+        list.appendChild(item);
+      });
+    })
+    .catch(err => {
+      console.error('Failed to load call history:', err);
+    });
+}
 
 initId(); renderContacts(); renderChats(); generateAndSaveKeys(); 
 setTimeout(() => { listenForIncomingCalls(); listenForInbox(); }, 2000);
