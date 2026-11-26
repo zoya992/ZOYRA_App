@@ -121,7 +121,7 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
     <div id="requestsList"></div>
   </div>
   <div id="chatList"></div>
-  <button class="btn full" onclick="startChat()">＋ Start a conversation</button>
+  <button class="btn full" id="startChatBtn" onclick="startChat()">＋ Start a conversation</button>
   <div id="chatRoom" class="card" style="display:none">
     <div class="actions" style="align-items:center">
       <button class="btn ghost" style="flex:0 0 auto" onclick="closeChat()">← Back</button>
@@ -220,7 +220,6 @@ function loadSentCache() { try { sentMessagesCache = JSON.parse(localStorage.get
 function saveSentCache() { localStorage.setItem('zoyra_sent_cache', JSON.stringify(sentMessagesCache)); }
 loadSentCache();
 
-// Global unread messages tracker
 let unreadMessages = {};
 
 function arrayBufferToBase64(buffer) { let binary = ''; const bytes = new Uint8Array(buffer); for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]); return window.btoa(binary); }
@@ -321,19 +320,16 @@ function listenForInbox() {
       const isSavedContact = contacts.some(c => c.id === senderId);
       
       if (isSavedContact) {
-        // TRIGGER NOTIFICATION FOR SAVED CONTACTS
         if (activeChatId !== senderId) {
           playNotificationSound();
           showToast(`New message from ${data.senderName || senderId}`);
           unreadMessages[senderId] = (unreadMessages[senderId] || 0) + 1;
-          renderChats(); // Update UI to show badge
+          renderChats();
         }
-        // Delete from inbox so it doesn't show in Requests
         db.collection('users').doc(myId).collection('inbox').doc(reqId).delete().catch(e => console.error(e));
         return;
       }
       
-      // Only show unknown senders in requests
       requestCount++;
       const item = document.createElement('div');
       item.className = 'request-item';
@@ -416,7 +412,6 @@ function renderChats(){
     
     const main=document.createElement('div');main.className='itemmain';
     
-    // Top row with Name and Badge
     const topRow = document.createElement('div');
     topRow.style.display = 'flex'; topRow.style.justifyContent = 'space-between'; topRow.style.alignItems = 'center';
     const name=document.createElement('strong');name.textContent=c.name||c.id;
@@ -443,9 +438,11 @@ function openChat(id){
   const contact=readContacts().find(c=>c.id===id);if(!contact){showToast('Contact not found.');return;}
   activeChatId=id; lastMsgCount = 0; 
   
-  // Clear unread messages for this chat
   unreadMessages[id] = 0;
-  renderChats(); // Update UI to remove badge
+  renderChats();
+  
+  // ✅ KEY FIX: Hide "Start a conversation" button when chat opens
+  document.getElementById('startChatBtn').style.display = 'none';
   
   document.getElementById('chatRoom').style.display='block';
   document.getElementById('chatTitle').textContent=contact.name||'ZOYRA contact'; document.getElementById('chatSubtitle').textContent=id;
@@ -453,7 +450,19 @@ function openChat(id){
   document.getElementById('messageInput').value=''; renderMessages(); listenForTyping(); listenForStatus(); document.getElementById('messageInput').focus();
 }
 
-function closeChat(){ activeChatId=null; document.getElementById('chatRoom').style.display='none'; if(unsubscribeMessages){unsubscribeMessages();unsubscribeMessages=null;} if(unsubscribeTyping){unsubscribeTyping();unsubscribeTyping=null;} if(unsubscribeStatus){unsubscribeStatus();unsubscribeStatus=null;} document.getElementById('typingIndicator').style.display='none'; renderChats(); }
+function closeChat(){ 
+  activeChatId=null; 
+  document.getElementById('chatRoom').style.display='none'; 
+  
+  // ✅ KEY FIX: Show "Start a conversation" button when back
+  document.getElementById('startChatBtn').style.display = 'block';
+  
+  if(unsubscribeMessages){unsubscribeMessages();unsubscribeMessages=null;} 
+  if(unsubscribeTyping){unsubscribeTyping();unsubscribeTyping=null;} 
+  if(unsubscribeStatus){unsubscribeStatus();unsubscribeStatus=null;} 
+  document.getElementById('typingIndicator').style.display='none'; 
+  renderChats(); 
+}
 
 function listenForStatus() { if(unsubscribeStatus) unsubscribeStatus(); unsubscribeStatus = db.collection('users').doc(activeChatId).onSnapshot(doc => { if(doc.exists && doc.data().isOnline) { document.getElementById('chatOnlineDot').style.display='block'; document.getElementById('chatSubtitle').textContent = 'Online'; } else { document.getElementById('chatOnlineDot').style.display='none'; document.getElementById('chatSubtitle').textContent = 'Last seen recently'; } }); }
 function listenForTyping() {
@@ -546,6 +555,7 @@ function listenForIncomingCalls() {
         const contact = readContacts().find(c=>c.id===callerId); document.getElementById('callAvatar').textContent = (contact?.name || callerId).slice(0,1).toUpperCase();
         if(confirm(`Incoming ${callType === 'audio' ? 'Audio' : 'Video'} Call from ${contact?.name || callerId}. Accept?`)) {
           activeChatId = callerId; document.getElementById('chatRoom').style.display='block'; document.getElementById('chatTitle').textContent=contact?.name||'Call';
+          document.getElementById('startChatBtn').style.display = 'none';
           try {
             localStream = await navigator.mediaDevices.getUserMedia(callType === 'audio' ? { audio: true } : { video: true, audio: true });
             document.getElementById('localVideo').srcObject = localStream; document.getElementById('callOverlay').style.display = 'flex';
