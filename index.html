@@ -4,11 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1020" id="themeColorMeta">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ZOYRA">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQwIiBmaWxsPSIjNjI3ZGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1NSUiIGZvbnQtc2l6ZT0iMTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlo8L3RleHQ+PC9zdmc+">
 <title>ZOYRA — Private conversations</title>
 <style>
 :root{--bg:#0b1020;--panel:#121b30;--panel2:#18243c;--line:#263552;--text:#f4f7ff;--muted:#9eacc5;--accent:#829cff;--accent2:#a8b8ff;--green:#57d6a0;--danger:#ff7e88;--warn:#ffb84d}
@@ -198,12 +193,6 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
-  });
-}
-
 const firebaseConfig = {
   apiKey: "AIzaSyDfJhbsYH8LNgciNcoNKmwhZNWAKNLsXM",
   authDomain: "zoyra-chat.firebaseapp.com",
@@ -458,7 +447,7 @@ async function renderMessages(){
     lastMsgCount = snapshot.size;
     for (const doc of snapshot.docs) {
       const m = doc.data(); const msgId = doc.id; const isMine = m.senderId === myId; const msg = document.createElement('div'); msg.className = 'msg ' + (isMine ? 'mine' : 'theirs'); const body = document.createElement('div');
-      if (isMine && sentMessagesCache[msgId]) { body.textContent = sentMessagesCache[msgId]; } else if (m.isEncrypted && m.text) { try { const decryptedText = await decryptMessage(m.text, myPrivateKey); body.textContent = decryptedText; } catch (, err) { body.textContent = '[Decryption Failed]'; } } else { body.textContent = '[Blocked: Unencrypted]'; }
+      if (isMine && sentMessagesCache[msgId]) { body.textContent = sentMessagesCache[msgId]; } else if (m.isEncrypted && m.text) { try { const decryptedText = await decryptMessage(m.text, myPrivateKey); body.textContent = decryptedText; } catch (err) { body.textContent = '[Decryption Failed]'; } } else { body.textContent = '[Blocked: Unencrypted]'; }
       msg.appendChild(body); const meta=document.createElement('div');meta.className='msg-meta'; const stamp=document.createElement('span');stamp.className='msg-time'; if(m.timestamp && m.timestamp.toDate) stamp.textContent=new Date(m.timestamp.toDate()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); else stamp.textContent='sending...'; meta.appendChild(stamp);
       if(isMine){ const delBtn=document.createElement('button');delBtn.className='msg-del';delBtn.innerHTML='🗑️'; delBtn.addEventListener('click',()=>deleteMessage(chatId, msgId)); meta.appendChild(delBtn); }
       msg.appendChild(meta);box.appendChild(msg);
