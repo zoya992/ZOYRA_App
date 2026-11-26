@@ -220,6 +220,9 @@ function loadSentCache() { try { sentMessagesCache = JSON.parse(localStorage.get
 function saveSentCache() { localStorage.setItem('zoyra_sent_cache', JSON.stringify(sentMessagesCache)); }
 loadSentCache();
 
+// Global unread messages tracker
+let unreadMessages = {};
+
 function arrayBufferToBase64(buffer) { let binary = ''; const bytes = new Uint8Array(buffer); for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]); return window.btoa(binary); }
 function base64ToArrayBuffer(base64) { const binary_string = window.atob(base64); const bytes = new Uint8Array(binary_string.length); for (let i = 0; i < binary_string.length; i++) bytes[i] = binary_string.charCodeAt(i); return bytes.buffer; }
 
@@ -266,7 +269,7 @@ function initId(){ let id=localStorage.getItem('zoyra_preview_id'); if(!id){id=m
 function saveProfile(){ const field=document.getElementById('displayName'); const name=field.value.trim(); if(!name){showToast('Please enter a display name.');field.focus();return;} localStorage.setItem('zoyra_display_name',name); showToast('Profile saved.'); }
 function copyId(){ const id=document.getElementById('userId').textContent; if(navigator.clipboard) navigator.clipboard.writeText(id).then(()=>showToast('ID copied.')).catch(()=>showToast('Select and copy manually.')); else showToast('Select and copy your ID manually.'); }
 function go(id,btn){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); window.scrollTo(0,0); }
-function showToast(message){ const el=document.getElementById('toast'); el.textContent=message;el.classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>el.classList.remove('show'),2400); }
+function showToast(message){ const el=document.getElementById('toast'); el.textContent=message;el.classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>el.classList.remove('show'),3000); }
 function playNotificationSound(){ try { const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain(); oscillator.connect(gainNode); gainNode.connect(audioCtx.destination); oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.15); } catch(e) {} }
 
 function readContacts(){ try{const v=JSON.parse(localStorage.getItem('zoyra_contacts')||'[]');return Array.isArray(v)?v:[];}catch(e){return [];} }
@@ -292,7 +295,7 @@ function addContact(){
 function getChatId(id1,id2){return [id1,id2].sort().join('|');}
 let activeChatId=null; let unsubscribeMessages=null; let unsubscribeTyping=null; let unsubscribeStatus=null; let unsubscribeInbox=null; let lastMsgCount = 0;
 
-// ========== SMART INBOX SYSTEM ==========
+// ========== SMART INBOX & NOTIFICATION SYSTEM ==========
 function listenForInbox() {
   if(unsubscribeInbox) unsubscribeInbox();
   const myId = localStorage.getItem('zoyra_preview_id');
@@ -315,11 +318,17 @@ function listenForInbox() {
       const reqId = doc.id;
       const senderId = data.senderId;
       
-      // KEY FIX: Check if sender is in contacts
       const isSavedContact = contacts.some(c => c.id === senderId);
       
       if (isSavedContact) {
-        // If saved contact, delete from inbox immediately (let chat handle it)
+        // TRIGGER NOTIFICATION FOR SAVED CONTACTS
+        if (activeChatId !== senderId) {
+          playNotificationSound();
+          showToast(`New message from ${data.senderName || senderId}`);
+          unreadMessages[senderId] = (unreadMessages[senderId] || 0) + 1;
+          renderChats(); // Update UI to show badge
+        }
+        // Delete from inbox so it doesn't show in Requests
         db.collection('users').doc(myId).collection('inbox').doc(reqId).delete().catch(e => console.error(e));
         return;
       }
@@ -373,15 +382,12 @@ function listenForInbox() {
 
 async function acceptRequest(senderId, senderName, chatId, reqId) {
   const myId = localStorage.getItem('zoyra_preview_id');
-  
   const contacts = readContacts();
   if(!contacts.some(c => c.id === senderId)) {
     contacts.push({ id: senderId, name: senderName || '' });
     localStorage.setItem('zoyra_contacts', JSON.stringify(contacts));
   }
-  
   await db.collection('users').doc(myId).collection('inbox').doc(reqId).delete();
-  
   showToast('Contact accepted! Opening chat...');
   renderContacts();
   renderChats();
@@ -391,36 +397,62 @@ async function acceptRequest(senderId, senderName, chatId, reqId) {
 async function blockRequest(reqId, senderId) {
   const myId = localStorage.getItem('zoyra_preview_id');
   if(!confirm(`Block messages from ${senderId}?`)) return;
-  
   const blocked = JSON.parse(localStorage.getItem('zoyra_blocked') || '[]');
   if(!blocked.includes(senderId)) {
     blocked.push(senderId);
     localStorage.setItem('zoyra_blocked', JSON.stringify(blocked));
   }
-  
   await db.collection('users').doc(myId).collection('inbox').doc(reqId).delete();
   showToast('User blocked.');
 }
 
-// ========== CHAT LIST ==========
+// ========== CHAT LIST WITH BADGES ==========
 function renderChats(){
   const list=document.getElementById('chatList');if(!list)return; const contacts=readContacts();list.replaceChildren();
   if(contacts.length===0){ const empty=document.createElement('div');empty.className='empty'; empty.innerHTML='<div class="symbol">💬</div><strong>No conversations yet</strong><p>Add a contact or accept a request.</p>'; list.appendChild(empty);return; }
   contacts.forEach(c=>{
     const row=document.createElement('button');row.className='item';row.style.cssText='width:100%;text-align:left;color:inherit;background:transparent;border:0;border-bottom:1px solid #ffffff12;cursor:pointer';
     const av=document.createElement('div');av.className='avatar';av.textContent=(c.name||c.id).slice(0,1).toUpperCase();
-    const main=document.createElement('div');main.className='itemmain'; const name=document.createElement('strong');name.textContent=c.name||c.id; const preview=document.createElement('small');preview.textContent='Tap to open chat'; main.append(name,preview);row.append(av,main);
+    
+    const main=document.createElement('div');main.className='itemmain';
+    
+    // Top row with Name and Badge
+    const topRow = document.createElement('div');
+    topRow.style.display = 'flex'; topRow.style.justifyContent = 'space-between'; topRow.style.alignItems = 'center';
+    const name=document.createElement('strong');name.textContent=c.name||c.id;
+    
+    if(unreadMessages[c.id] && unreadMessages[c.id] > 0) {
+      const badge = document.createElement('span');
+      badge.textContent = unreadMessages[c.id];
+      badge.style.cssText = 'background:var(--danger);color:#fff;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:bold;';
+      topRow.append(name, badge);
+    } else {
+      topRow.appendChild(name);
+    }
+    
+    const preview=document.createElement('small');preview.textContent='Tap to open chat';
+    main.append(topRow, preview);
+    row.append(av,main);
     row.addEventListener('click',()=>openChat(c.id));list.appendChild(row);
   });
 }
+
 function startChat(){ const id=prompt('Enter the ZOYRA ID of the person you want to chat with:'); if(!id)return; const clean=id.trim().toUpperCase(); if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(clean)){showToast('Invalid ID format.');return;} const contacts=readContacts(); if(!contacts.some(c=>c.id===clean)){ contacts.push({id:clean,name:''}); localStorage.setItem('zoyra_contacts',JSON.stringify(contacts)); renderContacts(); } openChat(clean); }
+
 function openChat(id){
   const contact=readContacts().find(c=>c.id===id);if(!contact){showToast('Contact not found.');return;}
-  activeChatId=id; lastMsgCount = 0; document.getElementById('chatRoom').style.display='block';
+  activeChatId=id; lastMsgCount = 0; 
+  
+  // Clear unread messages for this chat
+  unreadMessages[id] = 0;
+  renderChats(); // Update UI to remove badge
+  
+  document.getElementById('chatRoom').style.display='block';
   document.getElementById('chatTitle').textContent=contact.name||'ZOYRA contact'; document.getElementById('chatSubtitle').textContent=id;
   document.getElementById('chatAvatar').textContent=(contact.name||id).slice(0,1).toUpperCase();
   document.getElementById('messageInput').value=''; renderMessages(); listenForTyping(); listenForStatus(); document.getElementById('messageInput').focus();
 }
+
 function closeChat(){ activeChatId=null; document.getElementById('chatRoom').style.display='none'; if(unsubscribeMessages){unsubscribeMessages();unsubscribeMessages=null;} if(unsubscribeTyping){unsubscribeTyping();unsubscribeTyping=null;} if(unsubscribeStatus){unsubscribeStatus();unsubscribeStatus=null;} document.getElementById('typingIndicator').style.display='none'; renderChats(); }
 
 function listenForStatus() { if(unsubscribeStatus) unsubscribeStatus(); unsubscribeStatus = db.collection('users').doc(activeChatId).onSnapshot(doc => { if(doc.exists && doc.data().isOnline) { document.getElementById('chatOnlineDot').style.display='block'; document.getElementById('chatSubtitle').textContent = 'Online'; } else { document.getElementById('chatOnlineDot').style.display='none'; document.getElementById('chatSubtitle').textContent = 'Last seen recently'; } }); }
@@ -467,7 +499,6 @@ async function sendMessage(){
     const docRef = await db.collection('chats').doc(chatId).collection('messages').add({ text: encryptedText, isEncrypted: true, senderId: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
     sentMessagesCache[docRef.id] = text; saveSentCache();
     
-    // Always send to recipient's inbox for notification
     const myName = localStorage.getItem('zoyra_display_name') || 'Anonymous';
     await db.collection('users').doc(activeChatId).collection('inbox').doc(docRef.id).set({
       chatId: chatId,
