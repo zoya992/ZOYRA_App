@@ -42,7 +42,9 @@ body.light-theme .msg.theirs{background:#f1f5f9;color:#10182c}
 .msg-meta{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:4px}
 .msg-time{font-size:10px;color:#bdc9e2}
 .msg-ticks{font-size:12px;color:#bdc9e2;margin-left:4px}
+.msg-ticks.sent{color:var(--muted)}
 .msg-ticks.delivered{color:var(--accent2)}
+.msg-ticks.read{color:#57d6a0}
 body.light-theme .msg-time{color:#5a6b8c}
 .msg-del{background:none;border:none;color:#ff7e88;cursor:pointer;font-size:14px;padding:2px 5px;border-radius:6px;opacity:0.7;transition:0.2s}
 .msg-del:hover{opacity:1;background:#ffffff15}
@@ -105,6 +107,12 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 .menu-item strong{display:block;font-size:14px}
 .menu-item small{display:block;color:var(--muted);font-size:11px}
 .menu-item.danger strong{color:var(--danger)}
+.profile-display{display:flex;align-items:center;justify-content:space-between;padding:12px;background:#0e1729;border-radius:12px;margin-top:12px}
+.profile-name{font-size:18px;font-weight:700;color:var(--text)}
+.edit-btn{background:none;border:1px solid var(--accent);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer}
+.edit-btn:hover{background:var(--accent);color:#10182c}
+.trust-text{text-align:center;padding:16px;color:var(--muted);font-size:13px;line-height:1.6}
+.trust-text .icon{font-size:24px;margin-bottom:8px}
 @media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
 </style>
 </head>
@@ -124,10 +132,17 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   <p class="sub">A private communication space with End-to-End Encryption.</p>
   <div class="card">
     <div class="idlabel">YOUR PROFILE</div>
-    <label class="field" for="displayName">Display name</label>
-    <input id="displayName" class="fieldinput" maxlength="32" placeholder="Enter your name">
-    <button class="btn full" id="saveProfileBtn" style="margin-top:12px" onclick="saveProfile()">Save profile</button>
-    <div id="profileSavedMsg" class="saved-success">✓ Profile Saved</div>
+    <div id="profileEditSection">
+      <label class="field" for="displayName">Display name</label>
+      <input id="displayName" class="fieldinput" maxlength="32" placeholder="Enter your name">
+      <button class="btn full" id="saveProfileBtn" style="margin-top:12px" onclick="saveProfile()">Save profile</button>
+    </div>
+    <div id="profileDisplaySection" style="display:none">
+      <div class="profile-display">
+        <div class="profile-name" id="profileDisplayName"></div>
+        <button class="edit-btn" onclick="editProfile()">✏️ Edit</button>
+      </div>
+    </div>
     <div class="idlabel" style="margin-top:22px">YOUR ZOYRA ID</div>
     <div class="userid" id="userId">Creating ID…</div>
     <button class="btn secondary full" onclick="copyId()">Copy ZOYRA ID</button>
@@ -156,7 +171,7 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   <button class="btn full" id="startChatBtn" onclick="startChat()">＋ Start a conversation</button>
   <div id="chatRoom" class="card" style="display:none">
     <div class="actions" style="align-items:center">
-      <button class="btn ghost" style="flex:0 0 auto" onclick="closeChat()">← Back</button>
+      <button class="btn ghost" style="flex:0 0 auto;padding:8px 12px;font-size:18px" onclick="closeChat()">←</button>
       <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px">
         <div style="position:relative"><div class="avatar" style="width:32px;height:32px;font-size:14px" id="chatAvatar">?</div><div class="online-dot" id="chatOnlineDot" style="display:none"></div></div>
         <div><strong id="chatTitle">Conversation</strong><div class="idlabel" id="chatSubtitle" style="font-size:10px"></div></div>
@@ -182,7 +197,13 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 <section id="calls" class="screen">
   <div class="eyebrow">Stay connected</div><h1>Calls</h1><p class="sub">Your call history.</p>
   <div id="callHistoryList"></div>
-  <div class="notice">Audio and video calling uses WebRTC. Media goes directly from device to device.</div>
+  <div class="trust-text">
+    <div class="icon">🔒</div>
+    <strong>Your calls are 100% private</strong><br>
+    • No one can listen — not even us<br>
+    • Calls go directly between phones<br>
+    • Nothing is recorded or stored
+  </div>
 </section>
 
 <section id="settings" class="screen">
@@ -200,6 +221,10 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
       <div class="ico">🔄</div>
       <div><strong>Reset encryption keys</strong><small>Free users: max 2 resets. Further resets require Premium.</small></div>
     </div>
+    <div class="feature" onclick="shareApp()">
+      <div class="ico">📤</div>
+      <div><strong>Share ZOYRA</strong><small>Invite friends to secure chat</small></div>
+    </div>
     <div class="feature"><div class="ico">🌐</div><div><strong>Language</strong><small>English</small></div></div>
   </div>
   <footer>ZOYRA · Built with care<br>Privacy first.</footer>
@@ -215,7 +240,6 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 </nav>
 <div id="toast" class="toast" role="status"></div>
 
-<!-- FAB for Contacts -->
 <button class="fab-button" id="contactsFab" style="display:none" onclick="showAddContactModal()">+</button>
 
 <div id="callOverlay">
@@ -236,7 +260,6 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   </div>
 </div>
 
-<!-- Modal: Backup Options -->
 <div class="modal-overlay" id="backupOptionsModal">
   <div class="modal">
     <h3>🔑 Choose Recovery Code Length</h3>
@@ -247,22 +270,20 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   </div>
 </div>
 
-<!-- Modal: Recovery Code Display -->
 <div class="modal-overlay" id="recoveryModal">
   <div class="modal">
     <h3>🔑 Your Recovery Code</h3>
-    <p id="recoveryModalText">Write these words down in order and keep them safe. If you lose your phone, you will need these words AND your ZOYRA ID to get your account back.</p>
+    <p id="recoveryModalText">Write these words down in order and keep them safe.</p>
     <div class="recovery-words" id="recoveryCodeDisplay"></div>
     <button class="btn full" onclick="copyRecoveryCode()">📋 Copy Words</button>
     <button class="btn secondary full" style="margin-top:8px" onclick="closeModal('recoveryModal')">I have saved it</button>
   </div>
 </div>
 
-<!-- Modal: Restore -->
 <div class="modal-overlay" id="restoreModal">
   <div class="modal">
     <h3>📥 Restore Your ID</h3>
-    <p>Enter your ZOYRA ID and recovery words to restore your account. Both are required.</p>
+    <p>Enter your ZOYRA ID and recovery words to restore your account.</p>
     <label class="field">Your ZOYRA ID</label>
     <input id="restoreIdInput" class="fieldinput" placeholder="ZY-XXXX-XXXX-XXXX" autocapitalize="characters">
     <label class="field">Recovery Words (separated by spaces)</label>
@@ -272,7 +293,6 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   </div>
 </div>
 
-<!-- Modal: Add Contact -->
 <div class="modal-overlay" id="addContactModal">
   <div class="modal">
     <h3>➕ Add New Contact</h3>
@@ -285,7 +305,6 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   </div>
 </div>
 
-<!-- Modal: Chat Menu -->
 <div class="modal-overlay" id="chatMenuModal">
   <div class="modal">
     <h3>Chat Options</h3>
@@ -304,7 +323,6 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   </div>
 </div>
 
-<!-- Modal: Call Action Menu (Option C) -->
 <div class="modal-overlay" id="callActionModal">
   <div class="modal">
     <h3 id="callActionTitle">Call Options</h3>
@@ -371,6 +389,7 @@ async function generateAndSaveKeys() {
     encStatus.textContent = "Keys Loaded. Syncing..."; 
     await uploadPublicKey(); 
     checkRecoveryCode();
+    loadProfile();
     return; 
   }
   try {
@@ -383,7 +402,17 @@ async function generateAndSaveKeys() {
     encStatus.textContent = "Keys Generated. Syncing..."; 
     await uploadPublicKey();
     checkRecoveryCode();
+    loadProfile();
   } catch (error) { console.error("Key generation failed:", error); encStatus.textContent = "Failed to generate keys"; }
+}
+
+function loadProfile() {
+  const savedName = localStorage.getItem('zoyra_display_name');
+  if (savedName) {
+    document.getElementById('profileDisplayName').textContent = savedName;
+    document.getElementById('profileEditSection').style.display = 'none';
+    document.getElementById('profileDisplaySection').style.display = 'block';
+  }
 }
 
 function checkRecoveryCode() {
@@ -506,7 +535,6 @@ async function restoreFromCode() {
 }
 
 window.resetKeys = async function() {
-  // Point 1: Track reset count (for future Premium)
   let resetCount = parseInt(localStorage.getItem('zoyra_reset_count') || '0');
   if (resetCount >= 2) {
     showToast('⚠️ Free limit reached (2/2). Reset requires Premium.');
@@ -560,9 +588,16 @@ function saveProfile(){
   const name=field.value.trim(); 
   if(!name){showToast('Please enter a display name.');field.focus();return;} 
   localStorage.setItem('zoyra_display_name',name); 
-  document.getElementById('saveProfileBtn').style.display = 'none';
-  document.getElementById('profileSavedMsg').style.display = 'block';
+  document.getElementById('profileDisplayName').textContent = name;
+  document.getElementById('profileEditSection').style.display = 'none';
+  document.getElementById('profileDisplaySection').style.display = 'block';
   showToast('Profile saved.'); 
+}
+
+function editProfile() {
+  document.getElementById('profileEditSection').style.display = 'block';
+  document.getElementById('profileDisplaySection').style.display = 'none';
+  document.getElementById('displayName').value = localStorage.getItem('zoyra_display_name') || '';
 }
 
 function copyId(){ const id=document.getElementById('userId').textContent; if(navigator.clipboard) navigator.clipboard.writeText(id).then(()=>showToast('ID copied.')).catch(()=>showToast('Select and copy manually.')); else showToast('Select and copy your ID manually.'); }
@@ -590,14 +625,13 @@ function go(id,btn){
 function showToast(message){ const el=document.getElementById('toast'); el.textContent=message;el.classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>el.classList.remove('show'),3000); }
 function playNotificationSound(){ try { const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain(); oscillator.connect(gainNode); gainNode.connect(audioCtx.destination); oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.15); } catch(e) {} }
 
-// ===== RINGTONE FOR INCOMING CALLS =====
 let ringtoneCtx = null;
 let ringtoneInterval = null;
 function startRingtone() {
   try {
     ringtoneCtx = new (window.AudioContext || window.webkitAudioContext)();
     let ringCount = 0;
-    const maxRings = 30; // Ring for ~30 seconds
+    const maxRings = 30;
     
     function playRing() {
       if (ringCount >= maxRings) { stopRingtone(); return; }
@@ -605,7 +639,6 @@ function startRingtone() {
       const gain = ringtoneCtx.createGain();
       osc.connect(gain);
       gain.connect(ringtoneCtx.destination);
-      // Two-tone ring pattern
       osc.frequency.setValueAtTime(440, ringtoneCtx.currentTime);
       osc.frequency.setValueAtTime(480, ringtoneCtx.currentTime + 0.4);
       gain.gain.setValueAtTime(0.2, ringtoneCtx.currentTime);
@@ -633,7 +666,6 @@ function stopRingtone() {
 
 function readContacts(){ try{const v=JSON.parse(localStorage.getItem('zoyra_contacts')||'[]');return Array.isArray(v)?v:[];}catch(e){return [];} }
 
-// Point 5: Redesigned Contacts
 function renderContacts(){
   const list=document.getElementById('contactList');if(!list)return; const contacts=readContacts();list.replaceChildren();
   if(contacts.length===0){ const empty=document.createElement('div');empty.className='empty'; empty.innerHTML='<div class="symbol">👥</div><strong>No contacts added</strong><p>Tap + to add your first contact.</p>'; list.appendChild(empty);return; }
@@ -867,7 +899,6 @@ function closeChat(){
   renderChats(); 
 }
 
-// Point 6: Chat Menu
 function showChatMenu() {
   document.getElementById('chatMenuModal').classList.add('show');
 }
@@ -936,8 +967,15 @@ async function renderMessages(){
       
       if (isMine) {
         const ticks = document.createElement('span');
-        ticks.className = 'msg-ticks delivered';
-        ticks.textContent = '✓✓';
+        const status = m.status || 'sent';
+        ticks.className = 'msg-ticks ' + status;
+        if (status === 'read') {
+          ticks.textContent = '✓✓';
+        } else if (status === 'delivered') {
+          ticks.textContent = '✓✓';
+        } else {
+          ticks.textContent = '✓';
+        }
         meta.appendChild(stamp);
         meta.appendChild(ticks);
       } else {
@@ -959,19 +997,18 @@ async function sendMessage(){
   try {
     const friendPublicKey = await getPublicKeyFromDB(activeChatId, 5); if (!friendPublicKey) { showToast('❌ Friend\'s key not found! Ask them to open the app.'); return; }
     const encryptedText = await encryptMessage(text, friendPublicKey);
-    const docRef = await db.collection('chats').doc(chatId).collection('messages').add({ text: encryptedText, isEncrypted: true, senderId: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    const docRef = await db.collection('chats').doc(chatId).collection('messages').add({ text: encryptedText, isEncrypted: true, senderId: myId, status: 'sent', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
     sentMessagesCache[docRef.id] = text; saveSentCache();
     
     const myName = localStorage.getItem('zoyra_display_name') || 'Anonymous';
     await db.collection('users').doc(activeChatId).collection('inbox').doc(docRef.id).set({
-      chatId: chatId, senderId: myId, senderName: myName, text: encryptedText, isEncrypted: true, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      chatId: chatId, senderId: myId, senderName: myName, text: encryptedText, isEncrypted: true, status: 'sent', timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
     showToast('Sent securely! 🔐'); input.value='';
   } catch(e) { console.error(e); showToast('Failed to send.'); }
 }
 document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
-// ===== CALLING SYSTEM WITH RINGTONE =====
 let localStream, remoteStream, peerConnection; 
 const servers = { iceServers: [
   { urls: 'stun:stun.l.google.com:19302' },
@@ -1018,7 +1055,6 @@ async function startCall(type = 'video') {
       timestamp: firebase.firestore.FieldValue.serverTimestamp() 
     });
     
-    // Listen for answer with timeout
     callListener = db.collection('calls').doc(chatId).onSnapshot(async doc => { 
       const data = doc.data(); 
       if (data && data.status === 'answering' && data.answer && !peerConnection.currentRemoteDescription) { 
@@ -1038,7 +1074,6 @@ async function startCall(type = 'video') {
       }); 
     });
     
-    // Auto-cancel after 45 seconds if no answer
     setTimeout(() => {
       if (peerConnection && document.getElementById('callStatusText').textContent === 'Calling...') {
         showToast('No answer. Call cancelled.');
@@ -1049,12 +1084,10 @@ async function startCall(type = 'video') {
   } catch (err) { console.error(err); showToast('Camera/Mic access denied or error.'); endCallUI(); }
 }
 
-// Point 7: Robust incoming call listener with polling
 function listenForIncomingCalls() {
   const myId = localStorage.getItem('zoyra_preview_id'); 
   if (!myId) return;
   
-  // Real-time listener
   const listener = db.collection('calls')
     .where('callee', '==', myId)
     .where('status', '==', 'offering')
@@ -1070,7 +1103,6 @@ function listenForIncomingCalls() {
       });
     });
   
-  // Polling backup (every 3 seconds)
   callPollingInterval = setInterval(async () => {
     try {
       const snapshot = await db.collection('calls')
@@ -1090,7 +1122,7 @@ function listenForIncomingCalls() {
 }
 
 function handleIncomingCall(chatId, callData) {
-  if (pendingIncomingCall) return; // Already handling one
+  if (pendingIncomingCall) return;
   
   const callerId = callData.caller;
   const callType = callData.callType || 'video';
@@ -1105,10 +1137,8 @@ function handleIncomingCall(chatId, callData) {
   document.getElementById('callControlsActive').style.display = 'none';
   document.getElementById('callOverlay').style.display = 'flex';
   
-  // Start ringtone
   startRingtone();
   
-  // Auto-reject after 30 seconds
   setTimeout(() => {
     if (pendingIncomingCall && pendingIncomingCall.chatId === chatId) {
       rejectIncomingCall();
@@ -1156,12 +1186,15 @@ function acceptIncomingCall() {
       };
       
       peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer))
-        .then(() => peerConnection.createAnswer())
-        .then(answer => peerConnection.setLocalDescription(answer))
         .then(() => {
-          db.collection('calls').doc(chatId).update({ 
-            answer: { type: answer.type, sdp: answer.sdp }, 
-            status: 'answering' 
+          return peerConnection.createAnswer();
+        })
+        .then((answer) => {
+          return peerConnection.setLocalDescription(answer).then(() => {
+            return db.collection('calls').doc(chatId).update({ 
+              answer: { type: answer.type, sdp: answer.sdp }, 
+              status: 'answering' 
+            });
           });
         })
         .catch(err => { console.error(err); endCallUI(); });
@@ -1247,7 +1280,6 @@ async function saveCallHistory(userId, callType, callStatus, duration, contactId
   } catch(e) { console.error('Failed to save call history:', e); }
 }
 
-// Point 8: Call History with Option C menu
 let selectedCallHistory = null;
 
 function renderCallHistory() {
@@ -1302,7 +1334,6 @@ function callBackFromHistory() {
   if (!selectedCallHistory) return;
   closeModal('callActionModal');
   
-  // Go to chats and open contact
   const contacts = readContacts();
   if (!contacts.some(c => c.id === selectedCallHistory.contactId)) {
     contacts.push({ id: selectedCallHistory.contactId, name: selectedCallHistory.contactName });
@@ -1316,7 +1347,6 @@ function callBackFromHistory() {
   
   openChat(selectedCallHistory.contactId);
   
-  // Auto-start call after a short delay
   setTimeout(() => {
     startCall(selectedCallHistory.callType || 'video');
   }, 500);
@@ -1341,18 +1371,16 @@ function viewContactFromHistory() {
   showToast(`Contact: ${selectedCallHistory.contactName || 'Unknown'}\nID: ${selectedCallHistory.contactId}`);
 }
 
-// Modal functions
 function showBackupOptions() {
   if (!localStorage.getItem('zoyra_private_key')) { showToast('Keys not ready yet.'); return; }
   
-  // Point 2: If backup already exists, show existing code
   const existingWords = localStorage.getItem('zoyra_recovery_words');
   if (existingWords) {
     document.getElementById('recoveryCodeDisplay').textContent = existingWords;
-    document.getElementById('recoveryModalText').textContent = 'This is your existing recovery code. Keep it safe. If you lose your phone, you will need these words AND your ZOYRA ID to get your account back.';
+    document.getElementById('recoveryModalText').textContent = 'This is your existing recovery code. Keep it safe.';
     document.getElementById('recoveryModal').classList.add('show');
   } else {
-    document.getElementById('recoveryModalText').textContent = 'Write these words down in order and keep them safe. If you lose your phone, you will need these words AND your ZOYRA ID to get your account back.';
+    document.getElementById('recoveryModalText').textContent = 'Write these words down in order and keep them safe.';
     document.getElementById('backupOptionsModal').classList.add('show');
   }
 }
@@ -1361,6 +1389,30 @@ function showRestoreModal() {
   document.getElementById('restoreIdInput').value = localStorage.getItem('zoyra_preview_id') || '';
   document.getElementById('restoreCodeInput').value = '';
   document.getElementById('restoreModal').classList.add('show');
+}
+
+async function shareApp() {
+  const shareData = {
+    title: 'ZOYRA - Private Chat',
+    text: 'Check out ZOYRA — a private encrypted chat app with no phone number required!',
+    url: 'https://zoya992.github.io/ZOYRA_App/'
+  };
+  
+  if (navigator.share) {
+    try {
+      await navigator.share(shareData);
+    } catch (err) {
+      console.error('Share failed:', err);
+    }
+  } else {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareData.url).then(() => {
+        showToast('Link copied! Share it with your friends.');
+      });
+    } else {
+      showToast('Copy this link: ' + shareData.url);
+    }
+  }
 }
 
 function closeModal(modalId) { document.getElementById(modalId).classList.remove('show'); }
