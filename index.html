@@ -63,7 +63,7 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 .call-controls{position:relative;z-index:2;display:flex;justify-content:center;gap:30px}
 .call-btn{width:64px;height:64px;border-radius:50%;border:0;font-size:26px;display:grid;place-items:center;color:#fff;cursor:pointer;transition:0.2s;box-shadow:0 4px 15px rgba(0,0,0,0.3)}
 .call-btn:active{transform:scale(0.9)}
-.btn-end{background:#ef4444}.btn-mute{background:#334155}
+.btn-end{background:#ef4444}.btn-mute{background:#334155}.btn-accept{background:#10b981}
 .requests-section{margin-bottom:16px}
 .requests-header{display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid #ffffff12;margin-bottom:8px}
 .requests-header strong{color:var(--warn);font-size:13px;letter-spacing:.05em}
@@ -79,6 +79,7 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 .req-accept{background:var(--green);color:#fff}
 .req-block{background:#334155;color:#fff}
 .call-history-item{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #ffffff12;cursor:pointer}
+.call-history-item:active{background:#ffffff10}
 .call-history-item .avatar{width:40px;height:40px;font-size:16px}
 .call-history-item .call-info-text{flex:1}
 .call-history-item .call-info-text strong{display:block;font-size:14px}
@@ -95,18 +96,15 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 .modal h3{margin:0 0 12px;font-size:18px}
 .modal p{color:var(--muted);font-size:13px;margin:0 0 16px}
 .modal .btn{margin-top:8px}
-.fab{position:fixed;bottom:90px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#b5c2ff,#829cff);color:#10182c;border:0;font-size:28px;font-weight:700;display:grid;place-items:center;box-shadow:0 4px 15px rgba(130,156,255,0.4);z-index:100;cursor:pointer;transition:transform 0.2s}
-.fab:active{transform:scale(0.9)}
-.chat-menu-btn{background:none;border:none;color:var(--accent2);font-size:20px;padding:8px 12px;cursor:pointer}
-.chat-menu{position:absolute;top:60px;right:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;min-width:160px;z-index:100;display:none;box-shadow:0 4px 15px rgba(0,0,0,0.3)}
-.chat-menu.show{display:block}
-.chat-menu button{display:block;width:100%;text-align:left;padding:10px 12px;background:none;border:0;color:var(--text);font-size:14px;cursor:pointer;border-radius:8px}
-.chat-menu button:hover{background:#ffffff15}
-.chat-menu button.danger{color:var(--danger)}
-.contact-menu{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:8px;min-width:200px;z-index:2001;display:none;box-shadow:0 8px 25px rgba(0,0,0,0.5)}
-.contact-menu.show{display:block}
-.contact-menu button{display:block;width:100%;text-align:left;padding:12px 16px;background:none;border:0;color:var(--text);font-size:14px;cursor:pointer;border-radius:8px}
-.contact-menu button:hover{background:#ffffff15}
+.fab-button{position:fixed;bottom:100px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#b5c2ff,#829cff);color:#10182c;font-size:28px;border:0;display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:100;transition:transform 0.2s}
+.fab-button:active{transform:scale(0.9)}
+.chat-header-actions{display:flex;gap:4px}
+.menu-item{display:flex;align-items:center;gap:12px;padding:14px 8px;border-bottom:1px solid #ffffff12;cursor:pointer}
+.menu-item:last-child{border:0}
+.menu-item .ico{font-size:20px;width:28px}
+.menu-item strong{display:block;font-size:14px}
+.menu-item small{display:block;color:var(--muted);font-size:11px}
+.menu-item.danger strong{color:var(--danger)}
 @media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
 </style>
 </head>
@@ -156,20 +154,18 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   </div>
   <div id="chatList"></div>
   <button class="btn full" id="startChatBtn" onclick="startChat()">＋ Start a conversation</button>
-  <div id="chatRoom" class="card" style="display:none;position:relative">
+  <div id="chatRoom" class="card" style="display:none">
     <div class="actions" style="align-items:center">
       <button class="btn ghost" style="flex:0 0 auto" onclick="closeChat()">← Back</button>
       <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px">
         <div style="position:relative"><div class="avatar" style="width:32px;height:32px;font-size:14px" id="chatAvatar">?</div><div class="online-dot" id="chatOnlineDot" style="display:none"></div></div>
         <div><strong id="chatTitle">Conversation</strong><div class="idlabel" id="chatSubtitle" style="font-size:10px"></div></div>
       </div>
-      <button class="btn ghost" style="flex:0 0 auto;padding:8px 12px;font-size:16px" onclick="startCall('audio')" title="Audio Call">📞</button>
-      <button class="btn ghost" style="flex:0 0 auto;padding:8px 12px;font-size:16px" onclick="startCall('video')" title="Video Call">📹</button>
-      <button class="chat-menu-btn" onclick="toggleChatMenu()">⋮</button>
-    </div>
-    <div class="chat-menu" id="chatMenu">
-      <button onclick="deleteCurrentChat()">🗑️ Delete Chat</button>
-      <button onclick="blockCurrentContact()">🚫 Block User</button>
+      <div class="chat-header-actions">
+        <button class="btn ghost" style="padding:8px 10px;font-size:16px" onclick="startCall('audio')" title="Audio Call">📞</button>
+        <button class="btn ghost" style="padding:8px 10px;font-size:16px" onclick="startCall('video')" title="Video Call">📹</button>
+        <button class="btn ghost" style="padding:8px 10px;font-size:18px" onclick="showChatMenu()" title="More">⋮</button>
+      </div>
     </div>
     <div id="messageList" style="min-height:200px;max-height:50vh;overflow:auto;margin:16px 0;padding:8px;background:#0e1729;border-radius:12px;border:1px solid var(--line)"></div>
     <div id="typingIndicator" class="typing-indicator"><span></span><span></span><span></span></div>
@@ -179,15 +175,14 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 </section>
 
 <section id="contacts" class="screen">
-  <div class="eyebrow">People</div><h1>Contacts</h1><p class="sub">Connect using a ZOYRA ID.</p>
+  <div class="eyebrow">People</div><h1>Contacts</h1><p class="sub">Your saved contacts.</p>
   <div id="contactList"></div>
-  <button class="fab" onclick="showAddContactModal()">+</button>
 </section>
 
 <section id="calls" class="screen">
-  <div class="eyebrow">Stay connected</div><h1>Calls</h1><p class="sub">P2P Encrypted Calls.</p>
+  <div class="eyebrow">Stay connected</div><h1>Calls</h1><p class="sub">Your call history.</p>
   <div id="callHistoryList"></div>
-  <div class="notice">Audio and video calling uses WebRTC. Media goes directly from device to device. Not stored on any server.</div>
+  <div class="notice">Audio and video calling uses WebRTC. Media goes directly from device to device.</div>
 </section>
 
 <section id="settings" class="screen">
@@ -195,7 +190,7 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   <div class="card">
     <div class="feature" onclick="showBackupOptions()">
       <div class="ico">🔑</div>
-      <div><strong>Backup & Recovery Code</strong><small id="backupStatus">Generate 12 or 24 word code</small></div>
+      <div><strong>Backup & Recovery Code</strong><small>View or generate your recovery code</small></div>
     </div>
     <div class="feature" onclick="showRestoreModal()">
       <div class="ico">📥</div>
@@ -203,7 +198,7 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
     </div>
     <div class="feature" onclick="resetKeys()">
       <div class="ico">🔄</div>
-      <div><strong>Reset encryption keys</strong><small>Free: 2 resets max. Premium for more.</small></div>
+      <div><strong>Reset encryption keys</strong><small>Free users: max 2 resets. Further resets require Premium.</small></div>
     </div>
     <div class="feature"><div class="ico">🌐</div><div><strong>Language</strong><small>English</small></div></div>
   </div>
@@ -220,6 +215,9 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 </nav>
 <div id="toast" class="toast" role="status"></div>
 
+<!-- FAB for Contacts -->
+<button class="fab-button" id="contactsFab" style="display:none" onclick="showAddContactModal()">+</button>
+
 <div id="callOverlay">
   <video id="remoteVideo" autoplay playsinline></video>
   <video id="localVideo" autoplay playsinline muted></video>
@@ -228,61 +226,43 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
     <h2 id="callStatusText">Connecting...</h2>
     <small id="callTimer">00:00</small>
   </div>
-  <div class="call-controls">
+  <div class="call-controls" id="callControlsIncoming" style="display:none">
+    <button class="call-btn btn-accept" onclick="acceptIncomingCall()">📞</button>
+    <button class="call-btn btn-end" onclick="rejectIncomingCall()">✕</button>
+  </div>
+  <div class="call-controls" id="callControlsActive">
     <button class="call-btn btn-mute" onclick="toggleMute()">🎤</button>
     <button class="call-btn btn-end" onclick="endCall()">📞</button>
   </div>
 </div>
 
-<!-- Incoming Call Modal with Ringtone -->
-<div class="modal-overlay" id="incomingCallModal">
-  <div class="modal" style="text-align:center">
-    <div class="call-avatar" id="incomingCallAvatar" style="margin:0 auto 20px">?</div>
-    <h3 id="incomingCallText">Incoming Call...</h3>
-    <p id="incomingCallType">Video Call</p>
-    <div style="display:flex;gap:12px;justify-content:center;margin-top:20px">
-      <button class="btn danger" onclick="rejectIncomingCall()" style="flex:1">Reject</button>
-      <button class="btn" onclick="acceptIncomingCall()" style="flex:1">Accept</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal for Backup Options -->
+<!-- Modal: Backup Options -->
 <div class="modal-overlay" id="backupOptionsModal">
   <div class="modal">
-    <h3>🔑 Recovery Code</h3>
-    <div id="existingBackupSection" style="display:none">
-      <p>You already have a recovery code. Keep it safe!</p>
-      <div class="recovery-words" id="existingRecoveryDisplay"></div>
-      <button class="btn full" onclick="copyExistingRecovery()">📋 Copy Code</button>
-      <button class="btn warn full" style="margin-top:8px" onclick="showPremiumRegenerate()">🔒 Regenerate (Premium)</button>
-      <button class="btn ghost full" style="margin-top:8px" onclick="closeModal('backupOptionsModal')">Close</button>
-    </div>
-    <div id="newBackupSection">
-      <p>Select how many words you want for your recovery code.</p>
-      <button class="btn full" onclick="generateBackup(12)">Generate 12-Word Code (Recommended)</button>
-      <button class="btn secondary full" style="margin-top:8px" onclick="generateBackup(24)">Generate 24-Word Code (Ultra Secure)</button>
-      <button class="btn ghost full" style="margin-top:8px" onclick="closeModal('backupOptionsModal')">Cancel</button>
-    </div>
+    <h3>🔑 Choose Recovery Code Length</h3>
+    <p>Select how many words you want for your recovery code. More words = higher security.</p>
+    <button class="btn full" onclick="generateBackup(12)">Generate 12-Word Code (Recommended)</button>
+    <button class="btn secondary full" style="margin-top:8px" onclick="generateBackup(24)">Generate 24-Word Code (Ultra Secure)</button>
+    <button class="btn ghost full" style="margin-top:8px" onclick="closeModal('backupOptionsModal')">Cancel</button>
   </div>
 </div>
 
-<!-- Modal for Recovery Code Display -->
+<!-- Modal: Recovery Code Display -->
 <div class="modal-overlay" id="recoveryModal">
   <div class="modal">
     <h3>🔑 Your Recovery Code</h3>
-    <p>Write these words down in order and keep them safe. You will need these words AND your ZOYRA ID to restore.</p>
+    <p id="recoveryModalText">Write these words down in order and keep them safe. If you lose your phone, you will need these words AND your ZOYRA ID to get your account back.</p>
     <div class="recovery-words" id="recoveryCodeDisplay"></div>
     <button class="btn full" onclick="copyRecoveryCode()">📋 Copy Words</button>
     <button class="btn secondary full" style="margin-top:8px" onclick="closeModal('recoveryModal')">I have saved it</button>
   </div>
 </div>
 
-<!-- Modal for Restore -->
+<!-- Modal: Restore -->
 <div class="modal-overlay" id="restoreModal">
   <div class="modal">
     <h3>📥 Restore Your ID</h3>
-    <p>Enter your ZOYRA ID and recovery words to restore your account.</p>
+    <p>Enter your ZOYRA ID and recovery words to restore your account. Both are required.</p>
     <label class="field">Your ZOYRA ID</label>
     <input id="restoreIdInput" class="fieldinput" placeholder="ZY-XXXX-XXXX-XXXX" autocapitalize="characters">
     <label class="field">Recovery Words (separated by spaces)</label>
@@ -292,7 +272,7 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   </div>
 </div>
 
-<!-- Modal for Add Contact -->
+<!-- Modal: Add Contact -->
 <div class="modal-overlay" id="addContactModal">
   <div class="modal">
     <h3>➕ Add New Contact</h3>
@@ -305,11 +285,47 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   </div>
 </div>
 
-<!-- Contact Action Menu (Point 8 Option C) -->
-<div class="contact-menu" id="contactMenu">
-  <button onclick="callBackFromHistory()">📞 Call Back</button>
-  <button onclick="openChatFromHistory()">💬 Open Chat</button>
-  <button onclick="viewContactFromHistory()">ℹ️ View Contact</button>
+<!-- Modal: Chat Menu -->
+<div class="modal-overlay" id="chatMenuModal">
+  <div class="modal">
+    <h3>Chat Options</h3>
+    <div class="menu-item" onclick="deleteCurrentChat();closeModal('chatMenuModal')">
+      <div class="ico">🗑️</div>
+      <div><strong>Delete Chat</strong><small>Remove all messages in this chat</small></div>
+    </div>
+    <div class="menu-item danger" onclick="blockCurrentContact();closeModal('chatMenuModal')">
+      <div class="ico">🚫</div>
+      <div><strong>Block User</strong><small>Block messages from this user</small></div>
+    </div>
+    <div class="menu-item" onclick="closeModal('chatMenuModal')">
+      <div class="ico">✕</div>
+      <div><strong>Cancel</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Call Action Menu (Option C) -->
+<div class="modal-overlay" id="callActionModal">
+  <div class="modal">
+    <h3 id="callActionTitle">Call Options</h3>
+    <p id="callActionSubtitle"></p>
+    <div class="menu-item" onclick="callBackFromHistory()">
+      <div class="ico">📞</div>
+      <div><strong>Call Back</strong><small>Start a new call</small></div>
+    </div>
+    <div class="menu-item" onclick="openChatFromHistory()">
+      <div class="ico">💬</div>
+      <div><strong>Open Chat</strong><small>Send a message</small></div>
+    </div>
+    <div class="menu-item" onclick="viewContactFromHistory()">
+      <div class="ico">ℹ️</div>
+      <div><strong>View Contact</strong><small>See contact details</small></div>
+    </div>
+    <div class="menu-item" onclick="closeModal('callActionModal')">
+      <div class="ico">✕</div>
+      <div><strong>Cancel</strong></div>
+    </div>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -346,9 +362,6 @@ function saveSentCache() { localStorage.setItem('zoyra_sent_cache', JSON.stringi
 loadSentCache();
 
 let unreadMessages = {};
-let ringtoneAudio = null;
-let pendingIncomingCall = null;
-let selectedCallHistory = null;
 
 function arrayBufferToBase64(buffer) { let binary = ''; const bytes = new Uint8Array(buffer); for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]); return window.btoa(binary); }
 function base64ToArrayBuffer(base64) { const binary_string = window.atob(base64); const bytes = new Uint8Array(binary_string.length); for (let i = 0; i < binary_string.length; i++) bytes[i] = binary_string.charCodeAt(i); return bytes.buffer; }
@@ -380,11 +393,6 @@ function checkRecoveryCode() {
   } else {
     document.getElementById('recoveryWarning').style.display = 'none';
   }
-  // Update backup status text
-  const backupStatus = document.getElementById('backupStatus');
-  if (backupStatus) {
-    backupStatus.textContent = hasBackup ? 'Backup saved ✓' : 'Generate 12 or 24 word code';
-  }
 }
 
 async function deriveKeyFromWords(words) {
@@ -408,7 +416,6 @@ function generateRandomWords(count) {
   return words;
 }
 
-// Point 2: Recovery Code Lock
 async function generateBackup(wordCount) {
   const myId = localStorage.getItem('zoyra_preview_id');
   const privateKey = localStorage.getItem('zoyra_private_key');
@@ -499,14 +506,14 @@ async function restoreFromCode() {
 }
 
 window.resetKeys = async function() {
-  // Point 1: Reset limit warning
-  const resetCount = parseInt(localStorage.getItem('zoyra_reset_count') || '0');
+  // Point 1: Track reset count (for future Premium)
+  let resetCount = parseInt(localStorage.getItem('zoyra_reset_count') || '0');
   if (resetCount >= 2) {
-    if (!confirm('⚠️ Free limit reached! You have used 2 free resets. Further resets require Premium. Continue anyway?')) return;
-  } else {
-    if(!confirm('Reset encryption keys? Old messages may not decrypt. Your backup will also be deleted.')) return;
+    showToast('⚠️ Free limit reached (2/2). Reset requires Premium.');
+    return;
   }
   
+  if(!confirm('Reset encryption keys? Old messages may not decrypt. Your backup will also be deleted.')) return;
   const myId = localStorage.getItem('zoyra_preview_id');
   if(myId) db.collection('users').doc(myId).update({ encryptedBackup: firebase.firestore.FieldValue.delete() }).catch(()=>{});
   
@@ -515,12 +522,15 @@ window.resetKeys = async function() {
   localStorage.removeItem('zoyra_preview_id');
   localStorage.removeItem('zoyra_has_backup');
   localStorage.removeItem('zoyra_recovery_words');
-  localStorage.setItem('zoyra_reset_count', (resetCount + 1).toString());
   sentMessagesCache = {}; 
   saveSentCache();
+  
+  resetCount++;
+  localStorage.setItem('zoyra_reset_count', resetCount.toString());
+  
   encStatus.textContent = "Resetting..."; 
   await generateAndSaveKeys(); 
-  showToast('Keys reset successfully');
+  showToast('Keys reset successfully (' + resetCount + '/2 free resets used)');
 };
 
 async function uploadPublicKey() {
@@ -568,34 +578,62 @@ function go(id,btn){
     document.getElementById('chatList').style.display = 'block';
     document.getElementById('chatRoom').style.display = 'none';
   }
+  if (id === 'contacts') {
+    document.getElementById('contactsFab').style.display = 'grid';
+    renderContacts();
+  } else {
+    document.getElementById('contactsFab').style.display = 'none';
+  }
   if (id === 'calls') { renderCallHistory(); }
-  if (id === 'contacts') { renderContacts(); }
-  if (id === 'settings') { checkRecoveryCode(); }
 }
 
 function showToast(message){ const el=document.getElementById('toast'); el.textContent=message;el.classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>el.classList.remove('show'),3000); }
 function playNotificationSound(){ try { const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain(); oscillator.connect(gainNode); gainNode.connect(audioCtx.destination); oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.15); } catch(e) {} }
 
-// Point 3: Ringtone functions
+// ===== RINGTONE FOR INCOMING CALLS =====
+let ringtoneCtx = null;
+let ringtoneInterval = null;
 function startRingtone() {
-  if (ringtoneAudio) return;
-  ringtoneAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGS57OihUBELTKXh8bllHAU2j9Xvz3kpBSh+zPDajzsKElyx6OyrWBUIQ5zd8sFuJAUuhM/z24k2CBhku+zooVARC0yl4fG5ZRwFNo/V7895KQUofsz');
-  ringtoneAudio.loop = true;
-  ringtoneAudio.volume = 0.7;
-  ringtoneAudio.play().catch(e => console.log('Ringtone play failed:', e));
+  try {
+    ringtoneCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let ringCount = 0;
+    const maxRings = 30; // Ring for ~30 seconds
+    
+    function playRing() {
+      if (ringCount >= maxRings) { stopRingtone(); return; }
+      const osc = ringtoneCtx.createOscillator();
+      const gain = ringtoneCtx.createGain();
+      osc.connect(gain);
+      gain.connect(ringtoneCtx.destination);
+      // Two-tone ring pattern
+      osc.frequency.setValueAtTime(440, ringtoneCtx.currentTime);
+      osc.frequency.setValueAtTime(480, ringtoneCtx.currentTime + 0.4);
+      gain.gain.setValueAtTime(0.2, ringtoneCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ringtoneCtx.currentTime + 0.8);
+      osc.start(ringtoneCtx.currentTime);
+      osc.stop(ringtoneCtx.currentTime + 0.8);
+      ringCount++;
+    }
+    
+    playRing();
+    ringtoneInterval = setInterval(playRing, 1500);
+  } catch(e) { console.error('Ringtone error:', e); }
 }
 
 function stopRingtone() {
-  if (ringtoneAudio) {
-    ringtoneAudio.pause();
-    ringtoneAudio.currentTime = 0;
-    ringtoneAudio = null;
+  if (ringtoneInterval) {
+    clearInterval(ringtoneInterval);
+    ringtoneInterval = null;
+  }
+  if (ringtoneCtx) {
+    ringtoneCtx.close().catch(()=>{});
+    ringtoneCtx = null;
   }
 }
 
 function readContacts(){ try{const v=JSON.parse(localStorage.getItem('zoyra_contacts')||'[]');return Array.isArray(v)?v:[];}catch(e){return [];} }
 
-// Point 5: Contacts Redesign with FAB
+// Point 5: Redesigned Contacts
 function renderContacts(){
   const list=document.getElementById('contactList');if(!list)return; const contacts=readContacts();list.replaceChildren();
   if(contacts.length===0){ const empty=document.createElement('div');empty.className='empty'; empty.innerHTML='<div class="symbol">👥</div><strong>No contacts added</strong><p>Tap + to add your first contact.</p>'; list.appendChild(empty);return; }
@@ -629,14 +667,16 @@ function showAddContactModal() {
   document.getElementById('addContactModal').classList.add('show');
 }
 
-function addContactFromModal(){
-  const id=document.getElementById('modalContactId').value.trim().toUpperCase(); const name=document.getElementById('modalContactName').value.trim();
+function addContactFromModal() {
+  const id = document.getElementById('modalContactId').value.trim().toUpperCase();
+  const name = document.getElementById('modalContactName').value.trim();
   if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(id)){showToast('Enter ID in format ZY-XXXX-XXXX-XXXX.');return;}
   if(id===localStorage.getItem('zoyra_preview_id')){showToast('You cannot add your own ID.');return;}
   const contacts=readContacts(); if(contacts.some(c=>c.id===id)){showToast('ID already in contacts.');return;}
   contacts.push({id,name}); localStorage.setItem('zoyra_contacts',JSON.stringify(contacts));
   closeModal('addContactModal');
-  renderContacts();showToast('Contact saved.');
+  renderContacts();
+  showToast('Contact saved.');
 }
 
 function openChatFromContacts(contactId) {
@@ -645,6 +685,7 @@ function openChatFromContacts(contactId) {
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
   document.querySelector('[data-screen="chats"]').classList.add('active');
   window.scrollTo(0,0);
+  document.getElementById('contactsFab').style.display = 'none';
   openChat(contactId);
 }
 
@@ -818,7 +859,6 @@ function closeChat(){
   document.getElementById('chatRoom').style.display='none'; 
   document.getElementById('chatList').style.display = 'block';
   document.getElementById('startChatBtn').style.display = 'block';
-  document.getElementById('chatMenu').classList.remove('show');
   
   if(unsubscribeMessages){unsubscribeMessages();unsubscribeMessages=null;} 
   if(unsubscribeTyping){unsubscribeTyping();unsubscribeTyping=null;} 
@@ -827,13 +867,12 @@ function closeChat(){
   renderChats(); 
 }
 
-// Point 6: Chat menu functions
-function toggleChatMenu() {
-  document.getElementById('chatMenu').classList.toggle('show');
+// Point 6: Chat Menu
+function showChatMenu() {
+  document.getElementById('chatMenuModal').classList.add('show');
 }
 
 async function deleteCurrentChat() {
-  document.getElementById('chatMenu').classList.remove('show');
   if (!activeChatId) return;
   if (!confirm(`Delete entire chat with ${activeChatId}? This cannot be undone.`)) return;
   
@@ -852,11 +891,9 @@ async function deleteCurrentChat() {
   } catch (e) { console.error(e); showToast('Failed to delete chat.'); }
 }
 
-async function blockCurrentContact() {
-  document.getElementById('chatMenu').classList.remove('show');
+function blockCurrentContact() {
   if (!activeChatId) return;
   if (!confirm(`Block ${activeChatId}? You will no longer receive messages from them.`)) return;
-  
   const blocked = JSON.parse(localStorage.getItem('zoyra_blocked') || '[]');
   if(!blocked.includes(activeChatId)) {
     blocked.push(activeChatId);
@@ -934,101 +971,239 @@ async function sendMessage(){
 }
 document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
-let localStream, remoteStream, peerConnection; const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:stun2.l.google.com:19302' }] }; let callListener = null; let callTimerInterval; let callStartTime = 0; let currentCallType = 'video';
+// ===== CALLING SYSTEM WITH RINGTONE =====
+let localStream, remoteStream, peerConnection; 
+const servers = { iceServers: [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:stun2.l.google.com:19302' }
+]}; 
+let callListener = null; let callTimerInterval; let callStartTime = 0; let currentCallType = 'video';
+let pendingIncomingCall = null;
+let callPollingInterval = null;
 
 async function startCall(type = 'video') {
-  if (!activeChatId) return; const myId = localStorage.getItem('zoyra_preview_id'); const chatId = getChatId(myId, activeChatId);
-  const contact = readContacts().find(c=>c.id===activeChatId); document.getElementById('callAvatar').textContent = (contact?.name || activeChatId).slice(0,1).toUpperCase();
+  if (!activeChatId) return; 
+  const myId = localStorage.getItem('zoyra_preview_id'); 
+  const chatId = getChatId(myId, activeChatId);
+  const contact = readContacts().find(c=>c.id===activeChatId); 
+  document.getElementById('callAvatar').textContent = (contact?.name || activeChatId).slice(0,1).toUpperCase();
   currentCallType = type;
+  
   try {
     showToast(`Requesting ${type === 'audio' ? 'Microphone' : 'Camera & Mic'}...`); 
     localStream = await navigator.mediaDevices.getUserMedia(type === 'audio' ? { audio: true } : { video: true, audio: true });
-    document.getElementById('localVideo').srcObject = localStream; document.getElementById('callOverlay').style.display = 'flex';
+    document.getElementById('localVideo').srcObject = localStream; 
+    document.getElementById('callOverlay').style.display = 'flex';
+    document.getElementById('callControlsIncoming').style.display = 'none';
+    document.getElementById('callControlsActive').style.display = 'flex';
     document.getElementById('callStatusText').textContent = 'Calling...'; 
-    callStartTime = Date.now(); startCallTimer();
-    peerConnection = new RTCPeerConnection(servers); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+    callStartTime = Date.now(); 
+    startCallTimer();
+    
+    peerConnection = new RTCPeerConnection(servers); 
+    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
     peerConnection.onicecandidate = event => { if (event.candidate) { db.collection('calls').doc(chatId).collection('ice').add({ candidate: event.candidate.toJSON(), sender: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); } };
     peerConnection.ontrack = event => { document.getElementById('remoteVideo').srcObject = event.streams[0]; document.getElementById('callStatusText').textContent = 'Connected'; };
-    const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer);
-    await db.collection('calls').doc(chatId).set({ offer: { type: offer.type, sdp: offer.sdp }, caller: myId, callee: activeChatId, callType: type, status: 'offering', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-    callListener = db.collection('calls').doc(chatId).onSnapshot(async doc => { const data = doc.data(); if (data && data.status === 'answering' && data.answer && !peerConnection.currentRemoteDescription) { await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer)); } if (data && data.status === 'ended') { endCallUI(); } });
-    db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { const data = change.doc.data(); if (data.sender !== myId) { peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e)); } } }); });
+    
+    const offer = await peerConnection.createOffer(); 
+    await peerConnection.setLocalDescription(offer);
+    await db.collection('calls').doc(chatId).set({ 
+      offer: { type: offer.type, sdp: offer.sdp }, 
+      caller: myId, 
+      callee: activeChatId, 
+      callType: type, 
+      status: 'offering', 
+      handled: false,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+    });
+    
+    // Listen for answer with timeout
+    callListener = db.collection('calls').doc(chatId).onSnapshot(async doc => { 
+      const data = doc.data(); 
+      if (data && data.status === 'answering' && data.answer && !peerConnection.currentRemoteDescription) { 
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer)); 
+      } 
+      if (data && data.status === 'ended') { endCallUI(); } 
+    });
+    
+    db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { 
+      snapshot.docChanges().forEach(change => { 
+        if (change.type === 'added') { 
+          const data = change.doc.data(); 
+          if (data.sender !== myId) { 
+            peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e)); 
+          } 
+        } 
+      }); 
+    });
+    
+    // Auto-cancel after 45 seconds if no answer
+    setTimeout(() => {
+      if (peerConnection && document.getElementById('callStatusText').textContent === 'Calling...') {
+        showToast('No answer. Call cancelled.');
+        endCall();
+      }
+    }, 45000);
+    
   } catch (err) { console.error(err); showToast('Camera/Mic access denied or error.'); endCallUI(); }
 }
 
-// Point 7: Better incoming call listener with retry
+// Point 7: Robust incoming call listener with polling
 function listenForIncomingCalls() {
-  const myId = localStorage.getItem('zoyra_preview_id'); if (!myId) return;
-  db.collection('calls').where('callee', '==', myId).where('status', '==', 'offering').onSnapshot(async snapshot => {
-    snapshot.docChanges().forEach(async change => {
-      if (change.type === 'added' && !pendingIncomingCall) {
-        const callData = change.doc.data(); 
-        const chatId = change.doc.id; 
-        const callerId = callData.caller; 
-        const callType = callData.callType || 'video';
-        const contact = readContacts().find(c=>c.id===callerId); 
-        
-        pendingIncomingCall = { chatId, callerId, callType, callData };
-        
-        document.getElementById('incomingCallAvatar').textContent = (contact?.name || callerId).slice(0,1).toUpperCase();
-        document.getElementById('incomingCallText').textContent = `Incoming ${callType === 'audio' ? 'Audio' : 'Video'} Call`;
-        document.getElementById('incomingCallType').textContent = contact?.name || callerId;
-        document.getElementById('incomingCallModal').classList.add('show');
-        
-        // Point 3: Start ringtone
-        startRingtone();
-      }
+  const myId = localStorage.getItem('zoyra_preview_id'); 
+  if (!myId) return;
+  
+  // Real-time listener
+  const listener = db.collection('calls')
+    .where('callee', '==', myId)
+    .where('status', '==', 'offering')
+    .onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const callData = change.doc.data();
+          if (!callData.handled) {
+            handleIncomingCall(change.doc.id, callData);
+            change.doc.ref.update({ handled: true }).catch(()=>{});
+          }
+        }
+      });
     });
-  });
+  
+  // Polling backup (every 3 seconds)
+  callPollingInterval = setInterval(async () => {
+    try {
+      const snapshot = await db.collection('calls')
+        .where('callee', '==', myId)
+        .where('status', '==', 'offering')
+        .get();
+      
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (!data.handled && !pendingIncomingCall) {
+          handleIncomingCall(doc.id, data);
+          doc.ref.update({ handled: true }).catch(()=>{});
+        }
+      });
+    } catch(e) { console.error('Polling error:', e); }
+  }, 3000);
+}
+
+function handleIncomingCall(chatId, callData) {
+  if (pendingIncomingCall) return; // Already handling one
+  
+  const callerId = callData.caller;
+  const callType = callData.callType || 'video';
+  const contact = readContacts().find(c=>c.id===callerId);
+  const callerName = contact?.name || callerId;
+  
+  pendingIncomingCall = { chatId, callData, callerId, callType, callerName };
+  
+  document.getElementById('callAvatar').textContent = callerName.slice(0,1).toUpperCase();
+  document.getElementById('callStatusText').textContent = `${callType === 'audio' ? 'Audio' : 'Video'} Call from ${callerName}`;
+  document.getElementById('callControlsIncoming').style.display = 'flex';
+  document.getElementById('callControlsActive').style.display = 'none';
+  document.getElementById('callOverlay').style.display = 'flex';
+  
+  // Start ringtone
+  startRingtone();
+  
+  // Auto-reject after 30 seconds
+  setTimeout(() => {
+    if (pendingIncomingCall && pendingIncomingCall.chatId === chatId) {
+      rejectIncomingCall();
+    }
+  }, 30000);
 }
 
 function acceptIncomingCall() {
   if (!pendingIncomingCall) return;
-  const { chatId, callerId, callType, callData } = pendingIncomingCall;
+  
   stopRingtone();
-  document.getElementById('incomingCallModal').classList.remove('show');
   
-  activeChatId = callerId; 
+  const { chatId, callData, callerId, callType } = pendingIncomingCall;
+  const myId = localStorage.getItem('zoyra_preview_id');
+  
+  activeChatId = callerId;
   currentCallType = callType;
-  document.getElementById('chatRoom').style.display='block'; 
-  document.getElementById('chatTitle').textContent=readContacts().find(c=>c.id===callerId)?.name||'Call';
-  document.getElementById('startChatBtn').style.display = 'none'; 
-  document.getElementById('chatList').style.display = 'none';
   
-  try {
-    localStream = await navigator.mediaDevices.getUserMedia(callType === 'audio' ? { audio: true } : { video: true, audio: true });
-    document.getElementById('localVideo').srcObject = localStream; 
-    document.getElementById('callOverlay').style.display = 'flex';
-    document.getElementById('callStatusText').textContent = 'Connecting...'; 
-    callStartTime = Date.now(); 
-    startCallTimer();
-    peerConnection = new RTCPeerConnection(servers); 
-    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-    peerConnection.onicecandidate = event => { if (event.candidate) { db.collection('calls').doc(chatId).collection('ice').add({ candidate: event.candidate.toJSON(), sender: localStorage.getItem('zoyra_preview_id'), timestamp: firebase.firestore.FieldValue.serverTimestamp() }); } };
-    peerConnection.ontrack = event => { document.getElementById('remoteVideo').srcObject = event.streams[0]; document.getElementById('callStatusText').textContent = 'Connected'; };
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer)); 
-    const answer = await peerConnection.createAnswer(); 
-    await peerConnection.setLocalDescription(answer);
-    await db.collection('calls').doc(chatId).update({ answer: { type: answer.type, sdp: answer.sdp }, status: 'answering' });
-    callListener = db.collection('calls').doc(chatId).onSnapshot(doc => { if (doc.data().status === 'ended') endCallUI(); });
-    db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { const data = change.doc.data(); if (data.sender !== localStorage.getItem('zoyra_preview_id')) { peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e)); } } }); });
-  } catch(err) { console.error(err); endCallUI(); }
+  document.getElementById('callControlsIncoming').style.display = 'none';
+  document.getElementById('callControlsActive').style.display = 'flex';
+  document.getElementById('callStatusText').textContent = 'Connecting...';
+  callStartTime = Date.now();
+  startCallTimer();
   
-  pendingIncomingCall = null;
+  navigator.mediaDevices.getUserMedia(callType === 'audio' ? { audio: true } : { video: true, audio: true })
+    .then(stream => {
+      localStream = stream;
+      document.getElementById('localVideo').srcObject = localStream;
+      
+      peerConnection = new RTCPeerConnection(servers);
+      localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+      
+      peerConnection.onicecandidate = event => { 
+        if (event.candidate) { 
+          db.collection('calls').doc(chatId).collection('ice').add({ 
+            candidate: event.candidate.toJSON(), 
+            sender: myId, 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+          }); 
+        } 
+      };
+      peerConnection.ontrack = event => { 
+        document.getElementById('remoteVideo').srcObject = event.streams[0]; 
+        document.getElementById('callStatusText').textContent = 'Connected'; 
+      };
+      
+      peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer))
+        .then(() => peerConnection.createAnswer())
+        .then(answer => peerConnection.setLocalDescription(answer))
+        .then(() => {
+          db.collection('calls').doc(chatId).update({ 
+            answer: { type: answer.type, sdp: answer.sdp }, 
+            status: 'answering' 
+          });
+        })
+        .catch(err => { console.error(err); endCallUI(); });
+      
+      callListener = db.collection('calls').doc(chatId).onSnapshot(doc => { 
+        if (doc.data().status === 'ended') endCallUI(); 
+      });
+      
+      db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { 
+        snapshot.docChanges().forEach(change => { 
+          if (change.type === 'added') { 
+            const data = change.doc.data(); 
+            if (data.sender !== myId) { 
+              peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e)); 
+            } 
+          } 
+        }); 
+      });
+      
+      pendingIncomingCall = null;
+    })
+    .catch(err => { 
+      console.error(err); 
+      showToast('Camera/Mic access denied'); 
+      endCallUI(); 
+    });
 }
 
 function rejectIncomingCall() {
   if (!pendingIncomingCall) return;
-  const { chatId, callerId, callType } = pendingIncomingCall;
-  stopRingtone();
-  document.getElementById('incomingCallModal').classList.remove('show');
   
-  db.collection('calls').doc(chatId).update({ status: 'ended' }); 
-  saveCallHistory(callerId, callType, 'missed', 0, localStorage.getItem('zoyra_preview_id'));
-  saveCallHistory(localStorage.getItem('zoyra_preview_id'), callType, 'missed', 0, callerId);
+  stopRingtone();
+  
+  const { chatId, callerId, callType } = pendingIncomingCall;
+  const myId = localStorage.getItem('zoyra_preview_id');
+  
+  db.collection('calls').doc(chatId).update({ status: 'ended' }).catch(()=>{});
+  saveCallHistory(callerId, callType, 'missed', 0, myId);
+  saveCallHistory(myId, callType, 'missed', 0, callerId);
   
   pendingIncomingCall = null;
-  showToast('Call rejected');
+  endCallUI();
 }
 
 function startCallTimer() { let seconds = 0; const timerEl = document.getElementById('callTimer'); clearInterval(callTimerInterval); callTimerInterval = setInterval(() => { seconds++; const m = Math.floor(seconds / 60).toString().padStart(2, '0'); const s = (seconds % 60).toString().padStart(2, '0'); timerEl.textContent = `${m}:${s}`; }, 1000); }
@@ -1048,9 +1223,18 @@ function endCall() {
   endCallUI(); 
 }
 function endCallUI() { 
-  clearInterval(callTimerInterval); if (peerConnection) peerConnection.close(); if (localStream) localStream.getTracks().forEach(track => track.stop()); if (callListener) callListener(); 
-  document.getElementById('callOverlay').style.display = 'none'; document.getElementById('remoteVideo').srcObject = null; document.getElementById('localVideo').srcObject = null; document.getElementById('callTimer').textContent = '00:00'; 
-  peerConnection = null; localStream = null; showToast('Call Ended'); 
+  stopRingtone();
+  clearInterval(callTimerInterval); 
+  if (peerConnection) peerConnection.close(); 
+  if (localStream) localStream.getTracks().forEach(track => track.stop()); 
+  if (callListener) callListener(); 
+  document.getElementById('callOverlay').style.display = 'none'; 
+  document.getElementById('remoteVideo').srcObject = null; 
+  document.getElementById('localVideo').srcObject = null; 
+  document.getElementById('callTimer').textContent = '00:00'; 
+  peerConnection = null; 
+  localStream = null; 
+  showToast('Call Ended'); 
 }
 
 async function saveCallHistory(userId, callType, callStatus, duration, contactId) {
@@ -1063,7 +1247,9 @@ async function saveCallHistory(userId, callType, callStatus, duration, contactId
   } catch(e) { console.error('Failed to save call history:', e); }
 }
 
-// Point 8: Call History with Click Menu (Option C)
+// Point 8: Call History with Option C menu
+let selectedCallHistory = null;
+
 function renderCallHistory() {
   const list = document.getElementById('callHistoryList');
   if (!list) return;
@@ -1075,116 +1261,100 @@ function renderCallHistory() {
       const empty = document.createElement('div'); empty.className = 'empty'; empty.innerHTML = '<div class="symbol">📞</div><strong>No call history</strong><p>Your recent calls will appear here.</p>'; list.appendChild(empty); return;
     }
     snapshot.forEach(doc => {
-      const data = doc.data(); 
+      const data = doc.data();
       const item = document.createElement('div'); 
       item.className = 'call-history-item';
+      item.onclick = () => showCallActionMenu(data.contactId, data.contactName, data.callType);
       
-      const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = (data.contactName || '?').slice(0,1).toUpperCase();
-      const info = document.createElement('div'); info.className = 'call-info-text';
-      const name = document.createElement('strong'); name.textContent = data.contactName || data.contactId;
+      const avatar = document.createElement('div'); 
+      avatar.className = 'avatar'; 
+      avatar.textContent = (data.contactName || '?').slice(0,1).toUpperCase();
+      
+      const info = document.createElement('div'); 
+      info.className = 'call-info-text';
+      const name = document.createElement('strong'); 
+      name.textContent = data.contactName || data.contactId;
       const details = document.createElement('small');
       const typeIcon = data.callType === 'audio' ? '📞' : '📹';
       const statusText = data.callStatus === 'incoming' ? 'Incoming' : data.callStatus === 'outgoing' ? 'Outgoing' : 'Missed';
       const durationText = data.duration > 0 ? ` ${Math.floor(data.duration/60)}:${(data.duration%60).toString().padStart(2,'0')}` : '';
       details.textContent = `${typeIcon} ${statusText}${durationText}`;
       info.append(name, details);
-      const icon = document.createElement('div'); icon.className = `call-icon ${data.callStatus}`; icon.textContent = data.callStatus === 'incoming' ? '↙' : data.callStatus === 'outgoing' ? '↗' : '✕';
       
-      item.append(avatar, info, icon);
+      const icon = document.createElement('div'); 
+      icon.className = `call-icon ${data.callStatus}`; 
+      icon.textContent = data.callStatus === 'incoming' ? '↙' : data.callStatus === 'outgoing' ? '↗' : '✕';
       
-      // Point 8: Click handler for menu
-      item.addEventListener('click', (e) => {
-        e.stopPropagation();
-        selectedCallHistory = data;
-        showContactMenu(e);
-      });
-      
+      item.append(avatar, info, icon); 
       list.appendChild(item);
     });
   }).catch(err => { console.error('Failed to load call history:', err); });
 }
 
-function showContactMenu(e) {
-  const menu = document.getElementById('contactMenu');
-  menu.style.display = 'block';
-  menu.classList.add('show');
-  
-  // Position near click
-  const rect = e.currentTarget.getBoundingClientRect();
-  menu.style.bottom = (window.innerHeight - rect.top + 10) + 'px';
-  menu.style.left = rect.left + 'px';
-  
-  setTimeout(() => {
-    document.addEventListener('click', hideContactMenu, { once: true });
-  }, 100);
-}
-
-function hideContactMenu() {
-  document.getElementById('contactMenu').classList.remove('show');
-  setTimeout(() => { document.getElementById('contactMenu').style.display = 'none'; }, 300);
+function showCallActionMenu(contactId, contactName, callType) {
+  selectedCallHistory = { contactId, contactName, callType };
+  document.getElementById('callActionTitle').textContent = contactName || contactId;
+  document.getElementById('callActionSubtitle').textContent = contactId;
+  document.getElementById('callActionModal').classList.add('show');
 }
 
 function callBackFromHistory() {
-  hideContactMenu();
   if (!selectedCallHistory) return;
-  const contactId = selectedCallHistory.contactId;
+  closeModal('callActionModal');
+  
+  // Go to chats and open contact
   const contacts = readContacts();
-  if (!contacts.some(c => c.id === contactId)) {
-    contacts.push({ id: contactId, name: selectedCallHistory.contactName || '' });
+  if (!contacts.some(c => c.id === selectedCallHistory.contactId)) {
+    contacts.push({ id: selectedCallHistory.contactId, name: selectedCallHistory.contactName });
     localStorage.setItem('zoyra_contacts', JSON.stringify(contacts));
   }
-  openChatFromContacts(contactId);
-  setTimeout(() => startCall('video'), 500);
+  
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('chats').classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.querySelector('[data-screen="chats"]').classList.add('active');
+  
+  openChat(selectedCallHistory.contactId);
+  
+  // Auto-start call after a short delay
+  setTimeout(() => {
+    startCall(selectedCallHistory.callType || 'video');
+  }, 500);
 }
 
 function openChatFromHistory() {
-  hideContactMenu();
   if (!selectedCallHistory) return;
-  const contactId = selectedCallHistory.contactId;
+  closeModal('callActionModal');
+  
   const contacts = readContacts();
-  if (!contacts.some(c => c.id === contactId)) {
-    contacts.push({ id: contactId, name: selectedCallHistory.contactName || '' });
+  if (!contacts.some(c => c.id === selectedCallHistory.contactId)) {
+    contacts.push({ id: selectedCallHistory.contactId, name: selectedCallHistory.contactName });
     localStorage.setItem('zoyra_contacts', JSON.stringify(contacts));
   }
-  openChatFromContacts(contactId);
+  
+  openChatFromContacts(selectedCallHistory.contactId);
 }
 
 function viewContactFromHistory() {
-  hideContactMenu();
   if (!selectedCallHistory) return;
-  showToast(`Contact: ${selectedCallHistory.contactName || selectedCallHistory.contactId}\nID: ${selectedCallHistory.contactId}`);
+  closeModal('callActionModal');
+  showToast(`Contact: ${selectedCallHistory.contactName || 'Unknown'}\nID: ${selectedCallHistory.contactId}`);
 }
 
 // Modal functions
 function showBackupOptions() {
   if (!localStorage.getItem('zoyra_private_key')) { showToast('Keys not ready yet.'); return; }
   
-  const hasBackup = localStorage.getItem('zoyra_has_backup');
-  if (hasBackup) {
-    // Point 2: Show existing backup
-    const existingWords = localStorage.getItem('zoyra_recovery_words') || 'Your recovery code is saved securely.';
-    document.getElementById('existingRecoveryDisplay').textContent = existingWords;
-    document.getElementById('existingBackupSection').style.display = 'block';
-    document.getElementById('newBackupSection').style.display = 'none';
+  // Point 2: If backup already exists, show existing code
+  const existingWords = localStorage.getItem('zoyra_recovery_words');
+  if (existingWords) {
+    document.getElementById('recoveryCodeDisplay').textContent = existingWords;
+    document.getElementById('recoveryModalText').textContent = 'This is your existing recovery code. Keep it safe. If you lose your phone, you will need these words AND your ZOYRA ID to get your account back.';
+    document.getElementById('recoveryModal').classList.add('show');
   } else {
-    document.getElementById('existingBackupSection').style.display = 'none';
-    document.getElementById('newBackupSection').style.display = 'block';
+    document.getElementById('recoveryModalText').textContent = 'Write these words down in order and keep them safe. If you lose your phone, you will need these words AND your ZOYRA ID to get your account back.';
+    document.getElementById('backupOptionsModal').classList.add('show');
   }
-  
-  document.getElementById('backupOptionsModal').classList.add('show');
-}
-
-function copyExistingRecovery() {
-  const code = document.getElementById('existingRecoveryDisplay').textContent;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(code).then(() => showToast('Recovery code copied!'));
-  } else {
-    showToast('Select and copy manually.');
-  }
-}
-
-function showPremiumRegenerate() {
-  showToast('🔒 Regenerate feature coming in Premium update!');
 }
 
 function showRestoreModal() {
