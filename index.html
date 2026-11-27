@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0b1020" id="themeColorMeta">
 <title>ZOYRA — Private conversations</title>
 <style>
-:root{--bg:#0b1020;--panel:#121b30;--panel2:#18243c;--line:#263552;--text:#f4f7ff;--muted:#9eacc5;--accent:#829cff;--accent2:#a8b8ff;--green:#57d6a0;--danger:#ff7e88;--warn:#ffb84d;--gold:#ffd700}
+:root{--bg:#0b1020;--panel:#121b30;--panel2:#18243c;--line:#263552;--text:#f4f7ff;--muted:#9eacc5;--accent:#829cff;--accent2:#a8b8ff;--green:#57d6a0;--danger:#ff7e88;--warn:#ffb84d}
 body.light-theme{--bg:#f4f7ff;--panel:#ffffff;--panel2:#eef2ff;--line:#d1d9e6;--text:#10182c;--muted:#5a6b8c;--accent:#4a6cf7;--accent2:#627df0;--green:#10b981;--danger:#ef4444;--warn:#f59e0b}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#24365d 0%,var(--bg) 54%);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;transition:background 0.3s, color 0.3s}
 body.light-theme{background:radial-gradient(ellipse at 50% -15%,#e0e7ff 0%,var(--bg) 54%)}
@@ -26,7 +26,7 @@ body.light-theme .card{background:#ffffff}
 .nav{position:fixed;bottom:0;left:0;right:0;background:#0d1528f2;border-top:1px solid var(--line);padding:9px 10px calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:4px;z-index:5;backdrop-filter:blur(16px);transition:background 0.3s}.nav button{background:none;border:0;color:var(--muted);font-size:10px;padding:7px 10px;border-radius:12px;min-width:65px;transition:0.2s;position:relative}.nav button span{display:block;font-size:19px;margin-bottom:2px}.nav button.active{color:var(--accent2);background:#202e4b}.nav-badge{position:absolute;top:4px;right:6px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;min-width:16px;text-align:center}
 body.light-theme .nav{background:#fffffff2;border-top-color:#d1d9e6}
 body.light-theme .nav button.active{background:#e0e7ff;color:#4a6cf7}
-.item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid #ffffff12;cursor:pointer;user-select:none;-webkit-user-select:none}.avatar{width:44px;height:44px;border-radius:15px;background:linear-gradient(145deg,#425985,#253451);display:grid;place-items:center;font-weight:800;color:#dce4ff;flex:none;position:relative}.online-dot{position:absolute;bottom:0;right:0;width:12px;height:12px;background:var(--green);border:2px solid var(--bg);border-radius:50%}.itemmain{flex:1;min-width:0}.itemmain strong{display:block}.itemmain small{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid #ffffff12;cursor:pointer}.avatar{width:44px;height:44px;border-radius:15px;background:linear-gradient(145deg,#425985,#253451);display:grid;place-items:center;font-weight:800;color:#dce4ff;flex:none;position:relative}.online-dot{position:absolute;bottom:0;right:0;width:12px;height:12px;background:var(--green);border:2px solid var(--bg);border-radius:50%}.itemmain{flex:1;min-width:0}.itemmain strong{display:block}.itemmain small{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .empty{text-align:center;padding:35px 15px;color:var(--muted)}.empty .symbol{font-size:38px;margin-bottom:8px}
 .field{display:block;color:var(--muted);font-size:12px;margin:14px 0 6px}.fieldinput{width:100%;padding:13px;background:#0e1729;color:var(--text);border:1px solid var(--line);border-radius:12px;outline:none;transition:background 0.3s}
 body.light-theme .fieldinput{background:#f1f5f9;color:#10182c;border-color:#d1d9e6}
@@ -80,7 +80,7 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 .request-actions button{padding:8px 10px;font-size:11px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
 .req-accept{background:var(--green);color:#fff}
 .req-block{background:#334155;color:#fff}
-.call-history-item{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #ffffff12;cursor:pointer;user-select:none;-webkit-user-select:none}
+.call-history-item{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #ffffff12;cursor:pointer}
 .call-history-item:active{background:#ffffff10}
 .call-history-item .avatar{width:40px;height:40px;font-size:16px}
 .call-history-item .call-info-text{flex:1}
@@ -108,23 +108,18 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 .menu-item small{display:block;color:var(--muted);font-size:11px}
 .menu-item.danger strong{color:var(--danger)}
 .profile-display{display:flex;align-items:center;justify-content:space-between;padding:12px;background:#0e1729;border-radius:12px;margin-top:12px}
-.profile-name{font-size:18px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.profile-name{font-size:18px;font-weight:700;color:var(--text)}
 .edit-btn{background:none;border:1px solid var(--accent);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer}
 .edit-btn:hover{background:var(--accent);color:#10182c}
 .trust-text{text-align:center;padding:16px;color:var(--muted);font-size:13px;line-height:1.6}
 .trust-text .icon{font-size:24px;margin-bottom:8px}
-.premium-badge{background:linear-gradient(135deg,#ffd700,#f59e0b);color:#10182c;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:0.5px}
-.premium-features-list{text-align:left;color:var(--muted);font-size:13px;margin-bottom:16px;padding-left:20px}
-.premium-features-list li{margin-bottom:8px}
-.delete-account-btn{background:linear-gradient(135deg,#ff9ea3,#ef4444);color:#fff;border:0;border-radius:13px;padding:14px 16px;font-weight:700;width:100%;margin-top:16px;cursor:pointer;font-size:14px}
-.delete-account-btn:active{transform:scale(0.97)}
 @media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
 </style>
 </head>
 <body>
 <div class="app">
 <header>
-  <div class="brand"><div class="logo">Z</div>ZOYRA <span id="premiumBadge" class="premium-badge" style="display:none">PRO</span></div>
+  <div class="brand"><div class="logo">Z</div>ZOYRA</div>
   <div style="display:flex;align-items:center;gap:12px">
     <div class="status"><i class="dot"></i> E2EE SECURE</div>
     <button id="themeToggle" class="theme-btn" title="Toggle Theme">🌙</button>
@@ -214,10 +209,6 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 <section id="settings" class="screen">
   <div class="eyebrow">Your preferences</div><h1>Settings</h1><p class="sub">Control your ZOYRA experience.</p>
   <div class="card">
-    <div class="feature" onclick="showPremiumModal()" style="background:linear-gradient(90deg, #3d2817, #17243d); border-radius:12px; margin-bottom:8px">
-      <div class="ico" style="font-size:24px">👑</div>
-      <div><strong style="color:var(--gold)">ZOYRA Premium</strong><small>Unlock unlimited resets & gold badge</small></div>
-    </div>
     <div class="feature" onclick="showBackupOptions()">
       <div class="ico">🔑</div>
       <div><strong>Backup & Recovery Code</strong><small>View or generate your recovery code</small></div>
@@ -228,7 +219,7 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
     </div>
     <div class="feature" onclick="resetKeys()">
       <div class="ico">🔄</div>
-      <div><strong>Reset encryption keys</strong><small id="resetLimitText">Free users: max 2 resets.</small></div>
+      <div><strong>Reset encryption keys</strong><small>Free users: max 2 resets. Further resets require Premium.</small></div>
     </div>
     <div class="feature" onclick="shareApp()">
       <div class="ico">📤</div>
@@ -236,7 +227,6 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
     </div>
     <div class="feature"><div class="ico">🌐</div><div><strong>Language</strong><small>English</small></div></div>
   </div>
-  <button class="delete-account-btn" onclick="deleteAccount()">🗑️ Delete My Account</button>
   <footer>ZOYRA · Built with care<br>Privacy first.</footer>
 </section>
 </div>
@@ -356,16 +346,6 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   </div>
 </div>
 
-<div class="modal-overlay" id="longPressMenuModal">
-  <div class="modal" id="longPressMenuContent">
-    <!-- Dynamic content -->
-  </div>
-</div>
-
-<div class="modal-overlay" id="premiumModal">
-  <div class="modal" id="premiumModalContent"></div>
-</div>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
@@ -380,6 +360,8 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+const WORDLIST = ["abandon","ability","able","about","above","absent","absorb","abstract","absurd","abuse","access","accident","account","accuse","achieve","acid","acoustic","acquire","across","act","action","actor","actress","actual","adapt","add","addict","address","adjust","admit","adult","advance","advice","aerobic","affair","afford","afraid","again","age","agent","agree","ahead","aim","air","airport","aisle","alarm","album","alcohol","alert","alien","all","alley","allow","almost","alone","alpha","already","also","alter","always","amateur","amazing","among","amount","amused","analyst","anchor","ancient","anger","angle","angry","animal","ankle","announce","annual","another","answer","antenna","antique","anxiety","any","apart","apology","appear","apple","approve","april","arch","arctic","area","arena","argue","arm","armed","armor","army","around","arrange","arrest","arrive","arrow","art","artefact","artist","artwork","ask","aspect","assault","asset","assist","assume","asthma","athlete","atom","attack","attend","attitude","attract","auction","audit","august","aunt","author","auto","autumn","average","avocado","avoid","awake","aware","awesome","awful","awkward","axis","baby","bachelor","bacon","badge","bag","balance","balcony","ball","bamboo","banana","banner","bar","barely","bargain","barrel","base","basic","basket","battle","beach","bean","beauty","because","become","beef","before","begin","behave","behind","believe","below","belt","bench","benefit","best","betray","better","between","beyond","bicycle","bid","bike","bind","biology","bird","birth","bitter","black","blade","blame","blanket","blast","bleak","bless","blind","blood","blossom","blow","blue","blur","blush","board","boat","body","boil","bomb","bone","bonus","book","boost","border","boring","borrow","boss","bottom","bounce","box","boy","bracket","brain","brand","brass","brave","bread","breeze","brick","bridge","brief","bright","bring","brisk","broccoli","broken","bronze","broom","brother","brown","brush","bubble","buddy","budget","buffalo","build","bulb","bulk","bullet","bundle","bunny","burden","burger","burst","bus","business","busy","butter","buyer","buzz","cabbage","cabin","cable","cactus","cage","cake","call","calm","camera","camp","can","canal","cancel","candy","cannon","canoe","canvas","canyon","capable","capital","captain","car","carbon","card","cargo","carpet","carry","cart","case","cash","casino","castle","casual","cat","catalog","catch","category","cattle","caught","cause","caution","cave","ceiling","celery","cement","census","century","cereal","certain","chair","chalk","champion","change","chaos","chapter","charge","chase","cheap","check","cheese","chef","cherry","chest","chicken","chief","child","chimney","choice","choose","chronic","chuckle","chunk","churn","citizen","city","civil","claim","clap","clarify","claw","clay","clean","clerk","clever","click","client","cliff","climb","clinic","clip","clock","clog","close","cloth","cloud","clown","club","clump","cluster","clutch","coach","coast","coconut","code","coffee","coil","coin","collect","color","column","combine","come","comfort","comic","common","company","concert","conduct","confirm","congress","connect","consider","control","convince","cook","cool","copper","copy","coral","core","corn","correct","cost","cotton","couch","country","couple","course","cousin","cover","coyote","crack","cradle","craft","cram","crane","crash","crater","crawl","crazy","cream","credit","creek","crew","cricket","crime","crisp","critic","crop","cross","crouch","crowd","crucial","cruel","cruise","crumble","crush","cry","crystal","cube","culture","cup","cupboard","curious","current","curtain","curve","cushion","custom","cute","cycle","dad","damage","damp","dance","danger","daring","dash","daughter","dawn","day","deal","debate","debris","decade","december","decide","decline","decorate","decrease","deer","defense","define","defy","degree","delay","deliver","demand","demise","denial","dentist","deny","depart","depend","deposit","depth","deputy","derive","describe","desert","design","desk","despair","destroy","detail","detect","develop","device","devote","diagram","dial","diamond","diary","dice","diesel","diet","differ","digital","dignity","dilemma","dinner","dinosaur","direct","dirt","disagree","discover","disease","dish","dismiss","disorder","display","distance","divert","divide","divorce","dizzy","doctor","document","dog","doll","dolphin","domain","donate","donkey","donor","door","dose","double","dove","draft","dragon","drama","drastic","draw","dream","dress","drift","drill","drink","drip","drive","drop","drum","dry","duck","dumb","dune","during","dust","dutch","duty","dwarf","dynamic","eager","eagle","early","earn","earth","easily","east","easy","echo","ecology","economy","edge","edit","educate","effort","egg","eight","either","elbow","elder","electric","elegant","element","elephant","elevator","elite","else","embark","embody","embrace","emerge","emotion","employ","empower","empty","enable","encourage","end","endless","endorse","enemy","energy","enforce","engage","engine","enhance","enjoy","enlist","enough","enrich","enroll","ensure","enter","entire","entry","envelope","episode","equal","equip","era","erase","erode","erosion","error","erupt","escape","essay","essence","estate","eternal","ethics","evidence","evil","evoke","evolve","exact","example","excess","exchange","excite","exclude","excuse","execute","exercise","exhaust","exhibit","exile","exist","exit","exotic","expand","expect","expire","explain","expose","express","extend","extra","eye","eyebrow","fabric","face","faculty","fade","faint","faith","fall","false","fame","family","famous","fan","fancy","fantasy","farm","fashion","fat","fatal","father","fatigue","fault","favorite","feature","february","federal","fee","feed","feel","female","fence","festival","fetch","fever","few","fiber","fiction","field","figure","file","film","filter","final","find","fine","finger","finish","fire","firm","fiscal","fish","fit","fitness","fix","flag","flame","flash","flat","flavor","flee","flight","flip","float","flock","floor","flower","fluid","flush","fly","foam","focus","fog","foil","fold","follow","food","foot","force","forest","forget","fork","fortune","forum","forward","fossil","foster","found","fox","fragile","frame","frequent","fresh","friend","fringe","frog","front","frost","frown","frozen","fruit","fuel","fun","funny","furnace","fury","future","gadget","gain","galaxy","gallery","game","gap","garage","garbage","garden","garlic","garment","gas","gasp","gate","gather","gauge","gaze","general","genius","genre","gentle","genuine","gesture","ghost","giant","gift","giggle","ginger","giraffe","girl","give","glad","glance","glare","glass","glide","glimpse","globe","gloom","glory","glove","glow","glue","goat","goddess","gold","good","goose","gorilla","gospel","gossip","govern","gown","grab","grace","grain","grant","grape","grass","gravity","great","green","grid","grief","grit","grocery","group","grow","grunt","guard","guess","guide","guilt","guitar","gun","gym","habit","hair","half","hammer","hamster","hand","happy","harbor","hard","harsh","harvest","hat","have","hawk","hazard","head","health","heart","heavy","hedgehog","height","hello","helmet","help","hen","hero","hip","hire","history","hobby","hockey","hold","hole","holiday","hollow","home","honey","hood","hope","horn","horror","horse","hospital","host","hotel","hour","hover","hub","huge","human","humble","humor","hundred","hungry","hunt","hurdle","hurry","hurt","husband","hybrid","ice","icon","idea","identify","idle","ignore","ill","illegal","illness","image","imitate","immense","immune","impact","impose","improve","impulse","inch","include","income","increase","index","indicate","indoor","industry","infant","inflict","inform","initial","inject","inmate","inner","innocent","input","inquiry","insane","insect","inside","inspire","install","intact","interest","into","invest","invite","involve","iron","island","isolate","issue","item","ivory","jacket","jaguar","jar","jazz","jealous","jeans","jelly","jewel","job","join","joke","journey","joy","judge","juice","jump","jungle","junior","junk","just","kangaroo","keen","keep","ketchup","key","kick","kid","kidney","kind","kingdom","kiss","kit","kitchen","kite","kitten","kiwi","knee","knife","knock","know","lab","label","labor","ladder","lady","lake","lamp","language","laptop","large","later","latin","laugh","laundry","lava","law","lawn","lawsuit","layer","lazy","leader","leaf","learn","leave","lecture","left","leg","legal","legend","leisure","lemon","lend","length","lens","leopard","lesson","letter","level","liberty","library","license","life","lift","light","like","limb","limit","link","lion","liquid","list","little","live","lizard","load","loan","lobster","local","lock","logic","lonely","long","loop","lottery","loud","lounge","love","loyal","lucky","luggage","lumber","lunar","lunch","luxury","lyrics","machine","mad","magic","magnet","maid","mail","main","major","make","mammal","man","manage","mandate","mango","mansion","manual","maple","marble","march","margin","marine","market","marriage","mask","mass","master","match","material","math","matrix","matter","maximum","maze","meadow","mean","measure","meat","mechanic","medal","media","melody","melt","member","memory","mention","menu","mercy","merge","merit","merry","mesh","message","metal","method","middle","midnight","milk","million","mimic","mind","minimum","minor","minute","miracle","mirror","misery","miss","mistake","mix","mixed","mixture","mobile","model","modify","mom","moment","monitor","monkey","monster","month","moon","moral","more","morning","mosquito","mother","motion","motor","mountain","mouse","move","movie","much","muffin","mule","multiply","muscle","museum","mushroom","music","must","mutual","myself","mystery","myth","naive","name","napkin","narrow","nasty","nation","nature","near","neck","need","negative","neglect","neither","nephew","nerve","nest","net","network","neutral","never","news","next","nice","night","noble","noise","nominee","noodle","normal","north","nose","notable","nothing","notice","novel","now","nuclear","number","nurse","nut","oak","obey","object","oblige","obscure","observe","obtain","obvious","occur","ocean","october","odor","off","offer","office","often","oil","okay","old","olive","olympic","omit","once","one","onion","online","only","open","opera","opinion","oppose","option","orange","orbit","orchard","order","ordinary","organ","orient","original","orphan","ostrich","other","outdoor","outer","output","outside","oval","oven","over","own","owner","oxygen","oyster","ozone","pact","paddle","page","pair","palace","palm","panda","panel","panic","panther","paper","parade","parent","park","parrot","party","pass","patch","path","patient","patrol","pattern","pause","pave","payment","peace","peanut","pear","peasant","pelican","pen","penalty","pencil","people","pepper","perfect","permit","person","pet","phone","photo","phrase","physical","piano","picnic","picture","piece","pig","pigeon","pill","pilot","pink","pioneer","pipe","pistol","pitch","pizza","place","planet","plastic","plate","play","please","pledge","pluck","plug","plunge","poem","poet","point","polar","pole","police","pond","pony","pool","popular","portion","position","possible","post","potato","pottery","poverty","powder","power","practice","praise","predict","prefer","prepare","present","pretty","prevent","price","pride","primary","print","priority","prison","private","prize","problem","process","produce","profit","program","project","promote","proof","property","prosper","protect","proud","provide","public","pudding","pull","pulp","pulse","pumpkin","punch","pupil","puppy","purchase","purity","purpose","purse","push","put","puzzle","pyramid","quality","quantum","quarter","question","quick","quit","quiz","quote","rabbit","raccoon","race","rack","radar","radio","rage","rail","rain","raise","rally","ramp","ranch","random","range","rapid","rare","rate","rather","raven","raw","razor","ready","real","reason","rebel","rebuild","recall","receive","recipe","record","recycle","reduce","reflect","reform","region","regret","regular","reject","relax","release","relief","rely","remain","remember","remind","remove","render","renew","rent","reopen","repair","repeat","replace","report","require","rescue","resemble","resist","resource","response","result","retire","retreat","return","reunion","reveal","review","reward","rhythm","rib","ribbon","rice","rich","ride","ridge","rifle","right","rigid","ring","riot","ripple","risk","ritual","rival","river","road","roast","robot","robust","rocket","romance","roof","rookie","room","rose","rotate","rough","round","route","royal","rubber","rude","rug","rule","run","runway","rural","sad","saddle","sadness","safe","sail","salad","salmon","salon","salt","salute","same","sample","sand","satisfy","satoshi","sauce","sausage","save","say","scale","scan","scare","scatter","scene","scheme","school","science","scissors","scorpion","scout","scrap","screen","script","scrub","sea","search","season","seat","second","secret","section","security","seed","seek","segment","select","sell","seminar","senior","sense","sentence","series","service","session","settle","setup","seven","shadow","shaft","shallow","share","shed","shell","sheriff","shield","shift","shine","ship","shiver","shock","shoe","shoot","shop","short","shoulder","shove","shrimp","shrug","shuffle","shy","sibling","sick","side","siege","sight","sign","silent","silk","silly","silver","similar","simple","since","sing","siren","sister","situate","six","size","skate","sketch","ski","skill","skin","skirt","skull","slab","slam","sleep","slender","slice","slide","slight","slim","slogan","slot","slow","slush","small","smart","smile","smoke","smooth","snack","snake","snap","sniff","snow","soap","soccer","social","sock","soda","soft","solar","soldier","solid","solution","solve","someone","song","soon","sorry","sort","soul","sound","soup","source","south","space","spare","spatial","spawn","speak","special","speed","spell","spend","sphere","spice","spider","spike","spin","spirit","split","sponsor","spoon","sport","spot","spray","spread","spring","spy","square","squeeze","squirrel","stable","stadium","staff","stage","stairs","stamp","stand","start","state","stay","steak","steel","stem","step","stereo","stick","still","sting","stock","stomach","stone","stool","story","stove","strategy","street","strike","strong","struggle","student","stuff","stumble","style","subject","submit","subway","success","such","sudden","suffer","sugar","suggest","suit","summer","sun","sunny","sunset","super","supply","supreme","sure","surface","surge","surprise","surround","survey","suspect","sustain","swallow","swamp","swap","swarm","swear","sweet","swim","swing","switch","sword","symbol","symptom","syrup","system","table","tackle","tag","tail","talent","talk","tank","tape","target","task","taste","tattoo","taxi","teach","team","tell","ten","tenant","tennis","tent","term","test","text","thank","that","theme","then","theory","there","they","thing","this","thought","three","thrive","throw","thumb","thunder","ticket","tide","tiger","tilt","timber","time","tiny","tip","tired","tissue","title","toast","tobacco","today","toddler","toe","together","toilet","token","tomato","tomorrow","tone","tongue","tonight","tool","tooth","top","topic","topple","torch","tornado","tortoise","toss","total","tourist","toward","tower","town","toy","track","trade","traffic","tragic","train","transfer","trap","trash","travel","tray","treat","tree","trend","trial","tribe","trick","trigger","trim","trip","trophy","trouble","truck","true","truly","trumpet","trust","truth","try","tube","tuna","tunnel","turkey","turn","turtle","twelve","twenty","twice","twin","twist","two","type","typical","ugly","umbrella","unable","unaware","uncle","uncover","under","undo","unfair","unfold","unhappy","uniform","union","unique","unit","universe","unknown","unlock","until","unusual","unveil","update","upgrade","uphold","upon","upper","upset","urban","usage","use","used","useful","useless","usual","utility","vacant","vacuum","vague","valid","valley","valve","van","vanish","vapor","various","vast","vault","vehicle","velvet","vendor","venture","venue","verb","verify","version","very","vessel","veteran","viable","vibrant","vicious","victory","video","view","village","vintage","violin","virtual","virus","visa","visit","visual","vital","vivid","vocal","voice","void","volcano","volume","vote","voyage","wage","wagon","wait","walk","wall","walnut","want","warfare","warm","warrior","wash","wasp","waste","water","wave","way","wealth","weapon","wear","weasel","weather","web","wedding","weekend","weird","welcome","well","west","wet","whale","what","wheat","wheel","when","where","whip","whisper","wide","width","wife","wild","will","win","window","wine","wing","wink","winner","winter","wire","wisdom","wise","wish","witness","wolf","woman","wonder","wood","wool","word","work","world","worry","worth","wrap","wreck","wrestle","wrist","write","wrong","yard","year","yellow","you","young","youth","zebra","zero","zone","zoo"];
 
 const themeBtn = document.getElementById('themeToggle');
 const themeMeta = document.getElementById('themeColorMeta');
@@ -408,7 +390,6 @@ async function generateAndSaveKeys() {
     await uploadPublicKey(); 
     checkRecoveryCode();
     loadProfile();
-    checkPremiumStatus();
     return; 
   }
   try {
@@ -422,33 +403,25 @@ async function generateAndSaveKeys() {
     await uploadPublicKey();
     checkRecoveryCode();
     loadProfile();
-    checkPremiumStatus();
   } catch (error) { console.error("Key generation failed:", error); encStatus.textContent = "Failed to generate keys"; }
 }
 
 function loadProfile() {
   const savedName = localStorage.getItem('zoyra_display_name');
-  const isPremium = localStorage.getItem('zoyra_is_premium') === 'true';
   if (savedName) {
-    let nameHtml = savedName;
-    if (isPremium) nameHtml += ' <span class="premium-badge">PRO</span>';
-    document.getElementById('profileDisplayName').innerHTML = nameHtml;
+    document.getElementById('profileDisplayName').textContent = savedName;
     document.getElementById('profileEditSection').style.display = 'none';
     document.getElementById('profileDisplaySection').style.display = 'block';
   }
 }
 
-function checkPremiumStatus() {
-  const isPremium = localStorage.getItem('zoyra_is_premium') === 'true';
-  document.getElementById('premiumBadge').style.display = isPremium ? 'inline-block' : 'none';
-  if (isPremium) {
-    document.getElementById('resetLimitText').textContent = 'Premium: Unlimited resets';
-  }
-}
-
 function checkRecoveryCode() {
   const hasBackup = localStorage.getItem('zoyra_has_backup');
-  document.getElementById('recoveryWarning').style.display = hasBackup ? 'none' : 'block';
+  if (!hasBackup) {
+    document.getElementById('recoveryWarning').style.display = 'block';
+  } else {
+    document.getElementById('recoveryWarning').style.display = 'none';
+  }
 }
 
 async function deriveKeyFromWords(words) {
@@ -464,26 +437,39 @@ async function deriveKeyFromWords(words) {
   );
 }
 
-const WORDLIST = ["abandon","ability","able","about","above","absent","absorb","abstract","absurd","abuse","access","accident","account","accuse","achieve","acid","acoustic","acquire","across","act","action","actor","actress","actual","adapt","add","addict","address","adjust","admit","adult","advance","advice","aerobic","affair","afford","afraid","again","age","agent","agree","ahead","aim","air","airport","aisle","alarm","album","alcohol","alert","alien","all","alley","allow","almost","alone","alpha","already","also","alter","always","amateur","amazing","among","amount","amused","analyst","anchor","ancient","anger","angle","angry","animal","ankle","announce","annual","another","answer","antenna","antique","anxiety","any","apart","apology","appear","apple","approve","april","arch","arctic","area","arena","argue","arm","armed","armor","army","around","arrange","arrest","arrive","arrow","art","artefact","artist","artwork","ask","aspect","assault","asset","assist","assume","asthma","athlete","atom","attack","attend","attitude","attract","auction","audit","august","aunt","author","auto","autumn","average","avocado","avoid","awake","aware","awesome","awful","awkward","axis","baby","bachelor","bacon","badge","bag","balance","balcony","ball","bamboo","banana","banner","bar","barely","bargain","barrel","base","basic","basket","battle","beach","bean","beauty","because","become","beef","before","begin","behave","behind","believe","below","belt","bench","benefit","best","betray","better","between","beyond","bicycle","bid","bike","bind","biology","bird","birth","bitter","black","blade","blame","blanket","blast","bleak","bless","blind","blood","blossom","blow","blue","blur","blush","board","boat","body","boil","bomb","bone","bonus","book","boost","border","boring","borrow","boss","bottom","bounce","box","boy","bracket","brain","brand","brass","brave","bread","breeze","brick","bridge","brief","bright","bring","brisk","broccoli","broken","bronze","broom","brother","brown","brush","bubble","buddy","budget","buffalo","build","bulb","bulk","bullet","bundle","bunny","burden","burger","burst","bus","business","busy","butter","buyer","buzz","cabbage","cabin","cable","cactus","cage","cake","call","calm","camera","camp","can","canal","cancel","candy","cannon","canoe","canvas","canyon","capable","capital","captain","car","carbon","card","cargo","carpet","carry","cart","case","cash","casino","castle","casual","cat","catalog","catch","category","cattle","caught","cause","caution","cave","ceiling","celery","cement","census","century","cereal","certain","chair","chalk","champion","change","chaos","chapter","charge","chase","cheap","check","cheese","chef","cherry","chest","chicken","chief","child","chimney","choice","choose","chronic","chuckle","chunk","churn","citizen","city","civil","claim","clap","clarify","claw","clay","clean","clerk","clever","click","client","cliff","climb","clinic","clip","clock","clog","close","cloth","cloud","clown","club","clump","cluster","clutch","coach","coast","coconut","code","coffee","coil","coin","collect","color","column","combine","come","comfort","comic","common","company","concert","conduct","confirm","congress","connect","consider","control","convince","cook","cool","copper","copy","coral","core","corn","correct","cost","cotton","couch","country","couple","course","cousin","cover","coyote","crack","cradle","craft","cram","crane","crash","crater","crawl","crazy","cream","credit","creek","crew","cricket","crime","crisp","critic","crop","cross","crouch","crowd","crucial","cruel","cruise","crumble","crush","cry","crystal","cube","culture","cup","cupboard","curious","current","curtain","curve","cushion","custom","cute","cycle","dad","damage","damp","dance","danger","daring","dash","daughter","dawn","day","deal","debate","debris","decade","december","decide","decline","decorate","decrease","deer","defense","define","defy","degree","delay","deliver","demand","demise","denial","dentist","deny","depart","depend","deposit","depth","deputy","derive","describe","desert","design","desk","despair","destroy","detail","detect","develop","device","devote","diagram","dial","diamond","diary","dice","diesel","diet","differ","digital","dignity","dilemma","dinner","dinosaur","direct","dirt","disagree","discover","disease","dish","dismiss","disorder","display","distance","divert","divide","divorce","dizzy","doctor","document","dog","doll","dolphin","domain","donate","donkey","donor","door","dose","double","dove","draft","dragon","drama","drastic","draw","dream","dress","drift","drill","drink","drip","drive","drop","drum","dry","duck","dumb","dune","during","dust","dutch","duty","dwarf","dynamic","eager","eagle","early","earn","earth","easily","east","easy","echo","ecology","economy","edge","edit","educate","effort","egg","eight","either","elbow","elder","electric","elegant","element","elephant","elevator","elite","else","embark","embody","embrace","emerge","emotion","employ","empower","empty","enable","encourage","end","endless","endorse","enemy","energy","enforce","engage","engine","enhance","enjoy","enlist","enough","enrich","enroll","ensure","enter","entire","entry","envelope","episode","equal","equip","era","erase","erode","erosion","error","erupt","escape","essay","essence","estate","eternal","ethics","evidence","evil","evoke","evolve","exact","example","excess","exchange","excite","exclude","excuse","execute","exercise","exhaust","exhibit","exile","exist","exit","exotic","expand","expect","expire","explain","expose","express","extend","extra","eye","eyebrow","fabric","face","faculty","fade","faint","faith","fall","false","fame","family","famous","fan","fancy","fantasy","farm","fashion","fat","fatal","father","fatigue","fault","favorite","feature","february","federal","fee","feed","feel","female","fence","festival","fetch","fever","few","fiber","fiction","field","figure","file","film","filter","final","find","fine","finger","finish","fire","firm","fiscal","fish","fit","fitness","fix","flag","flame","flash","flat","flavor","flee","flight","flip","float","flock","floor","flower","fluid","flush","fly","foam","focus","fog","foil","fold","follow","food","foot","force","forest","forget","fork","fortune","forum","forward","fossil","foster","found","fox","fragile","frame","frequent","fresh","friend","fringe","frog","front","frost","frown","frozen","fruit","fuel","fun","funny","furnace","fury","future","gadget","gain","galaxy","gallery","game","gap","garage","garbage","garden","garlic","garment","gas","gasp","gate","gather","gauge","gaze","general","genius","genre","gentle","genuine","gesture","ghost","giant","gift","giggle","ginger","giraffe","girl","give","glad","glance","glare","glass","glide","glimpse","globe","gloom","glory","glove","glow","glue","goat","goddess","gold","good","goose","gorilla","gospel","gossip","govern","gown","grab","grace","grain","grant","grape","grass","gravity","great","green","grid","grief","grit","grocery","group","grow","grunt","guard","guess","guide","guilt","guitar","gun","gym","habit","hair","half","hammer","hamster","hand","happy","harbor","hard","harsh","harvest","hat","have","hawk","hazard","head","health","heart","heavy","hedgehog","height","hello","helmet","help","hen","hero","hip","hire","history","hobby","hockey","hold","hole","holiday","hollow","home","honey","hood","hope","horn","horror","horse","hospital","host","hotel","hour","hover","hub","huge","human","humble","humor","hundred","hungry","hunt","hurdle","hurry","hurt","husband","hybrid","ice","icon","idea","identify","idle","ignore","ill","illegal","illness","image","imitate","immense","immune","impact","impose","improve","impulse","inch","include","income","increase","index","indicate","indoor","industry","infant","inflict","inform","initial","inject","inmate","inner","innocent","input","inquiry","insane","insect","inside","inspire","install","intact","interest","into","invest","invite","involve","iron","island","isolate","issue","item","ivory","jacket","jaguar","jar","jazz","jealous","jeans","jelly","jewel","job","join","joke","journey","joy","judge","juice","jump","jungle","junior","junk","just","kangaroo","keen","keep","ketchup","key","kick","kid","kidney","kind","kingdom","kiss","kit","kitchen","kite","kitten","kiwi","knee","knife","knock","know","lab","label","labor","ladder","lady","lake","lamp","language","laptop","large","later","latin","laugh","laundry","lava","law","lawn","lawsuit","layer","lazy","leader","leaf","learn","leave","lecture","left","leg","legal","legend","leisure","lemon","lend","length","lens","leopard","lesson","letter","level","liberty","library","license","life","lift","light","like","limb","limit","link","lion","liquid","list","little","live","lizard","load","loan","lobster","local","lock","logic","lonely","long","loop","lottery","loud","lounge","love","loyal","lucky","luggage","lumber","lunar","lunch","luxury","lyrics","machine","mad","magic","magnet","maid","mail","main","major","make","mammal","man","manage","mandate","mango","mansion","manual","maple","marble","march","margin","marine","market","marriage","mask","mass","master","match","material","math","matrix","matter","maximum","maze","meadow","mean","measure","meat","mechanic","medal","media","melody","melt","member","memory","mention","menu","mercy","merge","merit","merry","mesh","message","metal","method","middle","midnight","milk","million","mimic","mind","minimum","minor","minute","miracle","mirror","misery","miss","mistake","mix","mixed","mixture","mobile","model","modify","mom","moment","monitor","monkey","monster","month","moon","moral","more","morning","mosquito","mother","motion","motor","mountain","mouse","move","movie","much","muffin","mule","multiply","muscle","museum","mushroom","music","must","mutual","myself","mystery","myth","naive","name","napkin","narrow","nasty","nation","nature","near","neck","need","negative","neglect","neither","nephew","nerve","nest","net","network","neutral","never","news","next","nice","night","noble","noise","nominee","noodle","normal","north","nose","notable","nothing","notice","novel","now","nuclear","number","nurse","nut","oak","obey","object","oblige","obscure","observe","obtain","obvious","occur","ocean","october","odor","off","offer","office","often","oil","okay","old","olive","olympic","omit","once","one","onion","online","only","open","opera","opinion","oppose","option","orange","orbit","orchard","order","ordinary","organ","orient","original","orphan","ostrich","other","outdoor","outer","output","outside","oval","oven","over","own","owner","oxygen","oyster","ozone","pact","paddle","page","pair","palace","palm","panda","panel","panic","panther","paper","parade","parent","park","parrot","party","pass","patch","path","patient","patrol","pattern","pause","pave","payment","peace","peanut","pear","peasant","pelican","pen","penalty","pencil","people","pepper","perfect","permit","person","pet","phone","photo","phrase","physical","piano","picnic","picture","piece","pig","pigeon","pill","pilot","pink","pioneer","pipe","pistol","pitch","pizza","place","planet","plastic","plate","play","please","pledge","pluck","plug","plunge","poem","poet","point","polar","pole","police","pond","pony","pool","popular","portion","position","possible","post","potato","pottery","poverty","powder","power","practice","praise","predict","prefer","prepare","present","pretty","prevent","price","pride","primary","print","priority","prison","private","prize","problem","process","produce","profit","program","project","promote","proof","property","prosper","protect","proud","provide","public","pudding","pull","pulp","pulse","pumpkin","punch","pupil","puppy","purchase","purity","purpose","purse","push","put","puzzle","pyramid","quality","quantum","quarter","question","quick","quit","quiz","quote","rabbit","raccoon","race","rack","radar","radio","rage","rail","rain","raise","rally","ramp","ranch","random","range","rapid","rare","rate","rather","raven","raw","razor","ready","real","reason","rebel","rebuild","recall","receive","recipe","record","recycle","reduce","reflect","reform","region","regret","regular","reject","relax","release","relief","rely","remain","remember","remind","remove","render","renew","rent","reopen","repair","repeat","replace","report","require","rescue","resemble","resist","resource","response","result","retire","retreat","return","reunion","reveal","review","reward","rhythm","rib","ribbon","rice","rich","ride","ridge","rifle","right","rigid","ring","riot","ripple","risk","ritual","rival","river","road","roast","robot","robust","rocket","romance","roof","rookie","room","rose","rotate","rough","round","route","royal","rubber","rude","rug","rule","run","runway","rural","sad","saddle","sadness","safe","sail","salad","salmon","salon","salt","salute","same","sample","sand","satisfy","satoshi","sauce","sausage","save","say","scale","scan","scare","scatter","scene","scheme","school","science","scissors","scorpion","scout","scrap","screen","script","scrub","sea","search","season","seat","second","secret","section","security","seed","seek","segment","select","sell","seminar","senior","sense","sentence","series","service","session","settle","setup","seven","shadow","shaft","shallow","share","shed","shell","sheriff","shield","shift","shine","ship","shiver","shock","shoe","shoot","shop","short","shoulder","shove","shrimp","shrug","shuffle","shy","sibling","sick","side","siege","sight","sign","silent","silk","silly","silver","similar","simple","since","sing","siren","sister","situate","six","size","skate","sketch","ski","skill","skin","skirt","skull","slab","slam","sleep","slender","slice","slide","slight","slim","slogan","slot","slow","slush","small","smart","smile","smoke","smooth","snack","snake","snap","sniff","snow","soap","soccer","social","sock","soda","soft","solar","soldier","solid","solution","solve","someone","song","soon","sorry","sort","soul","sound","soup","source","south","space","spare","spatial","spawn","speak","special","speed","spell","spend","sphere","spice","spider","spike","spin","spirit","split","sponsor","spoon","sport","spot","spray","spread","spring","spy","square","squeeze","squirrel","stable","stadium","staff","stage","stairs","stamp","stand","start","state","stay","steak","steel","stem","step","stereo","stick","still","sting","stock","stomach","stone","stool","story","stove","strategy","street","strike","strong","struggle","student","stuff","stumble","style","subject","submit","subway","success","such","sudden","suffer","sugar","suggest","suit","summer","sun","sunny","sunset","super","supply","supreme","sure","surface","surge","surprise","surround","survey","suspect","sustain","swallow","swamp","swap","swarm","swear","sweet","swim","swing","switch","sword","symbol","symptom","syrup","system","table","tackle","tag","tail","talent","talk","tank","tape","target","task","taste","tattoo","taxi","teach","team","tell","ten","tenant","tennis","tent","term","test","text","thank","that","theme","then","theory","there","they","thing","this","thought","three","thrive","throw","thumb","thunder","ticket","tide","tiger","tilt","timber","time","tiny","tip","tired","tissue","title","toast","tobacco","today","toddler","toe","together","toilet","token","tomato","tomorrow","tone","tongue","tonight","tool","tooth","top","topic","topple","torch","tornado","tortoise","toss","total","tourist","toward","tower","town","toy","track","trade","traffic","tragic","train","transfer","trap","trash","travel","tray","treat","tree","trend","trial","tribe","trick","trigger","trim","trip","trophy","trouble","truck","true","truly","trumpet","trust","truth","try","tube","tuna","tunnel","turkey","turn","turtle","twelve","twenty","twice","twin","twist","two","type","typical","ugly","umbrella","unable","unaware","uncle","uncover","under","undo","unfair","unfold","unhappy","uniform","union","unique","unit","universe","unknown","unlock","until","unusual","unveil","update","upgrade","uphold","upon","upper","upset","urban","usage","use","used","useful","useless","usual","utility","vacant","vacuum","vague","valid","valley","valve","van","vanish","vapor","various","vast","vault","vehicle","velvet","vendor","venture","venue","verb","verify","version","very","vessel","veteran","viable","vibrant","vicious","victory","video","view","village","vintage","violin","virtual","virus","visa","visit","visual","vital","vivid","vocal","voice","void","volcano","volume","vote","voyage","wage","wagon","wait","walk","wall","walnut","want","warfare","warm","warrior","wash","wasp","waste","water","wave","way","wealth","weapon","wear","weasel","weather","web","wedding","weekend","weird","welcome","well","west","wet","whale","what","wheat","wheel","when","where","whip","whisper","wide","width","wife","wild","will","win","window","wine","wing","wink","winner","winter","wire","wisdom","wise","wish","witness","wolf","woman","wonder","wood","wool","word","work","world","worry","worth","wrap","wreck","wrestle","wrist","write","wrong","yard","year","yellow","you","young","youth","zebra","zero","zone","zoo"];
-
 function generateRandomWords(count) {
   const words = [];
-  for(let i=0; i<count; i++) { words.push(WORDLIST[Math.floor(Math.random() * 256)]); }
+  for(let i=0; i<count; i++) {
+    words.push(WORDLIST[Math.floor(Math.random() * 256)]);
+  }
   return words;
 }
 
 async function generateBackup(wordCount) {
   const myId = localStorage.getItem('zoyra_preview_id');
   const privateKey = localStorage.getItem('zoyra_private_key');
-  if (!myId || !privateKey) { showToast('Keys not ready yet.'); return; }
+  if (!myId || !privateKey) {
+    showToast('Keys not ready yet. Please wait.');
+    return;
+  }
+
   const words = generateRandomWords(wordCount);
   const key = await deriveKeyFromWords(words);
+  
   const enc = new TextEncoder();
   const iv = window.crypto.getRandomValues(new Uint8Array(12));
   const encrypted = await window.crypto.subtle.encrypt({name: "AES-GCM", iv}, key, enc.encode(privateKey));
-  await db.collection('users').doc(myId).set({ encryptedBackup: { data: arrayBufferToBase64(encrypted), iv: arrayBufferToBase64(iv) } }, {merge: true});
+  
+  await db.collection('users').doc(myId).set({
+    encryptedBackup: {
+      data: arrayBufferToBase64(encrypted),
+      iv: arrayBufferToBase64(iv)
+    }
+  }, {merge: true});
+
   localStorage.setItem('zoyra_has_backup', 'true');
   localStorage.setItem('zoyra_recovery_words', words.join(' '));
+  
   document.getElementById('recoveryCodeDisplay').textContent = words.join(' ');
   closeModal('backupOptionsModal');
   document.getElementById('recoveryModal').classList.add('show');
@@ -492,66 +478,87 @@ async function generateBackup(wordCount) {
 
 function copyRecoveryCode() {
   const code = document.getElementById('recoveryCodeDisplay').textContent;
-  if (navigator.clipboard) navigator.clipboard.writeText(code).then(() => showToast('Recovery code copied!'));
-  else showToast('Select and copy manually.');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code).then(() => showToast('Recovery code copied!'));
+  } else {
+    showToast('Select and copy manually.');
+  }
 }
 
 async function restoreFromCode() {
   const userId = document.getElementById('restoreIdInput').value.trim().toUpperCase();
   const wordsStr = document.getElementById('restoreCodeInput').value.trim().toLowerCase();
-  if (!userId || !wordsStr) { showToast('Please enter both ZOYRA ID and recovery words'); return; }
+  
+  if (!userId || !wordsStr) {
+    showToast('Please enter both ZOYRA ID and recovery words');
+    return;
+  }
+  
   const words = wordsStr.split(/\s+/).filter(w => w.length > 0);
-  if (words.length !== 12 && words.length !== 24) { showToast('Code must be exactly 12 or 24 words'); return; }
+  if (words.length !== 12 && words.length !== 24) {
+    showToast('Code must be exactly 12 or 24 words');
+    return;
+  }
+
   if (!confirm('This will replace your current keys and ID. Continue?')) return;
+
   try {
     const key = await deriveKeyFromWords(words);
     const doc = await db.collection('users').doc(userId).get();
-    if (!doc.exists || !doc.data().encryptedBackup) { showToast('No backup found for this ID.'); return; }
+    
+    if (!doc.exists || !doc.data().encryptedBackup) {
+      showToast('No backup found for this ID. Check ID and words.');
+      return;
+    }
+
     const backup = doc.data().encryptedBackup;
-    const decrypted = await window.crypto.subtle.decrypt({name: "AES-GCM", iv: base64ToArrayBuffer(backup.iv)}, key, base64ToArrayBuffer(backup.data));
+    const iv = base64ToArrayBuffer(backup.iv);
+    const encrypted = base64ToArrayBuffer(backup.data);
+    
+    const decrypted = await window.crypto.subtle.decrypt({name: "AES-GCM", iv}, key, encrypted);
+    const privateKey = new TextDecoder().decode(decrypted);
+    const publicKeyJwk = doc.data().publicKey;
+
     localStorage.setItem('zoyra_preview_id', userId);
-    localStorage.setItem('zoyra_private_key', new TextDecoder().decode(decrypted));
-    localStorage.setItem('zoyra_public_key', JSON.stringify(doc.data().publicKey));
+    localStorage.setItem('zoyra_private_key', privateKey);
+    localStorage.setItem('zoyra_public_key', JSON.stringify(publicKeyJwk));
     localStorage.setItem('zoyra_has_backup', 'true');
+
     closeModal('restoreModal');
     showToast('✅ ID and keys restored successfully!');
+    
     setTimeout(() => location.reload(), 1500);
-  } catch (e) { console.error(e); showToast('❌ Failed to restore.'); }
+  } catch (e) {
+    console.error('Restore failed:', e);
+    showToast('❌ Failed to restore. Check words and ID.');
+  }
 }
 
 window.resetKeys = async function() {
-  const isPremium = localStorage.getItem('zoyra_is_premium') === 'true';
   let resetCount = parseInt(localStorage.getItem('zoyra_reset_count') || '0');
-  if (!isPremium && resetCount >= 2) { showToast('⚠️ Free limit reached. Upgrade to Premium!'); showPremiumModal(); return; }
-  if(!confirm('Reset encryption keys? Old messages may not decrypt.')) return;
-  const myId = localStorage.getItem('zoyra_preview_id');
-  if(myId) db.collection('users').doc(myId).update({ encryptedBackup: firebase.firestore.FieldValue.delete() }).catch(()=>{});
-  localStorage.removeItem('zoyra_private_key'); localStorage.removeItem('zoyra_public_key'); localStorage.removeItem('zoyra_preview_id');
-  localStorage.removeItem('zoyra_has_backup'); localStorage.removeItem('zoyra_recovery_words');
-  sentMessagesCache = {}; saveSentCache();
-  if (!isPremium) { resetCount++; localStorage.setItem('zoyra_reset_count', resetCount.toString()); }
-  encStatus.textContent = "Resetting..."; 
-  await generateAndSaveKeys(); 
-  showToast('Keys reset successfully' + (isPremium ? ' (Premium)' : ` (${resetCount}/2)`));
-};
-
-// ===== NEW: DELETE ACCOUNT =====
-window.deleteAccount = async function() {
-  if(!confirm('⚠️ This will permanently delete your account, keys, and all data. This cannot be undone. Continue?')) return;
-  if(!confirm('Are you absolutely sure? Your ZOYRA ID will be lost forever.')) return;
-  
-  const myId = localStorage.getItem('zoyra_preview_id');
-  if (myId) {
-    try {
-      await db.collection('users').doc(myId).delete();
-      await db.collection('users').doc(myId).collection('inbox').get().then(s => s.forEach(d => d.ref.delete()));
-      await db.collection('users').doc(myId).collection('callHistory').get().then(s => s.forEach(d => d.ref.delete()));
-    } catch(e) { console.error(e); }
+  if (resetCount >= 2) {
+    showToast('⚠️ Free limit reached (2/2). Reset requires Premium.');
+    return;
   }
   
-  localStorage.clear();
-  showToast('Account deleted. Generating new ID...');
-  setTimeout(() => location.reload(), 1500);
+  if(!confirm('Reset encryption keys? Old messages may not decrypt. Your backup will also be deleted.')) return;
+  const myId = localStorage.getItem('zoyra_preview_id');
+  if(myId) db.collection('users').doc(myId).update({ encryptedBackup: firebase.firestore.FieldValue.delete() }).catch(()=>{});
+  
+  localStorage.removeItem('zoyra_private_key'); 
+  localStorage.removeItem('zoyra_public_key'); 
+  localStorage.removeItem('zoyra_preview_id');
+  localStorage.removeItem('zoyra_has_backup');
+  localStorage.removeItem('zoyra_recovery_words');
+  sentMessagesCache = {}; 
+  saveSentCache();
+  
+  resetCount++;
+  localStorage.setItem('zoyra_reset_count', resetCount.toString());
+  
+  encStatus.textContent = "Resetting..."; 
+  await generateAndSaveKeys(); 
+  showToast('Keys reset successfully (' + resetCount + '/2 free resets used)');
 };
 
 async function uploadPublicKey() {
@@ -560,14 +567,14 @@ async function uploadPublicKey() {
     const publicKeyJwk = JSON.parse(localStorage.getItem('zoyra_public_key'));
     await db.collection('users').doc(myId).set({ publicKey: publicKeyJwk, isOnline: true, lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
     encStatus.textContent = "Active & Secure 🔐";
-  } catch (error) { console.error(error); encStatus.textContent = "Network Error"; }
+  } catch (error) { console.error("Key upload failed:", error); encStatus.textContent = "Network Error"; }
 }
 
 window.addEventListener('beforeunload', () => { const myId = localStorage.getItem('zoyra_preview_id'); if(myId) db.collection('users').doc(myId).update({ isOnline: false, lastSeen: firebase.firestore.FieldValue.serverTimestamp() }); });
 
 async function getPrivateKey() { const jwk = JSON.parse(localStorage.getItem('zoyra_private_key')); return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["decrypt"]); }
 async function getPublicKeyFromDB(targetId, maxRetries = 5) {
-  for (let i = 0; i < maxRetries; i++) { try { const doc = await db.collection('users').doc(targetId).get(); if (doc.exists && doc.data().publicKey) { const jwk = doc.data().publicKey; return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["encrypt"]); } } catch (e) { console.error(e); } await new Promise(resolve => setTimeout(resolve, 1500)); } return null;
+  for (let i = 0; i < maxRetries; i++) { try { const doc = await db.collection('users').doc(targetId).get(); if (doc.exists && doc.data().publicKey) { const jwk = doc.data().publicKey; return await window.crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["encrypt"]); } } catch (e) { console.error(`Retry ${i+1} failed:`, e); } await new Promise(resolve => setTimeout(resolve, 1500)); } return null;
 }
 async function encryptMessage(text, publicKey) { const encoded = new TextEncoder().encode(text); const encrypted = await window.crypto.subtle.encrypt({ name: "RSA-OAEP" }, publicKey, encoded); return arrayBufferToBase64(encrypted); }
 async function decryptMessage(base64Cipher, privateKey) { const cipherBuffer = base64ToArrayBuffer(base64Cipher); const decrypted = await window.crypto.subtle.decrypt({ name: "RSA-OAEP" }, privateKey, cipherBuffer); return new TextDecoder().decode(decrypted); }
@@ -577,9 +584,14 @@ function makeId(){ const a=new Uint32Array(12); if(window.crypto && crypto.getRa
 function initId(){ let id=localStorage.getItem('zoyra_preview_id'); if(!id){id=makeId();localStorage.setItem('zoyra_preview_id',id)} document.getElementById('userId').textContent=id; document.getElementById('displayName').value=localStorage.getItem('zoyra_display_name')||''; }
 
 function saveProfile(){ 
-  const field=document.getElementById('displayName'); const name=field.value.trim(); 
+  const field=document.getElementById('displayName'); 
+  const name=field.value.trim(); 
   if(!name){showToast('Please enter a display name.');field.focus();return;} 
-  localStorage.setItem('zoyra_display_name',name); loadProfile(); showToast('Profile saved.'); 
+  localStorage.setItem('zoyra_display_name',name); 
+  document.getElementById('profileDisplayName').textContent = name;
+  document.getElementById('profileEditSection').style.display = 'none';
+  document.getElementById('profileDisplaySection').style.display = 'block';
+  showToast('Profile saved.'); 
 }
 
 function editProfile() {
@@ -588,7 +600,7 @@ function editProfile() {
   document.getElementById('displayName').value = localStorage.getItem('zoyra_display_name') || '';
 }
 
-function copyId(){ const id=document.getElementById('userId').textContent; if(navigator.clipboard) navigator.clipboard.writeText(id).then(()=>showToast('ID copied.')).catch(()=>showToast('Select and copy manually.')); else showToast('Select and copy manually.'); }
+function copyId(){ const id=document.getElementById('userId').textContent; if(navigator.clipboard) navigator.clipboard.writeText(id).then(()=>showToast('ID copied.')).catch(()=>showToast('Select and copy manually.')); else showToast('Select and copy your ID manually.'); }
 
 function go(id,btn){ 
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); 
@@ -601,137 +613,275 @@ function go(id,btn){
     document.getElementById('chatList').style.display = 'block';
     document.getElementById('chatRoom').style.display = 'none';
   }
-  if (id === 'contacts') { document.getElementById('contactsFab').style.display = 'grid'; renderContacts(); } 
-  else { document.getElementById('contactsFab').style.display = 'none'; }
+  if (id === 'contacts') {
+    document.getElementById('contactsFab').style.display = 'grid';
+    renderContacts();
+  } else {
+    document.getElementById('contactsFab').style.display = 'none';
+  }
   if (id === 'calls') { renderCallHistory(); }
 }
 
 function showToast(message){ const el=document.getElementById('toast'); el.textContent=message;el.classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>el.classList.remove('show'),3000); }
 function playNotificationSound(){ try { const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain(); oscillator.connect(gainNode); gainNode.connect(audioCtx.destination); oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.15); } catch(e) {} }
 
-let ringtoneCtx = null, ringtoneInterval = null;
+let ringtoneCtx = null;
+let ringtoneInterval = null;
 function startRingtone() {
   try {
     ringtoneCtx = new (window.AudioContext || window.webkitAudioContext)();
     let ringCount = 0;
+    const maxRings = 30;
+    
     function playRing() {
-      if (ringCount >= 30) { stopRingtone(); return; }
-      const osc = ringtoneCtx.createOscillator(); const gain = ringtoneCtx.createGain();
-      osc.connect(gain); gain.connect(ringtoneCtx.destination);
+      if (ringCount >= maxRings) { stopRingtone(); return; }
+      const osc = ringtoneCtx.createOscillator();
+      const gain = ringtoneCtx.createGain();
+      osc.connect(gain);
+      gain.connect(ringtoneCtx.destination);
       osc.frequency.setValueAtTime(440, ringtoneCtx.currentTime);
       osc.frequency.setValueAtTime(480, ringtoneCtx.currentTime + 0.4);
       gain.gain.setValueAtTime(0.2, ringtoneCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, ringtoneCtx.currentTime + 0.8);
-      osc.start(ringtoneCtx.currentTime); osc.stop(ringtoneCtx.currentTime + 0.8);
+      osc.start(ringtoneCtx.currentTime);
+      osc.stop(ringtoneCtx.currentTime + 0.8);
       ringCount++;
     }
-    playRing(); ringtoneInterval = setInterval(playRing, 1500);
-  } catch(e) { console.error(e); }
+    
+    playRing();
+    ringtoneInterval = setInterval(playRing, 1500);
+  } catch(e) { console.error('Ringtone error:', e); }
 }
+
 function stopRingtone() {
-  if (ringtoneInterval) { clearInterval(ringtoneInterval); ringtoneInterval = null; }
-  if (ringtoneCtx) { ringtoneCtx.close().catch(()=>{}); ringtoneCtx = null; }
+  if (ringtoneInterval) {
+    clearInterval(ringtoneInterval);
+    ringtoneInterval = null;
+  }
+  if (ringtoneCtx) {
+    ringtoneCtx.close().catch(()=>{});
+    ringtoneCtx = null;
+  }
 }
 
 function readContacts(){ try{const v=JSON.parse(localStorage.getItem('zoyra_contacts')||'[]');return Array.isArray(v)?v:[];}catch(e){return [];} }
 
-// ===== CHAT LIST WITH LONG PRESS =====
+function renderContacts(){
+  const list=document.getElementById('contactList');if(!list)return; const contacts=readContacts();list.replaceChildren();
+  if(contacts.length===0){ const empty=document.createElement('div');empty.className='empty'; empty.innerHTML='<div class="symbol">👥</div><strong>No contacts added</strong><p>Tap + to add your first contact.</p>'; list.appendChild(empty);return; }
+  contacts.forEach((contact,index)=>{
+    const row=document.createElement('div');row.className='item';
+    const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent=(contact.name||contact.id).slice(0,1).toUpperCase();
+    const main=document.createElement('div');main.className='itemmain'; 
+    const strong=document.createElement('strong');strong.textContent=contact.name||'ZOYRA contact'; 
+    const small=document.createElement('small');small.textContent=contact.id; 
+    main.append(strong,small);
+    
+    row.addEventListener('click', (e) => {
+      if (e.target.tagName === 'BUTTON') return;
+      openChatFromContacts(contact.id);
+    });
+    
+    const remove=document.createElement('button');remove.className='btn ghost';remove.textContent='Remove';remove.style.padding='8px 10px';remove.style.fontSize='12px';
+    remove.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      if(confirm(`Are you sure you want to remove "${contact.name || contact.id}" from your contacts?`)) {
+        const c=readContacts();c.splice(index,1);localStorage.setItem('zoyra_contacts',JSON.stringify(c));renderContacts();showToast('Contact removed.');
+      }
+    });
+    row.append(avatar,main,remove);list.appendChild(row);
+  });
+}
+
+function showAddContactModal() {
+  document.getElementById('modalContactName').value = '';
+  document.getElementById('modalContactId').value = '';
+  document.getElementById('addContactModal').classList.add('show');
+}
+
+function addContactFromModal() {
+  const id = document.getElementById('modalContactId').value.trim().toUpperCase();
+  const name = document.getElementById('modalContactName').value.trim();
+  if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(id)){showToast('Enter ID in format ZY-XXXX-XXXX-XXXX.');return;}
+  if(id===localStorage.getItem('zoyra_preview_id')){showToast('You cannot add your own ID.');return;}
+  const contacts=readContacts(); if(contacts.some(c=>c.id===id)){showToast('ID already in contacts.');return;}
+  contacts.push({id,name}); localStorage.setItem('zoyra_contacts',JSON.stringify(contacts));
+  closeModal('addContactModal');
+  renderContacts();
+  showToast('Contact saved.');
+}
+
+function openChatFromContacts(contactId) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('chats').classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.querySelector('[data-screen="chats"]').classList.add('active');
+  window.scrollTo(0,0);
+  document.getElementById('contactsFab').style.display = 'none';
+  openChat(contactId);
+}
+
+function addContact(){
+  const id=document.getElementById('contactId').value.trim().toUpperCase(); const name=document.getElementById('contactName').value.trim();
+  if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(id)){showToast('Enter ID in format ZY-XXXX-XXXX-XXXX.');return;}
+  if(id===localStorage.getItem('zoyra_preview_id')){showToast('You cannot add your own ID.');return;}
+  const contacts=readContacts(); if(contacts.some(c=>c.id===id)){showToast('ID already in contacts.');return;}
+  contacts.push({id,name}); localStorage.setItem('zoyra_contacts',JSON.stringify(contacts));
+  document.getElementById('contactId').value='';document.getElementById('contactName').value=''; renderContacts();showToast('Contact saved.');
+}
+function getChatId(id1,id2){return [id1,id2].sort().join('|');}
+let activeChatId=null; let unsubscribeMessages=null; let unsubscribeTyping=null; let unsubscribeStatus=null; let unsubscribeInbox=null; let lastMsgCount = 0;
+
+function listenForInbox() {
+  if(unsubscribeInbox) unsubscribeInbox();
+  const myId = localStorage.getItem('zoyra_preview_id');
+  if(!myId) return;
+  
+  const inboxRef = db.collection('users').doc(myId).collection('inbox').orderBy('timestamp','desc');
+  
+  unsubscribeInbox = inboxRef.onSnapshot(async (snapshot) => {
+    const requestsList = document.getElementById('requestsList');
+    const requestsSection = document.getElementById('requestsSection');
+    const requestsCount = document.getElementById('requestsCount');
+    const navBadge = document.getElementById('navBadge');
+    const contacts = readContacts();
+    
+    let requestCount = 0;
+    requestsList.replaceChildren();
+    
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const reqId = doc.id;
+      const senderId = data.senderId;
+      
+      const isSavedContact = contacts.some(c => c.id === senderId);
+      
+      if (isSavedContact) {
+        if (activeChatId !== senderId) {
+          playNotificationSound();
+          showToast(`New message from ${data.senderName || senderId}`);
+          unreadMessages[senderId] = (unreadMessages[senderId] || 0) + 1;
+          renderChats();
+        }
+        db.collection('users').doc(myId).collection('inbox').doc(reqId).delete().catch(e => console.error(e));
+        return;
+      }
+      
+      requestCount++;
+      const item = document.createElement('div');
+      item.className = 'request-item';
+      
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = (data.senderName || senderId || '?').slice(0,1).toUpperCase();
+      
+      const info = document.createElement('div');
+      info.className = 'req-info';
+      const nameEl = document.createElement('strong');
+      nameEl.textContent = data.senderName || 'Unknown';
+      const idEl = document.createElement('small');
+      idEl.textContent = senderId;
+      info.append(nameEl, idEl);
+      
+      const actions = document.createElement('div');
+      actions.className = 'request-actions';
+      
+      const acceptBtn = document.createElement('button');
+      acceptBtn.className = 'req-accept';
+      acceptBtn.textContent = '✓ Accept';
+      acceptBtn.onclick = () => acceptRequest(senderId, data.senderName, data.chatId, reqId);
+      
+      const blockBtn = document.createElement('button');
+      blockBtn.className = 'req-block';
+      blockBtn.textContent = '✕ Block';
+      blockBtn.onclick = () => blockRequest(reqId, senderId);
+      
+      actions.append(acceptBtn, blockBtn);
+      item.append(avatar, info, actions);
+      requestsList.appendChild(item);
+    });
+    
+    if (requestCount > 0) {
+      requestsSection.style.display = 'block';
+      requestsCount.textContent = `${requestCount} new`;
+      navBadge.textContent = requestCount;
+      navBadge.style.display = 'block';
+    } else {
+      requestsSection.style.display = 'none';
+      navBadge.style.display = 'none';
+    }
+  });
+}
+
+async function acceptRequest(senderId, senderName, chatId, reqId) {
+  const myId = localStorage.getItem('zoyra_preview_id');
+  const contacts = readContacts();
+  if(!contacts.some(c => c.id === senderId)) {
+    contacts.push({ id: senderId, name: senderName || '' });
+    localStorage.setItem('zoyra_contacts', JSON.stringify(contacts));
+  }
+  await db.collection('users').doc(myId).collection('inbox').doc(reqId).delete();
+  showToast('Contact accepted! Opening chat...');
+  renderContacts();
+  renderChats();
+  openChat(senderId);
+}
+
+async function blockRequest(reqId, senderId) {
+  const myId = localStorage.getItem('zoyra_preview_id');
+  if(!confirm(`Block messages from ${senderId}?`)) return;
+  const blocked = JSON.parse(localStorage.getItem('zoyra_blocked') || '[]');
+  if(!blocked.includes(senderId)) {
+    blocked.push(senderId);
+    localStorage.setItem('zoyra_blocked', JSON.stringify(blocked));
+  }
+  await db.collection('users').doc(myId).collection('inbox').doc(reqId).delete();
+  showToast('User blocked.');
+}
+
 function renderChats(){
   const list=document.getElementById('chatList');if(!list)return; const contacts=readContacts();list.replaceChildren();
   if(contacts.length===0){ const empty=document.createElement('div');empty.className='empty'; empty.innerHTML='<div class="symbol">💬</div><strong>No conversations yet</strong><p>Add a contact or accept a request.</p>'; list.appendChild(empty);return; }
   contacts.forEach(c=>{
-    const row=document.createElement('div');row.className='item';row.style.cssText='width:100%;text-align:left;color:inherit;background:transparent;border:0;border-bottom:1px solid #ffffff12;';
+    const row=document.createElement('button');row.className='item';row.style.cssText='width:100%;text-align:left;color:inherit;background:transparent;border:0;border-bottom:1px solid #ffffff12;cursor:pointer';
     const av=document.createElement('div');av.className='avatar';av.textContent=(c.name||c.id).slice(0,1).toUpperCase();
+    
     const main=document.createElement('div');main.className='itemmain';
+    
     const topRow = document.createElement('div');
     topRow.style.display = 'flex'; topRow.style.justifyContent = 'space-between'; topRow.style.alignItems = 'center';
     const name=document.createElement('strong');name.textContent=c.name||c.id;
+    
     if(unreadMessages[c.id] && unreadMessages[c.id] > 0) {
       const badge = document.createElement('span');
       badge.textContent = unreadMessages[c.id];
       badge.style.cssText = 'background:var(--danger);color:#fff;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:bold;';
       topRow.append(name, badge);
-    } else { topRow.appendChild(name); }
+    } else {
+      topRow.appendChild(name);
+    }
+    
     const preview=document.createElement('small');preview.textContent='Tap to open chat';
     main.append(topRow, preview);
     row.append(av,main);
-    
-    // Long press logic
-    let pressTimer = null;
-    const startPress = (e) => {
-      e.preventDefault();
-      pressTimer = setTimeout(() => showChatLongPressMenu(c.id, c.name), 800);
-    };
-    const cancelPress = () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
-    
-    row.addEventListener('mousedown', startPress);
-    row.addEventListener('touchstart', startPress, {passive: false});
-    row.addEventListener('mouseup', cancelPress);
-    row.addEventListener('mouseleave', cancelPress);
-    row.addEventListener('touchend', cancelPress);
-    row.addEventListener('touchmove', cancelPress);
-    row.addEventListener('click', (e) => { if (!pressTimer) openChat(c.id); else openChat(c.id); });
-    
-    list.appendChild(row);
+    row.addEventListener('click',()=>openChat(c.id));list.appendChild(row);
   });
 }
 
-function showChatLongPressMenu(contactId, contactName) {
-  const content = document.getElementById('longPressMenuContent');
-  content.innerHTML = `
-    <h3>${contactName || contactId}</h3>
-    <p style="font-size:12px;color:var(--muted)">${contactId}</p>
-    <div class="menu-item danger" onclick="deleteChatFromList('${contactId}')">
-      <div class="ico">🗑️</div>
-      <div><strong>Delete Chat</strong><small>Remove all messages</small></div>
-    </div>
-    <div class="menu-item danger" onclick="blockFromList('${contactId}')">
-      <div class="ico">🚫</div>
-      <div><strong>Block User</strong><small>Block messages</small></div>
-    </div>
-    <div class="menu-item" onclick="closeModal('longPressMenuModal')">
-      <div class="ico">✕</div>
-      <div><strong>Cancel</strong></div>
-    </div>
-  `;
-  document.getElementById('longPressMenuModal').classList.add('show');
-}
-
-async function deleteChatFromList(contactId) {
-  if (!confirm(`Delete entire chat with ${contactId}?`)) return;
-  const myId = localStorage.getItem('zoyra_preview_id');
-  const chatId = getChatId(myId, contactId);
-  try {
-    const snapshot = await db.collection('chats').doc(chatId).collection('messages').get();
-    const batch = db.batch();
-    snapshot.forEach(doc => batch.delete(doc.ref));
-    await batch.commit();
-    delete sentMessagesCache[chatId];
-    saveSentCache();
-    showToast('Chat deleted.');
-    closeModal('longPressMenuModal');
-    renderChats();
-  } catch(e) { console.error(e); showToast('Failed to delete.'); }
-}
-
-function blockFromList(contactId) {
-  if (!confirm(`Block ${contactId}?`)) return;
-  const blocked = JSON.parse(localStorage.getItem('zoyra_blocked') || '[]');
-  if(!blocked.includes(contactId)) { blocked.push(contactId); localStorage.setItem('zoyra_blocked', JSON.stringify(blocked)); }
-  showToast('User blocked.');
-  closeModal('longPressMenuModal');
-}
-
-function startChat(){ const id=prompt('Enter the ZOYRA ID:'); if(!id)return; const clean=id.trim().toUpperCase(); if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(clean)){showToast('Invalid ID format.');return;} const contacts=readContacts(); if(!contacts.some(c=>c.id===clean)){ contacts.push({id:clean,name:''}); localStorage.setItem('zoyra_contacts',JSON.stringify(contacts)); renderContacts(); } openChat(clean); }
+function startChat(){ const id=prompt('Enter the ZOYRA ID of the person you want to chat with:'); if(!id)return; const clean=id.trim().toUpperCase(); if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(clean)){showToast('Invalid ID format.');return;} const contacts=readContacts(); if(!contacts.some(c=>c.id===clean)){ contacts.push({id:clean,name:''}); localStorage.setItem('zoyra_contacts',JSON.stringify(contacts)); renderContacts(); } openChat(clean); }
 
 function openChat(id){
   const contact=readContacts().find(c=>c.id===id);if(!contact){showToast('Contact not found.');return;}
-  activeChatId=id; lastMsgCount = 0; unreadMessages[id] = 0; renderChats();
+  activeChatId=id; lastMsgCount = 0; 
+  
+  unreadMessages[id] = 0;
+  renderChats();
+  
   document.getElementById('chatList').style.display = 'none';
   document.getElementById('startChatBtn').style.display = 'none';
+  
   document.getElementById('chatRoom').style.display='block';
-  document.getElementById('chatTitle').textContent=contact.name||'ZOYRA contact'; 
-  document.getElementById('chatSubtitle').textContent=id;
+  document.getElementById('chatTitle').textContent=contact.name||'ZOYRA contact'; document.getElementById('chatSubtitle').textContent=id;
   document.getElementById('chatAvatar').textContent=(contact.name||id).slice(0,1).toUpperCase();
   document.getElementById('messageInput').value=''; renderMessages(); listenForTyping(); listenForStatus(); document.getElementById('messageInput').focus();
 }
@@ -741,6 +891,7 @@ function closeChat(){
   document.getElementById('chatRoom').style.display='none'; 
   document.getElementById('chatList').style.display = 'block';
   document.getElementById('startChatBtn').style.display = 'block';
+  
   if(unsubscribeMessages){unsubscribeMessages();unsubscribeMessages=null;} 
   if(unsubscribeTyping){unsubscribeTyping();unsubscribeTyping=null;} 
   if(unsubscribeStatus){unsubscribeStatus();unsubscribeStatus=null;} 
@@ -748,32 +899,38 @@ function closeChat(){
   renderChats(); 
 }
 
-function showChatMenu() { document.getElementById('chatMenuModal').classList.add('show'); }
+function showChatMenu() {
+  document.getElementById('chatMenuModal').classList.add('show');
+}
 
 async function deleteCurrentChat() {
   if (!activeChatId) return;
-  if (!confirm(`Delete entire chat with ${activeChatId}?`)) return;
+  if (!confirm(`Delete entire chat with ${activeChatId}? This cannot be undone.`)) return;
+  
   const myId = localStorage.getItem('zoyra_preview_id');
   const chatId = getChatId(myId, activeChatId);
+  
   try {
     const snapshot = await db.collection('chats').doc(chatId).collection('messages').get();
     const batch = db.batch();
-    snapshot.forEach(doc => batch.delete(doc.ref));
+    snapshot.forEach(doc => { batch.delete(doc.ref); });
     await batch.commit();
-    sentMessagesCache = {}; saveSentCache();
+    sentMessagesCache = {};
+    saveSentCache();
     showToast('Chat deleted.');
-    closeModal('chatMenuModal');
     closeChat();
-  } catch (e) { console.error(e); showToast('Failed.'); }
+  } catch (e) { console.error(e); showToast('Failed to delete chat.'); }
 }
 
 function blockCurrentContact() {
   if (!activeChatId) return;
-  if (!confirm(`Block ${activeChatId}?`)) return;
+  if (!confirm(`Block ${activeChatId}? You will no longer receive messages from them.`)) return;
   const blocked = JSON.parse(localStorage.getItem('zoyra_blocked') || '[]');
-  if(!blocked.includes(activeChatId)) { blocked.push(activeChatId); localStorage.setItem('zoyra_blocked', JSON.stringify(blocked)); }
+  if(!blocked.includes(activeChatId)) {
+    blocked.push(activeChatId);
+    localStorage.setItem('zoyra_blocked', JSON.stringify(blocked));
+  }
   showToast('User blocked.');
-  closeModal('chatMenuModal');
   closeChat();
 }
 
@@ -788,7 +945,7 @@ document.getElementById('messageInput').addEventListener('input', () => {
   if(!activeChatId) return; const myId = localStorage.getItem('zoyra_preview_id'); const chatId = getChatId(myId, activeChatId);
   const typingRef = db.collection('chats').doc(chatId).collection('typing').doc(myId);
   typingRef.set({ isTyping: true, timestamp: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-  clearTimeout(typingTimeout); typingTimeout = setTimeout(() => typingRef.set({ isTyping: false }), 2000);
+  clearTimeout(typingTimeout); typingTimeout = setTimeout(() => { typingRef.set({ isTyping: false }); }, 2000);
 });
 
 async function renderMessages(){
@@ -800,52 +957,67 @@ async function renderMessages(){
     if(!snapshot.empty && snapshot.size > lastMsgCount && lastMsgCount !== 0) { const lastDoc = snapshot.docs[snapshot.docs.length - 1]; if(lastDoc.data().senderId !== myId) playNotificationSound(); }
     lastMsgCount = snapshot.size;
     for (const doc of snapshot.docs) {
-      const m = doc.data(); const msgId = doc.id; const isMine = m.senderId === myId; const msg = document.createElement('div'); msg.className = 'msg ' + (isMine ? 'mine' : 'theirs'); 
-      const body = document.createElement('div');
-      if (isMine && sentMessagesCache[msgId]) { body.textContent = sentMessagesCache[msgId]; } 
-      else if (m.isEncrypted && m.text) { try { body.textContent = await decryptMessage(m.text, myPrivateKey); } catch (err) { body.textContent = '[Decryption Failed]'; } } 
-      else { body.textContent = '[Blocked]'; }
+      const m = doc.data(); const msgId = doc.id; const isMine = m.senderId === myId; const msg = document.createElement('div'); msg.className = 'msg ' + (isMine ? 'mine' : 'theirs'); const body = document.createElement('div');
+      if (isMine && sentMessagesCache[msgId]) { body.textContent = sentMessagesCache[msgId]; } else if (m.isEncrypted && m.text) { try { const decryptedText = await decryptMessage(m.text, myPrivateKey); body.textContent = decryptedText; } catch (err) { body.textContent = '[Decryption Failed]'; } } else { body.textContent = '[Blocked: Unencrypted]'; }
       msg.appendChild(body); 
       const meta=document.createElement('div');meta.className='msg-meta'; 
       const stamp=document.createElement('span');stamp.className='msg-time'; 
       if(m.timestamp && m.timestamp.toDate) stamp.textContent=new Date(m.timestamp.toDate()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); 
       else stamp.textContent='sending...';
+      
       if (isMine) {
         const ticks = document.createElement('span');
         const status = m.status || 'sent';
         ticks.className = 'msg-ticks ' + status;
-        ticks.textContent = (status === 'read' || status === 'delivered') ? '✓✓' : '✓';
-        meta.appendChild(stamp); meta.appendChild(ticks);
-      } else { meta.appendChild(stamp); }
+        if (status === 'read') {
+          ticks.textContent = '✓✓';
+        } else if (status === 'delivered') {
+          ticks.textContent = '✓✓';
+        } else {
+          ticks.textContent = '✓';
+        }
+        meta.appendChild(stamp);
+        meta.appendChild(ticks);
+      } else {
+        meta.appendChild(stamp);
+      }
+      
       if(isMine){ const delBtn=document.createElement('button');delBtn.className='msg-del';delBtn.innerHTML='🗑️'; delBtn.addEventListener('click',()=>deleteMessage(chatId, msgId)); meta.appendChild(delBtn); }
       msg.appendChild(meta);box.appendChild(msg);
     } box.scrollTop=box.scrollHeight;
   },(err)=>{ console.error(err); });
 }
-window.deleteMessage = function(chatId, msgId) { if(!confirm('Delete this message?')) return; db.collection('chats').doc(chatId).collection('messages').doc(msgId).delete().then(()=> { delete sentMessagesCache[msgId]; saveSentCache(); showToast('Deleted.'); }).catch((e)=> showToast('Failed.')); };
+window.deleteMessage = function(chatId, msgId) { if(!confirm('Delete this message?')) return; db.collection('chats').doc(chatId).collection('messages').doc(msgId).delete().then(()=> { delete sentMessagesCache[msgId]; saveSentCache(); showToast('Message deleted.'); }).catch((e)=> showToast('Failed to delete.')); };
 
 async function sendMessage(){
   if(!activeChatId)return; const input=document.getElementById('messageInput'); const text=input.value.trim(); if(!text){showToast('Write a message first.');return;}
   const myId=localStorage.getItem('zoyra_preview_id'); const chatId=getChatId(myId,activeChatId);
   db.collection('chats').doc(chatId).collection('typing').doc(myId).set({ isTyping: false });
-  showToast('Encrypting... 🔒');
+  showToast('Fetching key & Encrypting... 🔒');
   try {
-    const friendPublicKey = await getPublicKeyFromDB(activeChatId, 5); if (!friendPublicKey) { showToast('❌ Friend\'s key not found!'); return; }
+    const friendPublicKey = await getPublicKeyFromDB(activeChatId, 5); if (!friendPublicKey) { showToast('❌ Friend\'s key not found! Ask them to open the app.'); return; }
     const encryptedText = await encryptMessage(text, friendPublicKey);
     const docRef = await db.collection('chats').doc(chatId).collection('messages').add({ text: encryptedText, isEncrypted: true, senderId: myId, status: 'sent', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
     sentMessagesCache[docRef.id] = text; saveSentCache();
+    
     const myName = localStorage.getItem('zoyra_display_name') || 'Anonymous';
-    await db.collection('users').doc(activeChatId).collection('inbox').doc(docRef.id).set({ chatId, senderId: myId, senderName: myName, text: encryptedText, isEncrypted: true, status: 'sent', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast('Sent! 🔐'); input.value='';
-  } catch(e) { console.error(e); showToast('Failed.'); }
+    await db.collection('users').doc(activeChatId).collection('inbox').doc(docRef.id).set({
+      chatId: chatId, senderId: myId, senderName: myName, text: encryptedText, isEncrypted: true, status: 'sent', timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Sent securely! 🔐'); input.value='';
+  } catch(e) { console.error(e); showToast('Failed to send.'); }
 }
 document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
-// ===== CALLING WITH AUDIO UI FIX =====
 let localStream, remoteStream, peerConnection; 
-const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }]}; 
+const servers = { iceServers: [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:stun2.l.google.com:19302' }
+]}; 
 let callListener = null; let callTimerInterval; let callStartTime = 0; let currentCallType = 'video';
-let pendingIncomingCall = null; let callPollingInterval = null;
+let pendingIncomingCall = null;
+let callPollingInterval = null;
 
 async function startCall(type = 'video') {
   if (!activeChatId) return; 
@@ -856,52 +1028,107 @@ async function startCall(type = 'video') {
   currentCallType = type;
   
   try {
-    showToast(`Requesting ${type === 'audio' ? 'Microphone' : 'Camera'}...`); 
+    showToast(`Requesting ${type === 'audio' ? 'Microphone' : 'Camera & Mic'}...`); 
     localStream = await navigator.mediaDevices.getUserMedia(type === 'audio' ? { audio: true } : { video: true, audio: true });
-    
-    // FIX: Hide local video for audio calls
-    document.getElementById('localVideo').style.display = type === 'audio' ? 'none' : 'block';
     document.getElementById('localVideo').srcObject = localStream; 
     document.getElementById('callOverlay').style.display = 'flex';
     document.getElementById('callControlsIncoming').style.display = 'none';
     document.getElementById('callControlsActive').style.display = 'flex';
     document.getElementById('callStatusText').textContent = 'Calling...'; 
-    callStartTime = Date.now(); startCallTimer();
+    callStartTime = Date.now(); 
+    startCallTimer();
     
     peerConnection = new RTCPeerConnection(servers); 
     localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-    peerConnection.onicecandidate = event => { if (event.candidate) db.collection('calls').doc(chatId).collection('ice').add({ candidate: event.candidate.toJSON(), sender: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); };
+    peerConnection.onicecandidate = event => { if (event.candidate) { db.collection('calls').doc(chatId).collection('ice').add({ candidate: event.candidate.toJSON(), sender: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); } };
     peerConnection.ontrack = event => { document.getElementById('remoteVideo').srcObject = event.streams[0]; document.getElementById('callStatusText').textContent = 'Connected'; };
     
-    const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer);
-    await db.collection('calls').doc(chatId).set({ offer: { type: offer.type, sdp: offer.sdp }, caller: myId, callee: activeChatId, callType: type, status: 'offering', handled: false, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    const offer = await peerConnection.createOffer(); 
+    await peerConnection.setLocalDescription(offer);
+    await db.collection('calls').doc(chatId).set({ 
+      offer: { type: offer.type, sdp: offer.sdp }, 
+      caller: myId, 
+      callee: activeChatId, 
+      callType: type, 
+      status: 'offering', 
+      handled: false,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+    });
     
     callListener = db.collection('calls').doc(chatId).onSnapshot(async doc => { 
       const data = doc.data(); 
-      if (data && data.status === 'answering' && data.answer && !peerConnection.currentRemoteDescription) await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer)); 
-      if (data && data.status === 'ended') endCallUI(); 
+      if (data && data.status === 'answering' && data.answer && !peerConnection.currentRemoteDescription) { 
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer)); 
+      } 
+      if (data && data.status === 'ended') { endCallUI(); } 
     });
-    db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added' && change.doc.data().sender !== myId) peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data().candidate)).catch(e => console.error(e)); }); });
-    setTimeout(() => { if (peerConnection && document.getElementById('callStatusText').textContent === 'Calling...') { showToast('No answer.'); endCall(); } }, 45000);
-  } catch (err) { console.error(err); showToast('Access denied.'); endCallUI(); }
+    
+    db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { 
+      snapshot.docChanges().forEach(change => { 
+        if (change.type === 'added') { 
+          const data = change.doc.data(); 
+          if (data.sender !== myId) { 
+            peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e)); 
+          } 
+        } 
+      }); 
+    });
+    
+    setTimeout(() => {
+      if (peerConnection && document.getElementById('callStatusText').textContent === 'Calling...') {
+        showToast('No answer. Call cancelled.');
+        endCall();
+      }
+    }, 45000);
+    
+  } catch (err) { console.error(err); showToast('Camera/Mic access denied or error.'); endCallUI(); }
 }
 
 function listenForIncomingCalls() {
-  const myId = localStorage.getItem('zoyra_preview_id'); if (!myId) return;
-  db.collection('calls').where('callee', '==', myId).where('status', '==', 'offering').onSnapshot(snapshot => {
-    snapshot.docChanges().forEach(change => {
-      if (change.type === 'added' && !change.doc.data().handled) {
-        handleIncomingCall(change.doc.id, change.doc.data());
-        change.doc.ref.update({ handled: true }).catch(()=>{});
-      }
+  const myId = localStorage.getItem('zoyra_preview_id'); 
+  if (!myId) return;
+  
+  const listener = db.collection('calls')
+    .where('callee', '==', myId)
+    .where('status', '==', 'offering')
+    .onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const callData = change.doc.data();
+          if (!callData.handled) {
+            handleIncomingCall(change.doc.id, callData);
+            change.doc.ref.update({ handled: true }).catch(()=>{});
+          }
+        }
+      });
     });
-  });
+  
+  callPollingInterval = setInterval(async () => {
+    try {
+      const snapshot = await db.collection('calls')
+        .where('callee', '==', myId)
+        .where('status', '==', 'offering')
+        .get();
+      
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (!data.handled && !pendingIncomingCall) {
+          handleIncomingCall(doc.id, data);
+          doc.ref.update({ handled: true }).catch(()=>{});
+        }
+      });
+    } catch(e) { console.error('Polling error:', e); }
+  }, 3000);
 }
 
 function handleIncomingCall(chatId, callData) {
   if (pendingIncomingCall) return;
-  const callerId = callData.caller; const callType = callData.callType || 'video';
-  const contact = readContacts().find(c=>c.id===callerId); const callerName = contact?.name || callerId;
+  
+  const callerId = callData.caller;
+  const callType = callData.callType || 'video';
+  const contact = readContacts().find(c=>c.id===callerId);
+  const callerName = contact?.name || callerId;
+  
   pendingIncomingCall = { chatId, callData, callerId, callType, callerName };
   
   document.getElementById('callAvatar').textContent = callerName.slice(0,1).toUpperCase();
@@ -909,84 +1136,150 @@ function handleIncomingCall(chatId, callData) {
   document.getElementById('callControlsIncoming').style.display = 'flex';
   document.getElementById('callControlsActive').style.display = 'none';
   document.getElementById('callOverlay').style.display = 'flex';
+  
   startRingtone();
-  setTimeout(() => { if (pendingIncomingCall && pendingIncomingCall.chatId === chatId) rejectIncomingCall(); }, 30000);
+  
+  setTimeout(() => {
+    if (pendingIncomingCall && pendingIncomingCall.chatId === chatId) {
+      rejectIncomingCall();
+    }
+  }, 30000);
 }
 
 function acceptIncomingCall() {
   if (!pendingIncomingCall) return;
+  
   stopRingtone();
+  
   const { chatId, callData, callerId, callType } = pendingIncomingCall;
   const myId = localStorage.getItem('zoyra_preview_id');
-  activeChatId = callerId; currentCallType = callType;
   
-  // FIX: Hide local video for audio calls
-  document.getElementById('localVideo').style.display = callType === 'audio' ? 'none' : 'block';
+  activeChatId = callerId;
+  currentCallType = callType;
+  
   document.getElementById('callControlsIncoming').style.display = 'none';
   document.getElementById('callControlsActive').style.display = 'flex';
   document.getElementById('callStatusText').textContent = 'Connecting...';
-  callStartTime = Date.now(); startCallTimer();
+  callStartTime = Date.now();
+  startCallTimer();
   
   navigator.mediaDevices.getUserMedia(callType === 'audio' ? { audio: true } : { video: true, audio: true })
     .then(stream => {
       localStream = stream;
       document.getElementById('localVideo').srcObject = localStream;
+      
       peerConnection = new RTCPeerConnection(servers);
       localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-      peerConnection.onicecandidate = event => { if (event.candidate) db.collection('calls').doc(chatId).collection('ice').add({ candidate: event.candidate.toJSON(), sender: myId, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); };
-      peerConnection.ontrack = event => { document.getElementById('remoteVideo').srcObject = event.streams[0]; document.getElementById('callStatusText').textContent = 'Connected'; };
+      
+      peerConnection.onicecandidate = event => { 
+        if (event.candidate) { 
+          db.collection('calls').doc(chatId).collection('ice').add({ 
+            candidate: event.candidate.toJSON(), 
+            sender: myId, 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+          }); 
+        } 
+      };
+      peerConnection.ontrack = event => { 
+        document.getElementById('remoteVideo').srcObject = event.streams[0]; 
+        document.getElementById('callStatusText').textContent = 'Connected'; 
+      };
       
       peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer))
-        .then(() => peerConnection.createAnswer())
+        .then(() => {
+          return peerConnection.createAnswer();
+        })
         .then((answer) => {
-          return peerConnection.setLocalDescription(answer).then(() => db.collection('calls').doc(chatId).update({ answer: { type: answer.type, sdp: answer.sdp }, status: 'answering' }));
+          return peerConnection.setLocalDescription(answer).then(() => {
+            return db.collection('calls').doc(chatId).update({ 
+              answer: { type: answer.type, sdp: answer.sdp }, 
+              status: 'answering' 
+            });
+          });
         })
         .catch(err => { console.error(err); endCallUI(); });
       
-      callListener = db.collection('calls').doc(chatId).onSnapshot(doc => { if (doc.data().status === 'ended') endCallUI(); });
-      db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added' && change.doc.data().sender !== myId) peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data().candidate)).catch(e => console.error(e)); }); });
+      callListener = db.collection('calls').doc(chatId).onSnapshot(doc => { 
+        if (doc.data().status === 'ended') endCallUI(); 
+      });
+      
+      db.collection('calls').doc(chatId).collection('ice').onSnapshot(snapshot => { 
+        snapshot.docChanges().forEach(change => { 
+          if (change.type === 'added') { 
+            const data = change.doc.data(); 
+            if (data.sender !== myId) { 
+              peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e)); 
+            } 
+          } 
+        }); 
+      });
+      
       pendingIncomingCall = null;
     })
-    .catch(err => { console.error(err); showToast('Access denied'); endCallUI(); });
+    .catch(err => { 
+      console.error(err); 
+      showToast('Camera/Mic access denied'); 
+      endCallUI(); 
+    });
 }
 
 function rejectIncomingCall() {
   if (!pendingIncomingCall) return;
+  
   stopRingtone();
+  
   const { chatId, callerId, callType } = pendingIncomingCall;
   const myId = localStorage.getItem('zoyra_preview_id');
+  
   db.collection('calls').doc(chatId).update({ status: 'ended' }).catch(()=>{});
   saveCallHistory(callerId, callType, 'missed', 0, myId);
   saveCallHistory(myId, callType, 'missed', 0, callerId);
-  pendingIncomingCall = null; endCallUI();
+  
+  pendingIncomingCall = null;
+  endCallUI();
 }
 
 function startCallTimer() { let seconds = 0; const timerEl = document.getElementById('callTimer'); clearInterval(callTimerInterval); callTimerInterval = setInterval(() => { seconds++; const m = Math.floor(seconds / 60).toString().padStart(2, '0'); const s = (seconds % 60).toString().padStart(2, '0'); timerEl.textContent = `${m}:${s}`; }, 1000); }
 function toggleMute() { if (localStream) { const audioTrack = localStream.getAudioTracks()[0]; if (audioTrack) { audioTrack.enabled = !audioTrack.enabled; showToast(audioTrack.enabled ? 'Unmuted' : 'Muted'); } } }
 function endCall() { 
-  const myId = localStorage.getItem('zoyra_preview_id'); const chatId = activeChatId ? getChatId(myId, activeChatId) : null; 
-  if (chatId) { db.collection('calls').doc(chatId).update({ status: 'ended' }).catch(e=>{}); db.collection('calls').doc(chatId).collection('ice').get().then(snap => snap.forEach(doc => doc.ref.delete())); } 
+  const myId = localStorage.getItem('zoyra_preview_id'); 
+  const chatId = activeChatId ? getChatId(myId, activeChatId) : null; 
+  if (chatId) { 
+    db.collection('calls').doc(chatId).update({ status: 'ended' }).catch(e=>{}); 
+    db.collection('calls').doc(chatId).collection('ice').get().then(snap => { snap.forEach(doc => doc.ref.delete()); }); 
+  } 
   const duration = Math.floor((Date.now() - callStartTime) / 1000);
-  if (activeChatId) { saveCallHistory(myId, currentCallType, 'outgoing', duration, activeChatId); saveCallHistory(activeChatId, currentCallType, 'incoming', duration, myId); }
+  if (activeChatId) {
+    saveCallHistory(myId, currentCallType, 'outgoing', duration, activeChatId);
+    saveCallHistory(activeChatId, currentCallType, 'incoming', duration, myId);
+  }
   endCallUI(); 
 }
 function endCallUI() { 
-  stopRingtone(); clearInterval(callTimerInterval); 
+  stopRingtone();
+  clearInterval(callTimerInterval); 
   if (peerConnection) peerConnection.close(); 
   if (localStream) localStream.getTracks().forEach(track => track.stop()); 
   if (callListener) callListener(); 
   document.getElementById('callOverlay').style.display = 'none'; 
-  document.getElementById('remoteVideo').srcObject = null; document.getElementById('localVideo').srcObject = null; 
+  document.getElementById('remoteVideo').srcObject = null; 
+  document.getElementById('localVideo').srcObject = null; 
   document.getElementById('callTimer').textContent = '00:00'; 
-  peerConnection = null; localStream = null; showToast('Call Ended'); 
+  peerConnection = null; 
+  localStream = null; 
+  showToast('Call Ended'); 
 }
 
 async function saveCallHistory(userId, callType, callStatus, duration, contactId) {
   const contact = readContacts().find(c => c.id === contactId);
-  try { await db.collection('users').doc(userId).collection('callHistory').add({ contactId, contactName: contact?.name || contactId, callType, callStatus, duration, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); } catch(e) { console.error(e); }
+  const contactName = contact?.name || contactId;
+  try {
+    await db.collection('users').doc(userId).collection('callHistory').add({
+      contactId: contactId, contactName: contactName, callType: callType, callStatus: callStatus, duration: duration, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) { console.error('Failed to save call history:', e); }
 }
 
-// ===== CALL HISTORY WITH LONG PRESS DELETE =====
 let selectedCallHistory = null;
 
 function renderCallHistory() {
@@ -1001,60 +1294,33 @@ function renderCallHistory() {
     }
     snapshot.forEach(doc => {
       const data = doc.data();
-      const item = document.createElement('div'); item.className = 'call-history-item';
+      const item = document.createElement('div'); 
+      item.className = 'call-history-item';
+      item.onclick = () => showCallActionMenu(data.contactId, data.contactName, data.callType);
       
-      // Long press for delete
-      let pressTimer = null;
-      const startPress = (e) => { e.preventDefault(); pressTimer = setTimeout(() => showCallLongPressMenu(doc.id, data.contactName || data.contactId), 800); };
-      const cancelPress = () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
-      item.addEventListener('mousedown', startPress);
-      item.addEventListener('touchstart', startPress, {passive: false});
-      item.addEventListener('mouseup', cancelPress);
-      item.addEventListener('mouseleave', cancelPress);
-      item.addEventListener('touchend', cancelPress);
-      item.addEventListener('touchmove', cancelPress);
-      item.addEventListener('click', () => showCallActionMenu(data.contactId, data.contactName, data.callType));
+      const avatar = document.createElement('div'); 
+      avatar.className = 'avatar'; 
+      avatar.textContent = (data.contactName || '?').slice(0,1).toUpperCase();
       
-      const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = (data.contactName || '?').slice(0,1).toUpperCase();
-      const info = document.createElement('div'); info.className = 'call-info-text';
-      const name = document.createElement('strong'); name.textContent = data.contactName || data.contactId;
+      const info = document.createElement('div'); 
+      info.className = 'call-info-text';
+      const name = document.createElement('strong'); 
+      name.textContent = data.contactName || data.contactId;
       const details = document.createElement('small');
       const typeIcon = data.callType === 'audio' ? '📞' : '📹';
       const statusText = data.callStatus === 'incoming' ? 'Incoming' : data.callStatus === 'outgoing' ? 'Outgoing' : 'Missed';
       const durationText = data.duration > 0 ? ` ${Math.floor(data.duration/60)}:${(data.duration%60).toString().padStart(2,'0')}` : '';
       details.textContent = `${typeIcon} ${statusText}${durationText}`;
       info.append(name, details);
-      const icon = document.createElement('div'); icon.className = `call-icon ${data.callStatus}`; icon.textContent = data.callStatus === 'incoming' ? '↙' : data.callStatus === 'outgoing' ? '↗' : '✕';
-      item.append(avatar, info, icon); list.appendChild(item);
+      
+      const icon = document.createElement('div'); 
+      icon.className = `call-icon ${data.callStatus}`; 
+      icon.textContent = data.callStatus === 'incoming' ? '↙' : data.callStatus === 'outgoing' ? '↗' : '✕';
+      
+      item.append(avatar, info, icon); 
+      list.appendChild(item);
     });
-  }).catch(err => console.error(err));
-}
-
-function showCallLongPressMenu(docId, contactName) {
-  const content = document.getElementById('longPressMenuContent');
-  content.innerHTML = `
-    <h3>${contactName}</h3>
-    <div class="menu-item danger" onclick="deleteCallRecord('${docId}')">
-      <div class="ico">🗑️</div>
-      <div><strong>Delete Call Record</strong><small>Remove from history</small></div>
-    </div>
-    <div class="menu-item" onclick="closeModal('longPressMenuModal')">
-      <div class="ico">✕</div>
-      <div><strong>Cancel</strong></div>
-    </div>
-  `;
-  document.getElementById('longPressMenuModal').classList.add('show');
-}
-
-async function deleteCallRecord(docId) {
-  if (!confirm('Delete this call record?')) return;
-  const myId = localStorage.getItem('zoyra_preview_id');
-  try {
-    await db.collection('users').doc(myId).collection('callHistory').doc(docId).delete();
-    showToast('Call record deleted.');
-    closeModal('longPressMenuModal');
-    renderCallHistory();
-  } catch(e) { console.error(e); showToast('Failed.'); }
+  }).catch(err => { console.error('Failed to load call history:', err); });
 }
 
 function showCallActionMenu(contactId, contactName, callType) {
@@ -1065,130 +1331,56 @@ function showCallActionMenu(contactId, contactName, callType) {
 }
 
 function callBackFromHistory() {
-  if (!selectedCallHistory) return; closeModal('callActionModal');
+  if (!selectedCallHistory) return;
+  closeModal('callActionModal');
+  
   const contacts = readContacts();
-  if (!contacts.some(c => c.id === selectedCallHistory.contactId)) { contacts.push({ id: selectedCallHistory.contactId, name: selectedCallHistory.contactName }); localStorage.setItem('zoyra_contacts', JSON.stringify(contacts)); }
+  if (!contacts.some(c => c.id === selectedCallHistory.contactId)) {
+    contacts.push({ id: selectedCallHistory.contactId, name: selectedCallHistory.contactName });
+    localStorage.setItem('zoyra_contacts', JSON.stringify(contacts));
+  }
+  
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('chats').classList.add('active');
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
   document.querySelector('[data-screen="chats"]').classList.add('active');
+  
   openChat(selectedCallHistory.contactId);
-  setTimeout(() => startCall(selectedCallHistory.callType || 'video'), 500);
+  
+  setTimeout(() => {
+    startCall(selectedCallHistory.callType || 'video');
+  }, 500);
 }
 
 function openChatFromHistory() {
-  if (!selectedCallHistory) return; closeModal('callActionModal');
+  if (!selectedCallHistory) return;
+  closeModal('callActionModal');
+  
   const contacts = readContacts();
-  if (!contacts.some(c => c.id === selectedCallHistory.contactId)) { contacts.push({ id: selectedCallHistory.contactId, name: selectedCallHistory.contactName }); localStorage.setItem('zoyra_contacts', JSON.stringify(contacts)); }
+  if (!contacts.some(c => c.id === selectedCallHistory.contactId)) {
+    contacts.push({ id: selectedCallHistory.contactId, name: selectedCallHistory.contactName });
+    localStorage.setItem('zoyra_contacts', JSON.stringify(contacts));
+  }
+  
   openChatFromContacts(selectedCallHistory.contactId);
 }
 
 function viewContactFromHistory() {
-  if (!selectedCallHistory) return; closeModal('callActionModal');
+  if (!selectedCallHistory) return;
+  closeModal('callActionModal');
   showToast(`Contact: ${selectedCallHistory.contactName || 'Unknown'}\nID: ${selectedCallHistory.contactId}`);
 }
 
-function renderContacts(){
-  const list=document.getElementById('contactList');if(!list)return; const contacts=readContacts();list.replaceChildren();
-  if(contacts.length===0){ const empty=document.createElement('div');empty.className='empty'; empty.innerHTML='<div class="symbol">👥</div><strong>No contacts added</strong><p>Tap + to add your first contact.</p>'; list.appendChild(empty);return; }
-  contacts.forEach((contact,index)=>{
-    const row=document.createElement('div');row.className='item';
-    const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent=(contact.name||contact.id).slice(0,1).toUpperCase();
-    const main=document.createElement('div');main.className='itemmain'; 
-    const strong=document.createElement('strong');strong.textContent=contact.name||'ZOYRA contact'; 
-    const small=document.createElement('small');small.textContent=contact.id; 
-    main.append(strong,small);
-    row.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') return; openChatFromContacts(contact.id); });
-    const remove=document.createElement('button');remove.className='btn ghost';remove.textContent='Remove';remove.style.padding='8px 10px';remove.style.fontSize='12px';
-    remove.addEventListener('click',(e)=>{
-      e.stopPropagation();
-      if(confirm(`Remove "${contact.name || contact.id}"?`)) { const c=readContacts();c.splice(index,1);localStorage.setItem('zoyra_contacts',JSON.stringify(c));renderContacts();showToast('Removed.'); }
-    });
-    row.append(avatar,main,remove);list.appendChild(row);
-  });
-}
-
-function showAddContactModal() { document.getElementById('modalContactName').value = ''; document.getElementById('modalContactId').value = ''; document.getElementById('addContactModal').classList.add('show'); }
-function addContactFromModal() {
-  const id = document.getElementById('modalContactId').value.trim().toUpperCase(); const name = document.getElementById('modalContactName').value.trim();
-  if(!/^ZY-(?:[A-HJ-NP-Z2-9]{4}-){2}[A-HJ-NP-Z2-9]{4}$/.test(id)){showToast('Invalid ID format.');return;}
-  if(id===localStorage.getItem('zoyra_preview_id')){showToast('Cannot add own ID.');return;}
-  const contacts=readContacts(); if(contacts.some(c=>c.id===id)){showToast('Already in contacts.');return;}
-  contacts.push({id,name}); localStorage.setItem('zoyra_contacts',JSON.stringify(contacts));
-  closeModal('addContactModal'); renderContacts(); showToast('Contact saved.');
-}
-
-function openChatFromContacts(contactId) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('chats').classList.add('active');
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-  document.querySelector('[data-screen="chats"]').classList.add('active');
-  window.scrollTo(0,0);
-  document.getElementById('contactsFab').style.display = 'none';
-  openChat(contactId);
-}
-
-function listenForInbox() {
-  if(unsubscribeInbox) unsubscribeInbox();
-  const myId = localStorage.getItem('zoyra_preview_id'); if(!myId) return;
-  const inboxRef = db.collection('users').doc(myId).collection('inbox').orderBy('timestamp','desc');
-  unsubscribeInbox = inboxRef.onSnapshot(async (snapshot) => {
-    const requestsList = document.getElementById('requestsList');
-    const requestsSection = document.getElementById('requestsSection');
-    const requestsCount = document.getElementById('requestsCount');
-    const navBadge = document.getElementById('navBadge');
-    const contacts = readContacts();
-    let requestCount = 0; requestsList.replaceChildren();
-    snapshot.forEach(doc => {
-      const data = doc.data(); const reqId = doc.id; const senderId = data.senderId;
-      const isSavedContact = contacts.some(c => c.id === senderId);
-      if (isSavedContact) {
-        if (activeChatId !== senderId) { playNotificationSound(); showToast(`New message from ${data.senderName || senderId}`); unreadMessages[senderId] = (unreadMessages[senderId] || 0) + 1; renderChats(); }
-        db.collection('users').doc(myId).collection('inbox').doc(reqId).delete().catch(e => console.error(e));
-        return;
-      }
-      requestCount++;
-      const item = document.createElement('div'); item.className = 'request-item';
-      const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = (data.senderName || senderId || '?').slice(0,1).toUpperCase();
-      const info = document.createElement('div'); info.className = 'req-info';
-      const nameEl = document.createElement('strong'); nameEl.textContent = data.senderName || 'Unknown';
-      const idEl = document.createElement('small'); idEl.textContent = senderId;
-      info.append(nameEl, idEl);
-      const actions = document.createElement('div'); actions.className = 'request-actions';
-      const acceptBtn = document.createElement('button'); acceptBtn.className = 'req-accept'; acceptBtn.textContent = '✓ Accept'; acceptBtn.onclick = () => acceptRequest(senderId, data.senderName, data.chatId, reqId);
-      const blockBtn = document.createElement('button'); blockBtn.className = 'req-block'; blockBtn.textContent = '✕ Block'; blockBtn.onclick = () => blockRequest(reqId, senderId);
-      actions.append(acceptBtn, blockBtn); item.append(avatar, info, actions); requestsList.appendChild(item);
-    });
-    if (requestCount > 0) { requestsSection.style.display = 'block'; requestsCount.textContent = `${requestCount} new`; navBadge.textContent = requestCount; navBadge.style.display = 'block'; } 
-    else { requestsSection.style.display = 'none'; navBadge.style.display = 'none'; }
-  });
-}
-
-async function acceptRequest(senderId, senderName, chatId, reqId) {
-  const myId = localStorage.getItem('zoyra_preview_id'); const contacts = readContacts();
-  if(!contacts.some(c => c.id === senderId)) { contacts.push({ id: senderId, name: senderName || '' }); localStorage.setItem('zoyra_contacts', JSON.stringify(contacts)); }
-  await db.collection('users').doc(myId).collection('inbox').doc(reqId).delete();
-  showToast('Accepted!'); renderContacts(); renderChats(); openChat(senderId);
-}
-
-async function blockRequest(reqId, senderId) {
-  const myId = localStorage.getItem('zoyra_preview_id');
-  if(!confirm(`Block ${senderId}?`)) return;
-  const blocked = JSON.parse(localStorage.getItem('zoyra_blocked') || '[]');
-  if(!blocked.includes(senderId)) { blocked.push(senderId); localStorage.setItem('zoyra_blocked', JSON.stringify(blocked)); }
-  await db.collection('users').doc(myId).collection('inbox').doc(reqId).delete();
-  showToast('Blocked.');
-}
-
 function showBackupOptions() {
-  if (!localStorage.getItem('zoyra_private_key')) { showToast('Keys not ready.'); return; }
+  if (!localStorage.getItem('zoyra_private_key')) { showToast('Keys not ready yet.'); return; }
+  
   const existingWords = localStorage.getItem('zoyra_recovery_words');
   if (existingWords) {
     document.getElementById('recoveryCodeDisplay').textContent = existingWords;
     document.getElementById('recoveryModalText').textContent = 'This is your existing recovery code. Keep it safe.';
     document.getElementById('recoveryModal').classList.add('show');
   } else {
-    document.getElementById('recoveryModalText').textContent = 'Write these words down in order.';
+    document.getElementById('recoveryModalText').textContent = 'Write these words down in order and keep them safe.';
     document.getElementById('backupOptionsModal').classList.add('show');
   }
 }
@@ -1200,29 +1392,27 @@ function showRestoreModal() {
 }
 
 async function shareApp() {
-  const shareData = { title: 'ZOYRA - Private Chat', text: 'Check out ZOYRA — a private encrypted chat app!', url: 'https://zoya992.github.io/ZOYRA_App/' };
-  if (navigator.share) { try { await navigator.share(shareData); } catch (err) {} } 
-  else { if (navigator.clipboard) { navigator.clipboard.writeText(shareData.url).then(() => showToast('Link copied!')); } else { showToast('Copy: ' + shareData.url); } }
-}
-
-function showPremiumModal() {
-  const isPremium = localStorage.getItem('zoyra_is_premium') === 'true';
-  const content = document.getElementById('premiumModalContent');
-  if (isPremium) {
-    content.innerHTML = `<h3 style="color:var(--gold)">👑 You are Premium!</h3><p>Enjoy your benefits:</p><ul class="premium-features-list"><li>✅ Unlimited Key Resets</li><li>✅ Gold PRO Badge</li><li>✅ Priority Support</li></ul><button class="btn ghost full" onclick="closeModal('premiumModal')">Close</button>`;
+  const shareData = {
+    title: 'ZOYRA - Private Chat',
+    text: 'Check out ZOYRA — a private encrypted chat app with no phone number required!',
+    url: 'https://zoya992.github.io/ZOYRA_App/'
+  };
+  
+  if (navigator.share) {
+    try {
+      await navigator.share(shareData);
+    } catch (err) {
+      console.error('Share failed:', err);
+    }
   } else {
-    content.innerHTML = `<h3 style="color:var(--gold)">👑 ZOYRA Premium</h3><p>Unlock full power:</p><ul class="premium-features-list"><li>✅ Unlimited Key Resets</li><li>✅ Gold PRO Badge</li><li>✅ Priority Support</li></ul><h2 style="color:var(--warn); margin:10px 0; text-align:center">₹199/month</h2><button class="btn warn full" onclick="processPremiumUpgrade()">Upgrade Now</button><button class="btn ghost full" style="margin-top:8px" onclick="closeModal('premiumModal')">Later</button>`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareData.url).then(() => {
+        showToast('Link copied! Share it with your friends.');
+      });
+    } else {
+      showToast('Copy this link: ' + shareData.url);
+    }
   }
-  document.getElementById('premiumModal').classList.add('show');
-}
-
-function processPremiumUpgrade() {
-  showToast('Processing...');
-  setTimeout(() => {
-    localStorage.setItem('zoyra_is_premium', 'true');
-    showToast('🎉 Welcome to Premium!');
-    showPremiumModal(); checkPremiumStatus(); loadProfile();
-  }, 1500);
 }
 
 function closeModal(modalId) { document.getElementById(modalId).classList.remove('show'); }
