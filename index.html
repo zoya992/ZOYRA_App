@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0b1020" id="themeColorMeta">
 <title>ZOYRA — Private conversations</title>
 <style>
-:root{--bg:#0b1020;--panel:#121b30;--panel2:#18243c;--line:#263552;--text:#f4f7ff;--muted:#9eacc5;--accent:#829cff;--accent2:#a8b8ff;--green:#57d6a0;--danger:#ff7e88;--warn:#ffb84d;--gold:#ffd700}
+:root{--bg:#0b1020;--panel:#121b30;--panel2:#18243c;--line:#263552;--text:#f4f7ff;--muted:#9eacc5;--accent:#829cff;--accent2:#a8b8ff;--green:#57d6a0;--danger:#ff7e88;--warn:#ffb84d}
 body.light-theme{--bg:#f4f7ff;--panel:#ffffff;--panel2:#eef2ff;--line:#d1d9e6;--text:#10182c;--muted:#5a6b8c;--accent:#4a6cf7;--accent2:#627df0;--green:#10b981;--danger:#ef4444;--warn:#f59e0b}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#24365d 0%,var(--bg) 54%);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;transition:background 0.3s, color 0.3s}
 body.light-theme{background:radial-gradient(ellipse at 50% -15%,#e0e7ff 0%,var(--bg) 54%)}
@@ -48,8 +48,6 @@ body.light-theme .msg.theirs{background:#f1f5f9;color:#10182c}
 body.light-theme .msg-time{color:#5a6b8c}
 .msg-del{background:none;border:none;color:#ff7e88;cursor:pointer;font-size:14px;padding:2px 5px;border-radius:6px;opacity:0.7;transition:0.2s}
 .msg-del:hover{opacity:1;background:#ffffff15}
-.msg-image{max-width:100%;border-radius:8px;margin-top:5px;cursor:pointer}
-.msg-audio{width:100%;margin-top:5px;border-radius:8px}
 footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#e8edff;color:#111a2c;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:10;max-width:90%;text-align:center}.toast.show{opacity:1}
 .typing-indicator{display:none;padding:10px 13px;background:#1a2b4b;border-radius:14px;border-bottom-left-radius:3px;width:fit-content;margin-bottom:8px;animation:msgPop 0.3s}
@@ -110,21 +108,18 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 .menu-item small{display:block;color:var(--muted);font-size:11px}
 .menu-item.danger strong{color:var(--danger)}
 .profile-display{display:flex;align-items:center;justify-content:space-between;padding:12px;background:#0e1729;border-radius:12px;margin-top:12px}
-.profile-name{font-size:18px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.profile-name{font-size:18px;font-weight:700;color:var(--text)}
 .edit-btn{background:none;border:1px solid var(--accent);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer}
 .edit-btn:hover{background:var(--accent);color:#10182c}
 .trust-text{text-align:center;padding:16px;color:var(--muted);font-size:13px;line-height:1.6}
 .trust-text .icon{font-size:24px;margin-bottom:8px}
-.premium-badge{background:linear-gradient(135deg,#ffd700,#f59e0b);color:#10182c;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:0.5px}
-.premium-features-list{text-align:left;color:var(--muted);font-size:13px;margin-bottom:16px;padding-left:20px}
-.premium-features-list li{margin-bottom:8px}
 @media(min-width:560px){body{padding:20px 0}.app{border:1px solid #1c2a45;border-radius:26px;overflow:hidden;min-height:calc(100vh - 40px);background:#0b1020}.nav{max-width:520px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
 </style>
 </head>
 <body>
 <div class="app">
 <header>
-  <div class="brand"><div class="logo">Z</div>ZOYRA <span id="premiumBadge" class="premium-badge" style="display:none">PRO</span></div>
+  <div class="brand"><div class="logo">Z</div>ZOYRA</div>
   <div style="display:flex;align-items:center;gap:12px">
     <div class="status"><i class="dot"></i> E2EE SECURE</div>
     <button id="themeToggle" class="theme-btn" title="Toggle Theme">🌙</button>
@@ -190,13 +185,7 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
     <div id="messageList" style="min-height:200px;max-height:50vh;overflow:auto;margin:16px 0;padding:8px;background:#0e1729;border-radius:12px;border:1px solid var(--line)"></div>
     <div id="typingIndicator" class="typing-indicator"><span></span><span></span><span></span></div>
     <label class="field" for="messageInput">Message</label>
-    <div class="actions" style="align-items:center">
-      <button class="btn ghost" style="flex:0 0 auto;padding:10px;font-size:18px" onclick="document.getElementById('imageInput').click()" title="Send Photo">📷</button>
-      <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
-      <input id="messageInput" class="fieldinput" maxlength="1000" placeholder="Write a message…" style="min-width:0;flex:1">
-      <button class="btn ghost" id="micBtn" style="flex:0 0 auto;padding:10px;font-size:18px" onmousedown="startRecording()" onmouseup="stopRecording()" ontouchstart="startRecording()" ontouchend="stopRecording()" title="Hold for Voice Note">🎤</button>
-      <button class="btn" style="flex:0 0 auto" onclick="sendMessage()">Send</button>
-    </div>
+    <div class="actions"><input id="messageInput" class="fieldinput" maxlength="1000" placeholder="Write a message…" style="min-width:0"><button class="btn" style="flex:0 0 auto" onclick="sendMessage()">Send</button></div>
   </div>
 </section>
 
@@ -220,10 +209,6 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
 <section id="settings" class="screen">
   <div class="eyebrow">Your preferences</div><h1>Settings</h1><p class="sub">Control your ZOYRA experience.</p>
   <div class="card">
-    <div class="feature" onclick="showPremiumModal()" style="background:linear-gradient(90deg, #3d2817, #17243d); border-radius:12px; margin-bottom:8px">
-      <div class="ico" style="font-size:24px">👑</div>
-      <div><strong style="color:var(--gold)">ZOYRA Premium</strong><small>Unlock unlimited resets & gold badge</small></div>
-    </div>
     <div class="feature" onclick="showBackupOptions()">
       <div class="ico">🔑</div>
       <div><strong>Backup & Recovery Code</strong><small>View or generate your recovery code</small></div>
@@ -234,7 +219,7 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
     </div>
     <div class="feature" onclick="resetKeys()">
       <div class="ico">🔄</div>
-      <div><strong>Reset encryption keys</strong><small id="resetLimitText">Free users: max 2 resets.</small></div>
+      <div><strong>Reset encryption keys</strong><small>Free users: max 2 resets. Further resets require Premium.</small></div>
     </div>
     <div class="feature" onclick="shareApp()">
       <div class="ico">📤</div>
@@ -361,12 +346,6 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
   </div>
 </div>
 
-<div class="modal-overlay" id="premiumModal">
-  <div class="modal" id="premiumModalContent">
-    <!-- Content injected via JS -->
-  </div>
-</div>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
@@ -411,7 +390,6 @@ async function generateAndSaveKeys() {
     await uploadPublicKey(); 
     checkRecoveryCode();
     loadProfile();
-    checkPremiumStatus();
     return; 
   }
   try {
@@ -425,27 +403,15 @@ async function generateAndSaveKeys() {
     await uploadPublicKey();
     checkRecoveryCode();
     loadProfile();
-    checkPremiumStatus();
   } catch (error) { console.error("Key generation failed:", error); encStatus.textContent = "Failed to generate keys"; }
 }
 
 function loadProfile() {
   const savedName = localStorage.getItem('zoyra_display_name');
-  const isPremium = localStorage.getItem('zoyra_is_premium') === 'true';
   if (savedName) {
-    let nameHtml = savedName;
-    if (isPremium) nameHtml += ' <span class="premium-badge">PRO</span>';
-    document.getElementById('profileDisplayName').innerHTML = nameHtml;
+    document.getElementById('profileDisplayName').textContent = savedName;
     document.getElementById('profileEditSection').style.display = 'none';
     document.getElementById('profileDisplaySection').style.display = 'block';
-  }
-}
-
-function checkPremiumStatus() {
-  const isPremium = localStorage.getItem('zoyra_is_premium') === 'true';
-  document.getElementById('premiumBadge').style.display = isPremium ? 'inline-block' : 'none';
-  if (isPremium) {
-    document.getElementById('resetLimitText').textContent = 'Premium: Unlimited resets';
   }
 }
 
@@ -569,12 +535,9 @@ async function restoreFromCode() {
 }
 
 window.resetKeys = async function() {
-  const isPremium = localStorage.getItem('zoyra_is_premium') === 'true';
   let resetCount = parseInt(localStorage.getItem('zoyra_reset_count') || '0');
-  
-  if (!isPremium && resetCount >= 2) {
-    showToast('⚠️ Free limit reached. Upgrade to Premium!');
-    showPremiumModal();
+  if (resetCount >= 2) {
+    showToast('⚠️ Free limit reached (2/2). Reset requires Premium.');
     return;
   }
   
@@ -590,14 +553,12 @@ window.resetKeys = async function() {
   sentMessagesCache = {}; 
   saveSentCache();
   
-  if (!isPremium) {
-    resetCount++;
-    localStorage.setItem('zoyra_reset_count', resetCount.toString());
-  }
+  resetCount++;
+  localStorage.setItem('zoyra_reset_count', resetCount.toString());
   
   encStatus.textContent = "Resetting..."; 
   await generateAndSaveKeys(); 
-  showToast('Keys reset successfully' + (isPremium ? ' (Premium)' : ` (${resetCount}/2 free resets used)`));
+  showToast('Keys reset successfully (' + resetCount + '/2 free resets used)');
 };
 
 async function uploadPublicKey() {
@@ -627,7 +588,9 @@ function saveProfile(){
   const name=field.value.trim(); 
   if(!name){showToast('Please enter a display name.');field.focus();return;} 
   localStorage.setItem('zoyra_display_name',name); 
-  loadProfile();
+  document.getElementById('profileDisplayName').textContent = name;
+  document.getElementById('profileEditSection').style.display = 'none';
+  document.getElementById('profileDisplaySection').style.display = 'block';
   showToast('Profile saved.'); 
 }
 
@@ -994,22 +957,8 @@ async function renderMessages(){
     if(!snapshot.empty && snapshot.size > lastMsgCount && lastMsgCount !== 0) { const lastDoc = snapshot.docs[snapshot.docs.length - 1]; if(lastDoc.data().senderId !== myId) playNotificationSound(); }
     lastMsgCount = snapshot.size;
     for (const doc of snapshot.docs) {
-      const m = doc.data(); const msgId = doc.id; const isMine = m.senderId === myId; const msg = document.createElement('div'); msg.className = 'msg ' + (isMine ? 'mine' : 'theirs'); 
-      const body = document.createElement('div');
-      
-      if (isMine && sentMessagesCache[msgId]) { 
-        if (m.type === 'image') body.innerHTML = `<img src="${sentMessagesCache[msgId]}" class="msg-image" onclick="window.open(this.src)">`;
-        else if (m.type === 'audio') body.innerHTML = `<audio controls class="msg-audio" src="${sentMessagesCache[msgId]}"></audio>`;
-        else body.textContent = sentMessagesCache[msgId]; 
-      } else if (m.isEncrypted && m.text) { 
-        try { 
-          const decryptedText = await decryptMessage(m.text, myPrivateKey); 
-          if (m.type === 'image') body.innerHTML = `<img src="${decryptedText}" class="msg-image" onclick="window.open(this.src)">`;
-          else if (m.type === 'audio') body.innerHTML = `<audio controls class="msg-audio" src="${decryptedText}"></audio>`;
-          else body.textContent = decryptedText; 
-        } catch (err) { body.textContent = '[Decryption Failed]'; } 
-      } else { body.textContent = '[Blocked: Unencrypted]'; }
-      
+      const m = doc.data(); const msgId = doc.id; const isMine = m.senderId === myId; const msg = document.createElement('div'); msg.className = 'msg ' + (isMine ? 'mine' : 'theirs'); const body = document.createElement('div');
+      if (isMine && sentMessagesCache[msgId]) { body.textContent = sentMessagesCache[msgId]; } else if (m.isEncrypted && m.text) { try { const decryptedText = await decryptMessage(m.text, myPrivateKey); body.textContent = decryptedText; } catch (err) { body.textContent = '[Decryption Failed]'; } } else { body.textContent = '[Blocked: Unencrypted]'; }
       msg.appendChild(body); 
       const meta=document.createElement('div');meta.className='msg-meta'; 
       const stamp=document.createElement('span');stamp.className='msg-time'; 
@@ -1058,80 +1007,6 @@ async function sendMessage(){
     showToast('Sent securely! 🔐'); input.value='';
   } catch(e) { console.error(e); showToast('Failed to send.'); }
 }
-
-// ===== MEDIA SHARING (PHOTOS & VOICE) =====
-async function sendMediaMessage(base64Data, type) {
-  if(!activeChatId) return;
-  const myId = localStorage.getItem('zoyra_preview_id');
-  const chatId = getChatId(myId, activeChatId);
-  showToast('Encrypting media... 🔒');
-  try {
-    const friendPublicKey = await getPublicKeyFromDB(activeChatId, 5);
-    if (!friendPublicKey) { showToast('❌ Friend\'s key not found!'); return; }
-    const encryptedData = await encryptMessage(base64Data, friendPublicKey);
-    const docRef = await db.collection('chats').doc(chatId).collection('messages').add({
-      text: encryptedData, isEncrypted: true, senderId: myId, type: type, status: 'sent',
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    sentMessagesCache[docRef.id] = base64Data; 
-    saveSentCache();
-    showToast('Media sent securely! 🔐');
-  } catch(e) { console.error(e); showToast('Failed to send media.'); }
-}
-
-function handleImageUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  if (file.size > 500000) { 
-    showToast('⚠️ Image too large! Max 500KB for security.'); 
-    event.target.value = '';
-    return; 
-  }
-  const reader = new FileReader();
-  reader.onload = async (ev) => {
-    await sendMediaMessage(ev.target.result, 'image');
-    event.target.value = ''; // Reset input
-  };
-  reader.readAsDataURL(file);
-}
-
-let mediaRecorder;
-let audioChunks = [];
-let isRecording = false;
-
-function startRecording() {
-  if (isRecording) return;
-  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-    mediaRecorder = new MediaRecorder(stream);
-    audioChunks = [];
-    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-    mediaRecorder.onstop = async () => {
-      const blob = new Blob(audioChunks, { type: 'audio/webm' });
-      const reader = new FileReader();
-      reader.onload = async (ev) => {
-        await sendMediaMessage(ev.target.result, 'audio');
-      };
-      reader.readAsDataURL(blob);
-      stream.getTracks().forEach(track => track.stop());
-    };
-    mediaRecorder.start();
-    isRecording = true;
-    document.getElementById('micBtn').style.color = 'var(--danger)';
-    showToast('🔴 Recording... Release to send.');
-  }).catch(err => {
-    showToast('Microphone access denied.');
-  });
-}
-
-function stopRecording() {
-  if (!isRecording) return;
-  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-    mediaRecorder.stop();
-  }
-  isRecording = false;
-  document.getElementById('micBtn').style.color = '';
-}
-
 document.getElementById('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
 let localStream, remoteStream, peerConnection; 
@@ -1538,51 +1413,6 @@ async function shareApp() {
       showToast('Copy this link: ' + shareData.url);
     }
   }
-}
-
-function showPremiumModal() {
-  const isPremium = localStorage.getItem('zoyra_is_premium') === 'true';
-  const content = document.getElementById('premiumModalContent');
-  
-  if (isPremium) {
-    content.innerHTML = `
-      <h3 style="color:var(--gold)">👑 You are a Premium Member!</h3>
-      <p>Thank you for supporting ZOYRA. Enjoy your exclusive benefits:</p>
-      <ul class="premium-features-list">
-        <li>✅ Unlimited Key Resets</li>
-        <li>✅ Gold PRO Badge on Profile</li>
-        <li>✅ Priority Support</li>
-        <li>✅ Early Access to New Features</li>
-      </ul>
-      <button class="btn ghost full" onclick="closeModal('premiumModal')">Close</button>
-    `;
-  } else {
-    content.innerHTML = `
-      <h3 style="color:var(--gold)">👑 Upgrade to ZOYRA Premium</h3>
-      <p>Unlock the full power of privacy and support the development.</p>
-      <ul class="premium-features-list">
-        <li>✅ <strong>Unlimited</strong> Key Resets</li>
-        <li>✅ Exclusive Gold PRO Badge</li>
-        <li>✅ Priority Customer Support</li>
-        <li>✅ Early Access to New Features</li>
-      </ul>
-      <h2 style="color:var(--warn); margin:10px 0; text-align:center">₹199 / month</h2>
-      <button class="btn warn full" onclick="processPremiumUpgrade()">Upgrade Now</button>
-      <button class="btn ghost full" style="margin-top:8px" onclick="closeModal('premiumModal')">Maybe Later</button>
-    `;
-  }
-  document.getElementById('premiumModal').classList.add('show');
-}
-
-function processPremiumUpgrade() {
-  showToast('Processing secure payment...');
-  setTimeout(() => {
-    localStorage.setItem('zoyra_is_premium', 'true');
-    showToast('🎉 Welcome to ZOYRA Premium!');
-    showPremiumModal();
-    checkPremiumStatus();
-    loadProfile();
-  }, 1500);
 }
 
 function closeModal(modalId) { document.getElementById(modalId).classList.remove('show'); }
