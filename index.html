@@ -339,6 +339,10 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
       <div class="ico">ℹ️</div>
       <div><strong>View Contact</strong><small>See contact details</small></div>
     </div>
+    <div class="menu-item danger" onclick="removeCallRecord()">
+      <div class="ico">🗑️</div>
+      <div><strong>Remove</strong><small>Delete this call record</small></div>
+    </div>
     <div class="menu-item" onclick="closeModal('callActionModal')">
       <div class="ico">✕</div>
       <div><strong>Cancel</strong></div>
@@ -1030,6 +1034,10 @@ async function startCall(type = 'video') {
   try {
     showToast(`Requesting ${type === 'audio' ? 'Microphone' : 'Camera & Mic'}...`); 
     localStream = await navigator.mediaDevices.getUserMedia(type === 'audio' ? { audio: true } : { video: true, audio: true });
+    
+    // FIX 1: Audio call में video box छुपाएं
+    document.getElementById('localVideo').style.display = type === 'audio' ? 'none' : 'block';
+    
     document.getElementById('localVideo').srcObject = localStream; 
     document.getElementById('callOverlay').style.display = 'flex';
     document.getElementById('callControlsIncoming').style.display = 'none';
@@ -1166,6 +1174,9 @@ function acceptIncomingCall() {
   navigator.mediaDevices.getUserMedia(callType === 'audio' ? { audio: true } : { video: true, audio: true })
     .then(stream => {
       localStream = stream;
+      
+      // FIX 1: Audio call में video box छुपाएं
+      document.getElementById('localVideo').style.display = callType === 'audio' ? 'none' : 'block';
       document.getElementById('localVideo').srcObject = localStream;
       
       peerConnection = new RTCPeerConnection(servers);
@@ -1264,6 +1275,8 @@ function endCallUI() {
   document.getElementById('callOverlay').style.display = 'none'; 
   document.getElementById('remoteVideo').srcObject = null; 
   document.getElementById('localVideo').srcObject = null; 
+  // FIX 1: Call खत्म होने पर video box छुपाएं
+  document.getElementById('localVideo').style.display = 'none';
   document.getElementById('callTimer').textContent = '00:00'; 
   peerConnection = null; 
   localStream = null; 
@@ -1281,6 +1294,7 @@ async function saveCallHistory(userId, callType, callStatus, duration, contactId
 }
 
 let selectedCallHistory = null;
+let selectedCallDocId = null; // FIX 2: Delete के लिए doc ID
 
 function renderCallHistory() {
   const list = document.getElementById('callHistoryList');
@@ -1296,7 +1310,7 @@ function renderCallHistory() {
       const data = doc.data();
       const item = document.createElement('div'); 
       item.className = 'call-history-item';
-      item.onclick = () => showCallActionMenu(data.contactId, data.contactName, data.callType);
+      item.onclick = () => showCallActionMenu(doc.id, data.contactId, data.contactName, data.callType);
       
       const avatar = document.createElement('div'); 
       avatar.className = 'avatar'; 
@@ -1323,7 +1337,8 @@ function renderCallHistory() {
   }).catch(err => { console.error('Failed to load call history:', err); });
 }
 
-function showCallActionMenu(contactId, contactName, callType) {
+function showCallActionMenu(docId, contactId, contactName, callType) {
+  selectedCallDocId = docId; // FIX 2: Doc ID save करें
   selectedCallHistory = { contactId, contactName, callType };
   document.getElementById('callActionTitle').textContent = contactName || contactId;
   document.getElementById('callActionSubtitle').textContent = contactId;
@@ -1369,6 +1384,24 @@ function viewContactFromHistory() {
   if (!selectedCallHistory) return;
   closeModal('callActionModal');
   showToast(`Contact: ${selectedCallHistory.contactName || 'Unknown'}\nID: ${selectedCallHistory.contactId}`);
+}
+
+// FIX 2: Call record remove करने का function
+function removeCallRecord() {
+  if (!selectedCallDocId) { closeModal('callActionModal'); return; }
+  if (!confirm('Delete this call record from history?')) return;
+  
+  const myId = localStorage.getItem('zoyra_preview_id');
+  db.collection('users').doc(myId).collection('callHistory').doc(selectedCallDocId).delete()
+    .then(() => {
+      showToast('Call record deleted.');
+      closeModal('callActionModal');
+      renderCallHistory();
+    })
+    .catch(err => {
+      console.error(err);
+      showToast('Failed to delete.');
+    });
 }
 
 function showBackupOptions() {
