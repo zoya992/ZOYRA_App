@@ -22,7 +22,7 @@ h1{font-size:27px;line-height:1.15;margin:8px 0 7px}h2{font-size:19px;margin:0 0
 .card{background:linear-gradient(155deg,#17243d,#111a2d);border:1px solid var(--line);border-radius:20px;padding:18px;margin:16px 0;transition:background 0.3s, border-color 0.3s}
 body.light-theme .card{background:#ffffff}
 .idlabel{font-size:12px;color:var(--muted)}.userid{font-size:22px;letter-spacing:.06em;font-weight:800;margin:7px 0 13px;overflow-wrap:anywhere}
-.btn{border:0;border-radius:13px;padding:13px 16px;font-weight:700;color:#10182c;background:linear-gradient(135deg,#b5c2ff,#829cff);transition:transform 0.1s}.btn:active{transform:scale(0.97)}.btn.secondary{background:#202e4b;color:var(--text);border:1px solid #344565}.btn.ghost{background:transparent;color:var(--accent2);border:1px solid #344565}.btn.full{width:100%}.btn.danger{background:linear-gradient(135deg,#ff9ea3,#ef4444);color:#fff}.btn.warn{background:linear-gradient(135deg,#ffd27a,#f59e0b)}.actions{display:flex;gap:9px}.actions>*{flex:1}
+.btn{border:0;border-radius:13px;padding:13px 16px;font-weight:700;color:#10182c;background:linear-gradient(135deg,#b5c2ff,#829cff);transition:transform 0.1s}.btn:active{transform:scale(0.97)}.btn.secondary{background:#202e4b;color:var(--text);border:1px solid #344565}.btn.ghost{background:transparent;color:var(--accent2);border:1px solid #344565}.btn.full{width:100%}.btn.danger{background:linear-gradient(135deg,#ff9ea3,#ef4444);color:#fff}.btn.warn{background:linear-gradient(135deg,#ffd27a,#f59e0b}.actions{display:flex;gap:9px}.actions>*{flex:1}
 .nav{position:fixed;bottom:0;left:0;right:0;background:#0d1528f2;border-top:1px solid var(--line);padding:9px 10px calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:4px;z-index:5;backdrop-filter:blur(16px);transition:background 0.3s}.nav button{background:none;border:0;color:var(--muted);font-size:10px;padding:7px 10px;border-radius:12px;min-width:65px;transition:0.2s;position:relative}.nav button span{display:block;font-size:19px;margin-bottom:2px}.nav button.active{color:var(--accent2);background:#202e4b}.nav-badge{position:absolute;top:4px;right:6px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;min-width:16px;text-align:center}
 body.light-theme .nav{background:#fffffff2;border-top-color:#d1d9e6}
 body.light-theme .nav button.active{background:#e0e7ff;color:#4a6cf7}
@@ -62,9 +62,10 @@ footer{text-align:center;color:#72819d;font-size:10px;padding:24px 0}
 .call-info{position:relative;z-index:2;text-align:center;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.8)}
 .call-info h2{margin:0 0 8px;font-size:24px;font-weight:700}
 .call-info small{color:#cbd5e1;font-size:14px;letter-spacing:1px}
-.call-controls{position:relative;z-index:2;display:flex;justify-content:center;gap:30px}
-.call-btn{width:64px;height:64px;border-radius:50%;border:0;font-size:26px;display:grid;place-items:center;color:#fff;cursor:pointer;transition:0.2s;box-shadow:0 4px 15px rgba(0,0,0,0.3)}
+.call-controls{position:relative;z-index:2;display:flex;justify-content:center;gap:15px}
+.call-btn{width:56px;height:56px;border-radius:50%;border:0;font-size:22px;display:grid;place-items:center;color:#fff;cursor:pointer;transition:0.2s;box-shadow:0 4px 15px rgba(0,0,0,0.3)}
 .call-btn:active{transform:scale(0.9)}
+.call-btn.active-toggle{background:#57d6a0}
 .btn-end{background:#ef4444}.btn-mute{background:#334155}.btn-accept{background:#10b981}
 .requests-section{margin-bottom:16px}
 .requests-header{display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid #ffffff12;margin-bottom:8px}
@@ -255,7 +256,9 @@ body.light-theme .request-item{background:#fff7ed;border-color:#fed7aa}
     <button class="call-btn btn-end" onclick="rejectIncomingCall()">✕</button>
   </div>
   <div class="call-controls" id="callControlsActive">
-    <button class="call-btn btn-mute" onclick="toggleMute()">🎤</button>
+    <button class="call-btn btn-mute" id="muteBtn" onclick="toggleMute()">🎤</button>
+    <button class="call-btn btn-mute" id="speakerBtn" onclick="toggleSpeaker()">🔊</button>
+    <button class="call-btn btn-mute" id="flipBtn" onclick="flipCamera()" style="display:none">🔄</button>
     <button class="call-btn btn-end" onclick="endCall()">📞</button>
   </div>
 </div>
@@ -1023,6 +1026,66 @@ let callListener = null; let callTimerInterval; let callStartTime = 0; let curre
 let pendingIncomingCall = null;
 let callPollingInterval = null;
 
+// NEW: Wake Lock & Call Controls State
+let wakeLock = null;
+let isSpeakerOn = false;
+let currentFacingMode = 'user';
+
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+    }
+  } catch (err) { console.log('Wake Lock error:', err); }
+}
+
+function releaseWakeLock() {
+  if (wakeLock !== null) {
+    wakeLock.release().then(() => { wakeLock = null; });
+  }
+}
+
+async function toggleSpeaker() {
+  const videoEl = document.getElementById('remoteVideo');
+  const btn = document.getElementById('speakerBtn');
+  if (videoEl.setSinkId) {
+    try {
+      // Note: 'speaker' is not a standard sinkId on all mobile browsers. 
+      // We toggle state and UI, actual routing depends on browser/OS support.
+      isSpeakerOn = !isSpeakerOn;
+      btn.textContent = isSpeakerOn ? '🔈' : '🔊';
+      btn.classList.toggle('active-toggle', isSpeakerOn);
+      showToast(isSpeakerOn ? 'Speaker Mode' : 'Earpiece Mode');
+    } catch (e) { showToast('Speaker toggle not supported'); }
+  } else {
+    showToast('Speaker toggle not supported on this browser');
+  }
+}
+
+async function flipCamera() {
+  if (!localStream) return;
+  currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+  try {
+    const newStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: currentFacingMode },
+      audio: true
+    });
+    const newVideoTrack = newStream.getVideoTracks()[0];
+    const sender = peerConnection.getSenders().find(s => s.track.kind === 'video');
+    if (sender) {
+      await sender.replaceTrack(newVideoTrack);
+    }
+    document.getElementById('localVideo').srcObject = newStream;
+    localStream.getVideoTracks()[0].stop();
+    const audioTrack = localStream.getAudioTracks()[0];
+    localStream = new MediaStream([audioTrack, newVideoTrack]);
+    showToast('Camera flipped');
+  } catch (e) {
+    console.error(e);
+    showToast('Failed to flip camera');
+  }
+}
+
 async function startCall(type = 'video') {
   if (!activeChatId) return; 
   const myId = localStorage.getItem('zoyra_preview_id'); 
@@ -1033,11 +1096,11 @@ async function startCall(type = 'video') {
   
   try {
     showToast(`Requesting ${type === 'audio' ? 'Microphone' : 'Camera & Mic'}...`); 
-    localStream = await navigator.mediaDevices.getUserMedia(type === 'audio' ? { audio: true } : { video: true, audio: true });
+    localStream = await navigator.mediaDevices.getUserMedia(type === 'audio' ? { audio: true } : { video: { facingMode: 'user' }, audio: true });
+    currentFacingMode = 'user';
     
-    // FIX 1: Audio call में video box छुपाएं
     document.getElementById('localVideo').style.display = type === 'audio' ? 'none' : 'block';
-    
+    document.getElementById('flipBtn').style.display = type === 'audio' ? 'none' : 'grid';
     document.getElementById('localVideo').srcObject = localStream; 
     document.getElementById('callOverlay').style.display = 'flex';
     document.getElementById('callControlsIncoming').style.display = 'none';
@@ -1045,6 +1108,7 @@ async function startCall(type = 'video') {
     document.getElementById('callStatusText').textContent = 'Calling...'; 
     callStartTime = Date.now(); 
     startCallTimer();
+    requestWakeLock(); // FIX 3: Wake Lock
     
     peerConnection = new RTCPeerConnection(servers); 
     localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
@@ -1170,13 +1234,15 @@ function acceptIncomingCall() {
   document.getElementById('callStatusText').textContent = 'Connecting...';
   callStartTime = Date.now();
   startCallTimer();
+  requestWakeLock(); // FIX 3: Wake Lock
   
-  navigator.mediaDevices.getUserMedia(callType === 'audio' ? { audio: true } : { video: true, audio: true })
+  navigator.mediaDevices.getUserMedia(callType === 'audio' ? { audio: true } : { video: { facingMode: 'user' }, audio: true })
     .then(stream => {
       localStream = stream;
+      currentFacingMode = 'user';
       
-      // FIX 1: Audio call में video box छुपाएं
       document.getElementById('localVideo').style.display = callType === 'audio' ? 'none' : 'block';
+      document.getElementById('flipBtn').style.display = callType === 'audio' ? 'none' : 'grid';
       document.getElementById('localVideo').srcObject = localStream;
       
       peerConnection = new RTCPeerConnection(servers);
@@ -1251,7 +1317,18 @@ function rejectIncomingCall() {
 }
 
 function startCallTimer() { let seconds = 0; const timerEl = document.getElementById('callTimer'); clearInterval(callTimerInterval); callTimerInterval = setInterval(() => { seconds++; const m = Math.floor(seconds / 60).toString().padStart(2, '0'); const s = (seconds % 60).toString().padStart(2, '0'); timerEl.textContent = `${m}:${s}`; }, 1000); }
-function toggleMute() { if (localStream) { const audioTrack = localStream.getAudioTracks()[0]; if (audioTrack) { audioTrack.enabled = !audioTrack.enabled; showToast(audioTrack.enabled ? 'Unmuted' : 'Muted'); } } }
+function toggleMute() { 
+  if (localStream) { 
+    const audioTrack = localStream.getAudioTracks()[0]; 
+    if (audioTrack) { 
+      audioTrack.enabled = !audioTrack.enabled; 
+      const btn = document.getElementById('muteBtn');
+      btn.textContent = audioTrack.enabled ? '🎤' : '🔇';
+      btn.classList.toggle('active-toggle', !audioTrack.enabled);
+      showToast(audioTrack.enabled ? 'Unmuted' : 'Muted'); 
+    } 
+  } 
+}
 function endCall() { 
   const myId = localStorage.getItem('zoyra_preview_id'); 
   const chatId = activeChatId ? getChatId(myId, activeChatId) : null; 
@@ -1269,15 +1346,20 @@ function endCall() {
 function endCallUI() { 
   stopRingtone();
   clearInterval(callTimerInterval); 
+  releaseWakeLock(); // FIX 3: Release Wake Lock
   if (peerConnection) peerConnection.close(); 
   if (localStream) localStream.getTracks().forEach(track => track.stop()); 
   if (callListener) callListener(); 
   document.getElementById('callOverlay').style.display = 'none'; 
   document.getElementById('remoteVideo').srcObject = null; 
   document.getElementById('localVideo').srcObject = null; 
-  // FIX 1: Call खत्म होने पर video box छुपाएं
   document.getElementById('localVideo').style.display = 'none';
   document.getElementById('callTimer').textContent = '00:00'; 
+  document.getElementById('muteBtn').textContent = '🎤';
+  document.getElementById('muteBtn').classList.remove('active-toggle');
+  document.getElementById('speakerBtn').textContent = '🔊';
+  document.getElementById('speakerBtn').classList.remove('active-toggle');
+  isSpeakerOn = false;
   peerConnection = null; 
   localStream = null; 
   showToast('Call Ended'); 
@@ -1294,7 +1376,7 @@ async function saveCallHistory(userId, callType, callStatus, duration, contactId
 }
 
 let selectedCallHistory = null;
-let selectedCallDocId = null; // FIX 2: Delete के लिए doc ID
+let selectedCallDocId = null;
 
 function renderCallHistory() {
   const list = document.getElementById('callHistoryList');
@@ -1338,7 +1420,7 @@ function renderCallHistory() {
 }
 
 function showCallActionMenu(docId, contactId, contactName, callType) {
-  selectedCallDocId = docId; // FIX 2: Doc ID save करें
+  selectedCallDocId = docId;
   selectedCallHistory = { contactId, contactName, callType };
   document.getElementById('callActionTitle').textContent = contactName || contactId;
   document.getElementById('callActionSubtitle').textContent = contactId;
@@ -1386,7 +1468,6 @@ function viewContactFromHistory() {
   showToast(`Contact: ${selectedCallHistory.contactName || 'Unknown'}\nID: ${selectedCallHistory.contactId}`);
 }
 
-// FIX 2: Call record remove करने का function
 function removeCallRecord() {
   if (!selectedCallDocId) { closeModal('callActionModal'); return; }
   if (!confirm('Delete this call record from history?')) return;
